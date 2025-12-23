@@ -8,14 +8,22 @@
 {
 	"command": "npm",
 	
-	"version": "0.1.0",
-	"showOutput": "never",
-	"isShellCommand": true,
+	"version": "2.0.0",
 	
-	"tasks": [{
-		"taskName": "Build docs",
-		"isBuildCommand": true,
-		"args": ["run", "doc"],
-		"suppressTaskName": true
-	}]
+	"tasks": [
+		{
+			"label": "Build docs",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"doc"
+			],
+			"problemMatcher": [],
+			"group": {
+				"_id": "build",
+				"isDefault": false
+			}
+		}
+	]
 }

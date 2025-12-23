@@ -1,0 +1,8 @@
+{
+  "name": "fakereadline",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "Patbox <patbox4@outlook.com> (https://pb4.eu)",
+  "license": "ISC"
+}

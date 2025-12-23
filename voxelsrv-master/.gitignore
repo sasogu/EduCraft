@@ -1,0 +1,16 @@
+node_modules
+docs/textures/Base
+build
+
+
+Thumbs.db
+ehthumbs.db
+*.cab
+*.msi
+*.msm
+*.msp
+*_ignore
+$RECYCLE.BIN/
+Desktop.ini
+*~
+*~

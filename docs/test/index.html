@@ -2,37 +2,484 @@
 <html lang="en">
 
 <head>
-  <title>noa-hello-world</title>
+  <title>noa-classic</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <style type="text/css">
+    :root {
+      --ui-bg: rgba(10, 12, 18, 0.6);
+      --ui-border: rgba(255, 255, 255, 0.2);
+      --ui-highlight: #f7d37c;
+      --ui-accent: #85d6ff;
+      --slot-bg: rgba(30, 36, 50, 0.9);
+      --slot-border: rgba(255, 255, 255, 0.15);
+      --slot-active: rgba(255, 255, 255, 0.6);
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      --font-ui: "Silkscreen", "Lucida Console", "Monaco", monospace;
+    }
+
     body {
-      background-color: white;
+      background-color: #cce6ff;
       margin: 0px;
       overflow: hidden;
       -moz-user-select: none;
       -webkit-user-select: none;
       -ms-user-select: none;
+      font-family: var(--font-ui);
+      letter-spacing: 0.4px;
+      color: white;
     }
-    
+
     #reticle {
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 20px;
-      height: 20px;
-      line-height: 20px;
-      margin: -10px 0 0 -10px;
+      width: 18px;
+      height: 18px;
+      line-height: 18px;
+      margin: -9px 0 0 -9px;
       z-index: 99;
       color: white;
-      text-shadow: 1px 1px 0px black;
+      text-shadow: 1px 1px 0px #000;
       text-align: center;
+      pointer-events: none;
+    }
+
+    #hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    #status {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(7, 12, 24, 0.65), rgba(15, 20, 30, 0.3));
+      border: 1px solid var(--ui-border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      font-size: 12px;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    #status span {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    #status span:last-child {
+      margin-bottom: 0;
+      color: var(--ui-accent);
+    }
+
+    #music-status {
+      color: var(--ui-highlight);
+    }
+
+    #help {
+      position: fixed;
+      bottom: 18px;
+      left: 16px;
+      padding: 6px 10px;
+      background: var(--ui-bg);
+      border: 1px solid var(--ui-border);
+      border-radius: 6px;
+      font-size: 11px;
+      pointer-events: none;
+    }
+
+    #hotbar {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(9, 46px);
+      gap: 6px;
+      padding: 8px 10px;
+      background: linear-gradient(180deg, rgba(9, 13, 22, 0.8), rgba(2, 5, 11, 0.9));
+      border: 1px solid var(--ui-border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      pointer-events: none;
+    }
+
+    .slot {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      background: var(--slot-bg);
+      border: 1px solid var(--slot-border);
+      display: grid;
+      place-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slot.selected {
+      border-color: var(--slot-active);
+      box-shadow: 0 0 0 2px rgba(247, 211, 124, 0.6);
+    }
+
+    .slot .icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background-size: cover;
+      background-position: center;
+    }
+
+    .slot .key {
+      position: absolute;
+      bottom: 4px;
+      right: 6px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.7);
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    #inventory {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    #inventory.open {
+      display: flex;
+      pointer-events: auto;
+    }
+
+    #inventory-panel {
+      width: min(880px, 90vw);
+      background: linear-gradient(140deg, rgba(12, 16, 26, 0.95), rgba(22, 26, 34, 0.9));
+      border: 1px solid var(--ui-border);
+      border-radius: 16px;
+      padding: 18px 20px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    #inventory-title {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: var(--ui-highlight);
+      letter-spacing: 1.6px;
+    }
+
+    #inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 10px;
+    }
+
+    .inventory-item {
+      background: rgba(30, 34, 46, 0.9);
+      border: 1px solid var(--slot-border);
+      border-radius: 10px;
+      padding: 8px;
+      display: grid;
+      gap: 6px;
+      justify-items: center;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease;
+    }
+
+    .inventory-item:hover {
+      transform: translateY(-2px);
+      border-color: var(--ui-highlight);
+    }
+
+    .inventory-item .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+    }
+
+    .music-badge {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      padding: 2px 4px;
+      font-size: 9px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      color: #fff;
+      text-shadow: 1px 1px 0 #000;
+    }
+
+    .rhythm-icon {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .rhythm-icon::before {
+      content: "";
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      left: 0;
+      bottom: 0;
+      box-sizing: border-box;
+    }
+
+    .rhythm-icon::after {
+      content: "";
+      position: absolute;
+      width: 2px;
+      height: 12px;
+      background: #fff;
+      right: 0;
+      top: 0;
+    }
+
+    .rhythm-quarter::before {
+      background: #fff;
+    }
+
+    .rhythm-eighth::before {
+      background: #fff;
+    }
+
+    .rhythm-eighth::after {
+      height: 12px;
+    }
+
+    .rhythm-eighth .flag {
+      position: absolute;
+      right: -2px;
+      top: 0;
+      width: 6px;
+      height: 6px;
+      border-top: 2px solid #fff;
+      border-right: 2px solid #fff;
+      transform: skewY(-20deg);
+    }
+
+    .rhythm-half::before {
+      background: transparent;
+    }
+
+    .rhythm-rest {
+      position: absolute;
+      bottom: 6px;
+      left: 2px;
+      width: 10px;
+      height: 4px;
+      background: #fff;
+    }
+
+    .icon {
+      position: relative;
+    }
+
+    #inventory-hint {
+      margin-top: 12px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    #classroom {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 260px;
+      padding: 12px 12px 10px;
+      background: linear-gradient(160deg, rgba(12, 16, 26, 0.92), rgba(22, 26, 34, 0.92));
+      border: 1px solid var(--ui-border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      z-index: 95;
+      font-size: 11px;
+      display: none;
+      pointer-events: auto;
+    }
+
+    #classroom.open {
+      display: block;
+    }
+
+    #classroom h3 {
+      margin: 0 0 8px 0;
+      font-size: 12px;
+      letter-spacing: 1.2px;
+      color: var(--ui-highlight);
+      text-transform: uppercase;
+    }
+
+    #classroom .row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    #classroom .label {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #classroom .value {
+      color: #fff;
+    }
+
+    #classroom-seq {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 8px 0 10px;
+    }
+
+    .seq-chip {
+      padding: 4px 6px;
+      border-radius: 6px;
+      background: rgba(40, 50, 70, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .seq-chip.active {
+      border-color: var(--ui-accent);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(133, 214, 255, 0.5);
+    }
+
+    #classroom-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .classroom-btn {
+      padding: 6px 8px;
+      font-size: 11px;
+      font-family: var(--font-ui);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(35, 45, 70, 0.8);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .classroom-btn.secondary {
+      background: rgba(20, 28, 45, 0.8);
+    }
+
+    #classroom-status {
+      margin-top: 6px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #music-feedback {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      background: rgba(15, 18, 28, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 10px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 80;
+      pointer-events: none;
+    }
+
+    #music-feedback.active {
+      opacity: 1;
+    }
+
+    #audio-hint {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 6px 10px;
+      background: rgba(10, 12, 18, 0.7);
+      border: 1px solid var(--ui-border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      z-index: 90;
+      pointer-events: none;
+      display: none;
+    }
+
+    #music-pulse {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(133, 214, 255, 0.2), rgba(0, 0, 0, 0));
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 70;
+      pointer-events: none;
+    }
+
+    #music-pulse.active {
+      opacity: 1;
     }
   </style>
 </head>
 
 <body>
-  <div id="reticle">+</div>
+  <div id="hud">
+    <div id="reticle">+</div>
+    <div id="status">
+      <span id="block-name">Bloque: --</span>
+      <span id="player-pos">Pos: --</span>
+      <span id="mode-status">Modo: --</span>
+      <span id="music-status">Musica: --</span>
+    </div>
+    <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · Space/Ctrl Subir/Bajar</div>
+    <div id="hotbar"></div>
+  </div>
+  <div id="music-pulse"></div>
+  <div id="music-feedback">---</div>
+  <div id="audio-hint">Click o tecla para activar audio</div>
+  <div id="classroom">
+    <h3>Modo aula</h3>
+    <div class="row">
+      <span class="label">Nivel</span>
+      <span class="value" id="classroom-level">--</span>
+    </div>
+    <div class="row">
+      <span class="label">Puntuacion</span>
+      <span class="value" id="classroom-score">0</span>
+    </div>
+    <div class="row">
+      <span class="label">Progreso</span>
+      <span class="value" id="classroom-progress">0/0</span>
+    </div>
+    <div id="classroom-seq"></div>
+    <div id="classroom-actions">
+      <button class="classroom-btn" id="classroom-start" type="button">Empezar</button>
+      <button class="classroom-btn secondary" id="classroom-play" type="button">Repetir</button>
+      <button class="classroom-btn secondary" id="classroom-reset" type="button">Reiniciar</button>
+      <button class="classroom-btn secondary" id="classroom-toggle" type="button">Ocultar</button>
+    </div>
+    <div id="classroom-status">Pulsa Empezar para iniciar el reto.</div>
+  </div>
+  <div id="inventory">
+    <div id="inventory-panel">
+      <div id="inventory-title">Inventario</div>
+      <div id="inventory-grid"></div>
+      <div id="inventory-hint">Click para seleccionar. E para cerrar.</div>
+    </div>
+  </div>
   <script type="text/javascript" src="babylon.js"></script>
   <script type="text/javascript" src="bundle.js"></script>
 </body>
