@@ -628,6 +628,8 @@ var ui = {
 	classroomPlay: document.getElementById('classroom-play'),
 	classroomReset: document.getElementById('classroom-reset'),
 	classroomToggle: document.getElementById('classroom-toggle'),
+	classroomDifficulty: document.getElementById('classroom-difficulty'),
+	classroomWorldName: document.getElementById('classroom-world-name'),
 	challengeBanner: document.getElementById('challenge-banner'),
 }
 
@@ -654,15 +656,16 @@ var classroom = {
 	playing: false,
 	allowInput: false,
 	timeouts: [],
+	challengeIndex: 0,
+}
+var classroomConfig = {
+	selectedDifficulty: 0,
 }
 
 var classroomLevels = [
-	{ name: 'Eco 1', length: 3, notes: ['Do4', 'Re4', 'Mi4'], rhythms: ['Negra'], allowRest: false },
-	{ name: 'Eco 2', length: 4, notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4'], rhythms: ['Negra'], allowRest: false },
-	{ name: 'Eco 3', length: 5, notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4'], rhythms: ['Negra', 'Blanca'], allowRest: false },
-	{ name: 'Eco 4', length: 6, notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4', 'La4', 'Si4'], rhythms: ['Negra', 'Corchea'], allowRest: false },
-	{ name: 'Eco 5', length: 7, notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4', 'La4', 'Si4', 'Do5'], rhythms: ['Negra', 'Corchea'], allowRest: true },
-	{ name: 'Eco 6', length: 8, notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4', 'La4', 'Si4', 'Do5', 'Re5'], rhythms: ['Blanca', 'Negra', 'Corchea'], allowRest: true },
+	{ name: 'Nivel 1', lengths: [2, 2], notes: ['Do4', 'Re4', 'Mi4'], rhythms: ['Negra'], allowRest: false },
+	{ name: 'Nivel 2', lengths: [3, 4], notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4'], rhythms: ['Negra'], allowRest: false },
+	{ name: 'Nivel 3', lengths: [5, 6], notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4', 'La4', 'Si4', 'Do5', 'Re5'], rhythms: ['Blanca', 'Negra', 'Corchea'], allowRest: true },
 ]
 
 var worldName = getWorldName()
@@ -681,11 +684,26 @@ function setupClassroom() {
 	if (ui.classroomToggle) ui.classroomToggle.addEventListener('click', function () {
 		toggleClassroom(false)
 	})
+	if (ui.classroomDifficulty) {
+		ui.classroomDifficulty.addEventListener('change', function (event) {
+			setClassroomDifficulty(parseInt(event.target.value, 10))
+			updateClassroomUI()
+			scheduleSaveSettings()
+		})
+	}
+	setClassroomDifficulty(classroomConfig.selectedDifficulty)
 	if (ui.challengeBanner) {
 		ui.challengeBanner.addEventListener('click', function () {
 			hideChallengeBanner()
 		})
 	}
+}
+
+function setClassroomDifficulty(index) {
+	if (Number.isNaN(index)) return
+	var clamped = Math.max(0, Math.min(classroomLevels.length - 1, index))
+	classroomConfig.selectedDifficulty = clamped
+	if (ui.classroomDifficulty) ui.classroomDifficulty.value = String(clamped)
 }
 
 function toggleClassroom(force) {
@@ -737,6 +755,7 @@ function toggleWorldMenu(open) {
 
 function updateWorldDisplay() {
 	if (ui.worldCurrentName) ui.worldCurrentName.textContent = worldName
+	if (ui.classroomWorldName) ui.classroomWorldName.textContent = worldName
 }
 
 function refreshWorldList() {
@@ -834,6 +853,7 @@ function initLocalState() {
 			setCreativeMode(creativeMode)
 			setupClassroom()
 			setupWorldMenu()
+			updateClassroomUI()
 			toggleClassroom(settingsClassroomOpen())
 			applySavedEdits()
 			storage.touchWorld(worldName)
@@ -845,6 +865,7 @@ function initLocalState() {
 			setCreativeMode(creativeMode)
 			setupClassroom()
 			setupWorldMenu()
+			updateClassroomUI()
 			toggleClassroom(true)
 			storage.touchWorld(worldName)
 		})
@@ -866,6 +887,9 @@ function applySettings(settings) {
 	if (typeof settings.classroomOpen === 'boolean') {
 		classroom._open = settings.classroomOpen
 	}
+	if (typeof settings.classroomDifficulty === 'number') {
+		setClassroomDifficulty(settings.classroomDifficulty)
+	}
 }
 
 function settingsClassroomOpen() {
@@ -878,7 +902,8 @@ function collectSettings() {
 		hotbar: hotbarSlots.map(function (slot) { return slot.id }),
 		selectedIndex: selectedIndex,
 		creativeMode: creativeMode,
-		classroomOpen: ui.classroom.classList.contains('open')
+		classroomOpen: ui.classroom.classList.contains('open'),
+		classroomDifficulty: classroomConfig.selectedDifficulty
 	}
 }
 
@@ -1094,9 +1119,10 @@ function getDefaultHotbar() {
 
 function startClassroom() {
 	classroom.enabled = true
-	classroom.levelIndex = 0
+	classroom.levelIndex = classroomConfig.selectedDifficulty || 0
 	classroom.score = 0
 	classroom.inputIndex = 0
+	classroom.challengeIndex = 0
 	setLevel(classroom.levelIndex)
 	updateClassroomUI()
 	setClassroomStatus('Escucha la secuencia y repitela.')
@@ -1109,6 +1135,7 @@ function resetClassroom() {
 	classroom.score = 0
 	classroom.sequence = []
 	classroom.inputIndex = 0
+	classroom.challengeIndex = 0
 	classroom.playing = false
 	classroom.allowInput = false
 	clearClassroomTimers()
@@ -1118,19 +1145,28 @@ function resetClassroom() {
 
 function setLevel(index) {
 	classroom.levelIndex = index
-	classroom.sequence = buildSequence(classroomLevels[index])
+	classroom.sequence = buildSequence(classroomLevels[index], classroom.challengeIndex)
 	classroom.inputIndex = 0
 	updateClassroomUI()
 }
 
-function buildSequence(level) {
+function buildSequence(level, challengeIndex) {
 	var pool = buildPool(level)
 	var sequence = []
-	for (var i = 0; i < level.length; i++) {
+	var length = getSequenceLength(level, challengeIndex)
+	for (var i = 0; i < length; i++) {
 		var pick = pool[Math.floor(Math.random() * pool.length)]
 		sequence.push(pick)
 	}
 	return sequence
+}
+
+function getSequenceLength(level, challengeIndex) {
+	if (Array.isArray(level.lengths) && level.lengths.length) {
+		var idx = Math.max(0, Math.min(level.lengths.length - 1, challengeIndex || 0))
+		return level.lengths[idx]
+	}
+	return 2
 }
 
 function buildPool(level) {
@@ -1215,7 +1251,7 @@ function recordClassroomInput(blockId) {
 		updateClassroomUI()
 		if (classroom.inputIndex >= classroom.sequence.length) {
 			classroom.score += 10
-			setClassroomStatus('Bien! Siguiente nivel...')
+			setClassroomStatus('Bien! Siguiente reto...')
 			advanceLevel()
 		}
 	} else {
@@ -1227,7 +1263,9 @@ function recordClassroomInput(blockId) {
 
 function advanceLevel() {
 	classroom.allowInput = false
-	if (classroom.levelIndex + 1 >= classroomLevels.length) {
+	var level = classroomLevels[classroom.levelIndex]
+	var maxChallenges = (level && level.lengths) ? level.lengths.length : 1
+	if (classroom.challengeIndex + 1 >= maxChallenges) {
 		var unlocked = unlockBlockByName('Valla')
 		if (unlocked && !rewardPlaced) {
 			placeFenceRewardNearPlayer()
@@ -1239,7 +1277,7 @@ function advanceLevel() {
 		classroom.enabled = false
 		return
 	}
-	classroom.levelIndex += 1
+	classroom.challengeIndex += 1
 	setLevel(classroom.levelIndex)
 	setTimeout(function () {
 		playSequence()
@@ -1248,7 +1286,12 @@ function advanceLevel() {
 
 function updateClassroomUI() {
 	if (!ui.classroomLevel) return
-	var levelLabel = classroom.levelIndex >= 0 ? classroomLevels[classroom.levelIndex].name : '--'
+	var levelLabel = '--'
+	if (classroom.levelIndex >= 0) {
+		levelLabel = classroomLevels[classroom.levelIndex].name
+	} else if (classroomLevels[classroomConfig.selectedDifficulty]) {
+		levelLabel = classroomLevels[classroomConfig.selectedDifficulty].name
+	}
 	ui.classroomLevel.textContent = levelLabel
 	ui.classroomScore.textContent = String(classroom.score)
 	ui.classroomProgress.textContent = classroom.inputIndex + '/' + classroom.sequence.length
