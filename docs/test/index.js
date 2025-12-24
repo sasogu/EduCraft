@@ -8,6 +8,7 @@ var highlightScale = 1.0
 var lastValidPos = null
 var islandAnimal = null
 var playerNameCurrent = null
+var localPlayerNametag = null
 
 
 /**
@@ -202,11 +203,17 @@ function setupMultiplayer(noa, scene) {
 			entry = {
 				eid: eid,
 				mesh: mesh,
+				nametag: createNametag(mesh, player.name || 'Player', size.height, scene),
+				name: player.name || 'Player',
 				last: { x: player.x, y: player.y, z: player.z },
 				target: { x: player.x, y: player.y, z: player.z },
 				lastUpdate: Date.now(),
 			}
 			remotePlayers[player.id] = entry
+		}
+		if (player.name && entry.name !== player.name) {
+			entry.name = player.name
+			updateNametag(entry.nametag, player.name)
 		}
 		entry.last = { x: entry.target.x, y: entry.target.y, z: entry.target.z }
 		entry.target = { x: player.x, y: player.y, z: player.z }
@@ -216,6 +223,7 @@ function setupMultiplayer(noa, scene) {
 	function removeRemotePlayer(id) {
 		var entry = remotePlayers[id]
 		if (!entry) return
+		if (entry.nametag) entry.nametag.dispose()
 		noa.entities.deleteEntity(entry.eid, true)
 		delete remotePlayers[id]
 	}
@@ -305,12 +313,50 @@ function sanitizePlayerName(name) {
 	return cleaned.toUpperCase()
 }
 
+function createNametag(parent, name, height, scene) {
+	var fontSize = 64
+	var font = "bold " + fontSize + "px 'Silkscreen'"
+	var planeHeight = 0.28
+	var temp = new BABYLON.DynamicTexture('nametag-tmp', 64, scene, false)
+	var ctx = temp.getContext()
+	ctx.font = font
+	var textWidth = ctx.measureText(name).width + 12
+	temp.dispose()
+
+	var planeWidth = (planeHeight / (1.5 * fontSize)) * textWidth
+	var texture = new BABYLON.DynamicTexture('nametag', { width: textWidth, height: fontSize * 1.5 }, scene, false)
+	var mat = noa.rendering.makeStandardMaterial('nametag-mat-' + name)
+	mat.diffuseTexture = texture
+	mat.emissiveTexture = mat.diffuseTexture
+	mat.opacityTexture = mat.diffuseTexture
+	mat.diffuseTexture.hasAlpha = true
+	mat.specularColor = new BABYLON.Color3(0, 0, 0)
+	texture.drawText(name, null, null, font, '#ffffff', '#00000088', true)
+
+	var plane = BABYLON.MeshBuilder.CreatePlane('nametag-plane', { width: planeWidth, height: planeHeight }, scene)
+	plane.material = mat
+	plane.isPickable = false
+	plane.setParent(parent)
+	plane.position.y = height + 0.2
+	return plane
+}
+
+function updateNametag(plane, name) {
+	if (!plane || !plane.material || !plane.material.diffuseTexture) return
+	var texture = plane.material.diffuseTexture
+	texture.clear()
+	var fontSize = texture.getSize().height / 1.5
+	var font = "bold " + fontSize + "px 'Silkscreen'"
+	texture.drawText(name, null, null, font, '#ffffff', '#00000088', true)
+}
+
 function setPlayerName(name) {
 	var cleaned = sanitizePlayerName(name)
 	if (!cleaned) return false
 	playerNameCurrent = cleaned
 	localStorage.setItem('educraft-player-name', cleaned)
 	updatePlayerPanel()
+	if (localPlayerNametag) updateNametag(localPlayerNametag, cleaned)
 	if (multiplayer && multiplayer.setName) multiplayer.setName(cleaned)
 	return true
 }
@@ -534,6 +580,8 @@ playerMesh.scaling.y = h
 
 // offset of mesh relative to the entity's "position" (center of its feet)
 var offset = [0, h / 2, 0]
+
+localPlayerNametag = createNametag(playerMesh, getPlayerName(), h, scene)
 
 // a "mesh" component to the player entity
 noa.entities.addComponent(eid, noa.entities.names.mesh, {
