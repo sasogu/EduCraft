@@ -32,7 +32,8 @@ module.exports = function createRegistry(noa, scene) {
 	var leavesID = noa.registry.registerBlock(idCounter++, { material: 'leaves', opaque: false })
 	var glassID = noa.registry.registerBlock(idCounter++, { material: 'glass', opaque: false })
 	var waterID = noa.registry.registerBlock(idCounter++, { material: 'water', fluid: true, opaque: false })
-	var fenceID = noa.registry.registerBlock(idCounter++, { material: 'plank', opaque: false })
+	var fenceMesh = createFenceMesh('fence', textureAssets.plank.texture)
+	var fenceID = noa.registry.registerBlock(idCounter++, { blockMesh: fenceMesh, solid: true, opaque: false })
 	var dandelionID = registerPlantBlock('Diente de leon', textureAssets.dandelion, idCounter++)
 	var poppyID = registerPlantBlock('Amapola', textureAssets.poppy, idCounter++)
 
@@ -108,6 +109,40 @@ module.exports = function createRegistry(noa, scene) {
 		planeB.rotation.x = Math.PI
 		planeB.rotation.y = Math.PI / 2
 		var merged = BABYLON.Mesh.MergeMeshes([planeA, planeB], true, true, undefined, false, true)
+		merged.material = mat
+		merged.isVisible = false
+		return merged
+	}
+
+	function createFenceMesh(name, texture) {
+		var mat = noa.rendering.flatMaterial.clone(name + '-mat')
+		mat.diffuseTexture = texture
+		mat.specularColor = new BABYLON.Color3(0, 0, 0)
+
+		var postA = BABYLON.MeshBuilder.CreateBox(name + '-post-a', { width: 0.2, height: 1, depth: 0.2 }, scene)
+		var postB = BABYLON.MeshBuilder.CreateBox(name + '-post-b', { width: 0.2, height: 1, depth: 0.2 }, scene)
+		var railLow = BABYLON.MeshBuilder.CreateBox(name + '-rail-low', { width: 1, height: 0.15, depth: 0.2 }, scene)
+		var railHigh = BABYLON.MeshBuilder.CreateBox(name + '-rail-high', { width: 1, height: 0.15, depth: 0.2 }, scene)
+		var railLowZ = BABYLON.MeshBuilder.CreateBox(name + '-rail-low-z', { width: 0.2, height: 0.15, depth: 1 }, scene)
+		var railHighZ = BABYLON.MeshBuilder.CreateBox(name + '-rail-high-z', { width: 0.2, height: 0.15, depth: 1 }, scene)
+
+		postA.material = mat
+		postB.material = mat
+		railLow.material = mat
+		railHigh.material = mat
+		railLowZ.material = mat
+		railHighZ.material = mat
+
+		postA.position.x = -0.4
+		postA.position.y = 0.5
+		postB.position.x = 0.4
+		postB.position.y = 0.5
+		railLow.position.y = 0.4
+		railHigh.position.y = 0.7
+		railLowZ.position.y = 0.4
+		railHighZ.position.y = 0.7
+
+		var merged = BABYLON.Mesh.MergeMeshes([postA, postB, railLow, railHigh, railLowZ, railHighZ], true, true, undefined, false, true)
 		merged.material = mat
 		merged.isVisible = false
 		return merged

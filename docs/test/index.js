@@ -31,6 +31,7 @@ var opts = {
 	playerWidth: 0.6,
 	playerAutoStep: false,
 	useAO: false,
+	dragCameraOutsidePointerLock: false,
 }
 
 
@@ -570,11 +571,69 @@ function applyBlockEdit(blockId, position) {
 	}
 }
 
+function playBreakSound() {
+	var sound = breakSoundPool[breakSoundIndex]
+	if (!sound) {
+		sound = new Audio('audio/random/break.ogg')
+		sound.volume = 0.4
+		breakSoundPool[breakSoundIndex] = sound
+	}
+	breakSoundIndex = (breakSoundIndex + 1) % 4
+	try {
+		sound.currentTime = 0
+		sound.play()
+	} catch (err) {
+		// ignore playback errors
+	}
+}
+
+function registerStepSoundSet(name, files) {
+	stepSoundSets[name] = {
+		files: files,
+		pool: [],
+		index: 0,
+	}
+}
+
+function playStepSoundFor(blockId) {
+	var setName = getStepSoundName(blockId)
+	if (!setName) return
+	var set = stepSoundSets[setName]
+	if (!set) return
+	var file = set.files[set.index % set.files.length]
+	var sound = set.pool[set.index % set.files.length]
+	if (!sound) {
+		sound = new Audio(file)
+		sound.volume = 0.28
+		set.pool[set.index % set.files.length] = sound
+	}
+	set.index = (set.index + 1) % set.files.length
+	try {
+		sound.currentTime = 0
+		sound.play()
+	} catch (err) {
+		// ignore playback errors
+	}
+}
+
+function getStepSoundName(blockId) {
+	if (!blockId) return null
+	if (blockId === sandID) return 'sand'
+	if (blockId === gravelID) return 'gravel'
+	if (blockId === snowID) return 'snow'
+	if (blockId === leavesID) return 'leaves'
+	if (blockId === woodID || blockId === plankID || blockId === fenceID) return 'wood'
+	if (blockId === stoneID || blockId === brickID) return 'stone'
+	if (blockId === grassID || blockId === dirtID) return 'grass'
+	return 'stone'
+}
+
 
 // on left mouse, set targeted block to be air
 noa.inputs.down.on('fire', function () {
 	if (noa.targetedBlock) {
 		playMusicBlock(noa.targetedBlock.blockID)
+		if (noa.targetedBlock.blockID) playBreakSound()
 		applyBlockEdit(0, noa.targetedBlock.position)
 	}
 })
@@ -644,6 +703,10 @@ var musicFeedbackTimer = null
 var musicPulseTimer = null
 var audioState = { ctx: null }
 var audioReady = false
+var breakSoundPool = []
+var breakSoundIndex = 0
+var stepSoundCooldown = 0
+var stepSoundSets = {}
 var lastStepBlockId = null
 var lastStepTime = 0
 var rewardPlaced = false
@@ -1465,6 +1528,7 @@ noa.on('tick', function (dt) {
 	scrollCooldown -= dt
 	statusCooldown -= dt
 	lastStepTime -= dt
+	stepSoundCooldown -= dt
 	if (multiplayer) multiplayer.tick(dt)
 	updateIslandAnimal(dt)
 
@@ -1528,6 +1592,15 @@ noa.on('tick', function (dt) {
 	}
 	lastStepBlockId = blockUnder
 
+	if (!musicBlocks[blockUnder] && blockUnder && stepSoundCooldown <= 0) {
+		var vel = noa.playerBody.velocity
+		var speed = Math.sqrt(vel[0] * vel[0] + vel[2] * vel[2])
+		if (noa.playerBody.onGround && speed > 0.02) {
+			playStepSoundFor(blockUnder)
+			stepSoundCooldown = 220
+		}
+	}
+
 	if (creativeMode && allowFlight) {
 		var body = noa.playerBody
 		var flySpeed = noa.inputs.state.sprint ? 12 : 6
@@ -1589,6 +1662,14 @@ function setCreativeMode(enabled) {
 	scheduleSaveSettings()
 }
 
+registerStepSoundSet('grass', ['audio/step/grass1.ogg', 'audio/step/grass2.ogg', 'audio/step/grass3.ogg'])
+registerStepSoundSet('sand', ['audio/step/sand1.ogg', 'audio/step/sand2.ogg', 'audio/step/sand3.ogg'])
+registerStepSoundSet('stone', ['audio/step/stone1.ogg', 'audio/step/stone2.ogg', 'audio/step/stone3.ogg'])
+registerStepSoundSet('gravel', ['audio/step/gravel1.ogg', 'audio/step/gravel2.ogg'])
+registerStepSoundSet('snow', ['audio/step/snow1.ogg', 'audio/step/snow2.ogg'])
+registerStepSoundSet('wood', ['audio/step/wood1.ogg', 'audio/step/wood2.ogg'])
+registerStepSoundSet('leaves', ['audio/step/leaves1.ogg', 'audio/step/leaves2.ogg'])
+
 function updateIslandAnimal(dt) {
 	if (!islandAnimal) return
 	islandAnimal.time += dt
@@ -1637,6 +1718,12 @@ function updateIslandAnimal(dt) {
 	}
 	var y = pos[1]
 	var groundY = getGroundY(x, z, y)
+	if (isAnimalBlockedAt(x, z, y, groundY)) {
+		islandAnimal.targetX = null
+		islandAnimal.targetZ = null
+		islandAnimal.nextTargetTime = islandAnimal.time
+		return
+	}
 
 	if (islandAnimal.grounded) {
 		if (groundY === null || groundY < y - 0.01) {
@@ -1668,6 +1755,21 @@ function updateIslandAnimal(dt) {
 			leg.rotation.x = phase * 0.35
 		}
 	}
+}
+
+function isAnimalBlockedAt(x, z, feetY, groundY) {
+	var xi = Math.floor(x)
+	var zi = Math.floor(z)
+	var footBlock = Math.floor(feetY)
+	if (isFenceBlockAt(xi, footBlock, zi) || isFenceBlockAt(xi, footBlock + 1, zi)) return true
+	if (noa.registry.getBlockSolidity(noa.getBlock(xi, footBlock, zi))) return true
+	if (noa.registry.getBlockSolidity(noa.getBlock(xi, footBlock + 1, zi))) return true
+	if (groundY !== null && groundY - feetY > 1.2) return true
+	return false
+}
+
+function isFenceBlockAt(x, y, z) {
+	return noa.getBlock(x, y, z) === fenceID
 }
 
 function getGroundY(x, z, startY) {
