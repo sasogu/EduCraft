@@ -103,6 +103,68 @@
       pointer-events: auto;
     }
 
+    #player-panel {
+      position: fixed;
+      top: 78px;
+      right: 16px;
+      width: 200px;
+      padding: 8px 10px;
+      background: linear-gradient(160deg, rgba(12, 16, 26, 0.92), rgba(22, 26, 34, 0.92));
+      border: 1px solid var(--ui-border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      font-size: 11px;
+      pointer-events: auto;
+      z-index: 60;
+    }
+
+    #player-panel .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    #player-panel .label {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    #player-panel .name-input {
+      width: 64px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(18, 24, 38, 0.9);
+      color: #fff;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    #player-panel .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+
+    #player-panel .btn {
+      padding: 4px 8px;
+      font-size: 11px;
+      font-family: var(--font-ui);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(35, 45, 70, 0.8);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    #player-panel .current {
+      margin-top: 6px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
     #world-current {
       padding: 6px 10px;
       background: linear-gradient(135deg, rgba(7, 12, 24, 0.65), rgba(15, 20, 30, 0.3));
@@ -675,6 +737,16 @@
     <div id="world-ui">
       <div id="world-current">Mundo: <span id="world-current-name">--</span></div>
       <button id="world-open" type="button">Mundos</button>
+    </div>
+    <div id="player-panel">
+      <div class="row">
+        <span class="label">Nick</span>
+        <input class="name-input" id="player-name-input" maxlength="3" placeholder="ABC">
+      </div>
+      <div class="actions">
+        <button class="btn" id="player-name-save" type="button">Guardar</button>
+      </div>
+      <div class="current">Actual: <span id="player-name-current">---</span></div>
     </div>
     <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · L Mundos · Space/Ctrl Subir/Bajar</div>
     <div id="hotbar"></div>

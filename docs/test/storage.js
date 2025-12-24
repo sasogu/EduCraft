@@ -1,5 +1,5 @@
 
-import Dexie from 'dexie';
+const Dexie = require('dexie');
 
 var db = new Dexie('educraft-storage')
 db.version(1).stores({
@@ -49,7 +49,7 @@ function createWorld(name) {
 	})
 }
 
-export {
+module.exports = {
 	getSettings,
 	saveSettings,
 	getWorldEdits,

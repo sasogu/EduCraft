@@ -7,6 +7,7 @@ var defaultFov = 0.8
 var highlightScale = 1.0
 var lastValidPos = null
 var islandAnimal = null
+var playerNameCurrent = null
 
 
 /**
@@ -93,7 +94,7 @@ noa.blockTargetIdCheck = function (id) {
 function setupMultiplayer(noa, scene) {
 	var params = new URLSearchParams(window.location.search)
 	var serverUrl = params.get('server')
-	var playerName = params.get('name') || params.get('player')
+	var playerName = getPlayerName()
 	var proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
 	if (!serverUrl) serverUrl = proto + '://' + window.location.host + '/ws'
 
@@ -184,6 +185,14 @@ function setupMultiplayer(noa, scene) {
 		})
 	}
 
+	function setName(name) {
+		playerName = sanitizePlayerName(name)
+		if (!playerName) return
+		if (socket && socket.readyState === WebSocket.OPEN) {
+			send({ type: 'hello', v: 1, name: playerName })
+		}
+	}
+
 	function upsertRemotePlayer(player) {
 		var entry = remotePlayers[player.id]
 		if (!entry) {
@@ -263,7 +272,73 @@ function setupMultiplayer(noa, scene) {
 
 	connect()
 
-	return { tick: tick, updateRemotes: updateRemotes }
+	return { tick: tick, updateRemotes: updateRemotes, setName: setName }
+}
+
+function getPlayerName() {
+	var fromParams = getPlayerNameFromParams()
+	if (fromParams) {
+		playerNameCurrent = fromParams
+		localStorage.setItem('educraft-player-name', fromParams)
+		return fromParams
+	}
+	var stored = sanitizePlayerName(localStorage.getItem('educraft-player-name') || '')
+	if (stored) {
+		playerNameCurrent = stored
+		return stored
+	}
+	var fallback = 'P' + Math.floor(Math.random() * 900 + 100)
+	playerNameCurrent = fallback
+	localStorage.setItem('educraft-player-name', fallback)
+	return fallback
+}
+
+function getPlayerNameFromParams() {
+	var params = new URLSearchParams(window.location.search)
+	return sanitizePlayerName(params.get('name') || params.get('player') || '')
+}
+
+function sanitizePlayerName(name) {
+	if (!name) return ''
+	var cleaned = name.trim().replace(/\s+/g, '')
+	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3)
+	return cleaned.toUpperCase()
+}
+
+function setPlayerName(name) {
+	var cleaned = sanitizePlayerName(name)
+	if (!cleaned) return false
+	playerNameCurrent = cleaned
+	localStorage.setItem('educraft-player-name', cleaned)
+	updatePlayerPanel()
+	if (multiplayer && multiplayer.setName) multiplayer.setName(cleaned)
+	return true
+}
+
+function setupPlayerPanel() {
+	if (!ui.playerNameInput) return
+	ui.playerNameInput.value = playerNameCurrent || ''
+	updatePlayerPanel()
+	if (ui.playerNameSave) {
+		ui.playerNameSave.addEventListener('click', function () {
+			var next = ui.playerNameInput.value || ''
+			if (!setPlayerName(next)) return
+		})
+	}
+	ui.playerNameInput.addEventListener('keydown', function (event) {
+		if (event.key === 'Enter') {
+			setPlayerName(ui.playerNameInput.value || '')
+		}
+	})
+}
+
+function updatePlayerPanel() {
+	if (ui.playerNameInput) {
+		ui.playerNameInput.value = playerNameCurrent || ''
+	}
+	if (ui.playerNameCurrent) {
+		ui.playerNameCurrent.textContent = playerNameCurrent || '--'
+	}
 }
 
 function setupInputFocus(noa) {
@@ -671,6 +746,9 @@ var ui = {
 	audioHint: document.getElementById('audio-hint'),
 	worldCurrentName: document.getElementById('world-current-name'),
 	worldOpen: document.getElementById('world-open'),
+	playerNameInput: document.getElementById('player-name-input'),
+	playerNameSave: document.getElementById('player-name-save'),
+	playerNameCurrent: document.getElementById('player-name-current'),
 	worlds: document.getElementById('worlds'),
 	worldsList: document.getElementById('worlds-list'),
 	worldsError: document.getElementById('worlds-error'),
@@ -916,6 +994,7 @@ function initLocalState() {
 			setCreativeMode(creativeMode)
 			setupClassroom()
 			setupWorldMenu()
+			setupPlayerPanel()
 			updateClassroomUI()
 			toggleClassroom(settingsClassroomOpen())
 			applySavedEdits()
@@ -928,6 +1007,7 @@ function initLocalState() {
 			setCreativeMode(creativeMode)
 			setupClassroom()
 			setupWorldMenu()
+			setupPlayerPanel()
 			updateClassroomUI()
 			toggleClassroom(true)
 			storage.touchWorld(worldName)
