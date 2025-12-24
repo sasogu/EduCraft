@@ -6,6 +6,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <style type="text/css">
+    @font-face {
+      font-family: "Silkscreen";
+      src: url("fonts/silkscreen.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Silkscreen";
+      src: url("fonts/silkscreen-bold.ttf") format("truetype");
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
     :root {
       --ui-bg: rgba(10, 12, 18, 0.6);
       --ui-border: rgba(255, 255, 255, 0.2);
@@ -74,6 +90,46 @@
     #status span:last-child {
       margin-bottom: 0;
       color: var(--ui-accent);
+    }
+
+    #world-ui {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: grid;
+      gap: 8px;
+      justify-items: end;
+      z-index: 60;
+      pointer-events: auto;
+    }
+
+    #world-current {
+      padding: 6px 10px;
+      background: linear-gradient(135deg, rgba(7, 12, 24, 0.65), rgba(15, 20, 30, 0.3));
+      border: 1px solid var(--ui-border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    #world-open {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--ui-border);
+      background: rgba(9, 13, 22, 0.9);
+      color: white;
+      cursor: pointer;
+    }
+
+    #world-open:hover {
+      border-color: var(--ui-highlight);
+      color: var(--ui-highlight);
     }
 
     #music-status {
@@ -156,6 +212,128 @@
     #inventory.open {
       display: flex;
       pointer-events: auto;
+    }
+
+    #worlds {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 12, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 110;
+    }
+
+    #worlds.open {
+      display: flex;
+      pointer-events: auto;
+    }
+
+    #worlds-panel {
+      width: min(640px, 90vw);
+      background: linear-gradient(140deg, rgba(12, 16, 26, 0.96), rgba(22, 26, 34, 0.92));
+      border: 1px solid var(--ui-border);
+      border-radius: 16px;
+      padding: 18px 20px 16px;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    #worlds-title {
+      font-size: 14px;
+      color: var(--ui-highlight);
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+
+    #worlds-create {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    #world-name-input {
+      background: rgba(20, 24, 34, 0.9);
+      border: 1px solid var(--ui-border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: white;
+      font-family: var(--font-ui);
+      font-size: 12px;
+    }
+
+    #world-create {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--ui-border);
+      background: rgba(9, 13, 22, 0.9);
+      color: white;
+      cursor: pointer;
+    }
+
+    #worlds-error {
+      font-size: 11px;
+      color: #ffb4b4;
+      min-height: 12px;
+    }
+
+    #worlds-list {
+      display: grid;
+      gap: 6px;
+      max-height: 240px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .world-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      background: rgba(30, 34, 46, 0.9);
+      border: 1px solid var(--slot-border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .world-item:hover {
+      border-color: var(--ui-highlight);
+    }
+
+    .world-item.active {
+      border-color: var(--ui-accent);
+      box-shadow: 0 0 0 2px rgba(133, 214, 255, 0.35);
+    }
+
+    .world-meta {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    #worlds-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    #worlds-close {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--ui-border);
+      background: rgba(9, 13, 22, 0.9);
+      color: white;
+      cursor: pointer;
     }
 
     #inventory-panel {
@@ -432,6 +610,45 @@
     #music-pulse.active {
       opacity: 1;
     }
+
+    #challenge-banner {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, rgba(10, 12, 18, 0.8), rgba(10, 12, 18, 0.35) 60%, rgba(10, 12, 18, 0));
+      z-index: 120;
+      pointer-events: auto;
+      text-align: center;
+    }
+
+    #challenge-banner.active {
+      display: flex;
+    }
+
+    #challenge-banner .panel {
+      padding: 24px 28px;
+      border-radius: 16px;
+      background: linear-gradient(150deg, rgba(12, 16, 26, 0.95), rgba(22, 26, 34, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: var(--shadow);
+      max-width: 80vw;
+    }
+
+    #challenge-banner h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+      letter-spacing: 2px;
+      color: var(--ui-highlight);
+      text-transform: uppercase;
+    }
+
+    #challenge-banner p {
+      margin: 0;
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+    }
   </style>
 </head>
 
@@ -444,7 +661,11 @@
       <span id="mode-status">Modo: --</span>
       <span id="music-status">Musica: --</span>
     </div>
-    <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · Space/Ctrl Subir/Bajar</div>
+    <div id="world-ui">
+      <div id="world-current">Mundo: <span id="world-current-name">--</span></div>
+      <button id="world-open" type="button">Mundos</button>
+    </div>
+    <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · L Mundos · Space/Ctrl Subir/Bajar</div>
     <div id="hotbar"></div>
   </div>
   <div id="music-pulse"></div>
@@ -473,11 +694,31 @@
     </div>
     <div id="classroom-status">Pulsa Empezar para iniciar el reto.</div>
   </div>
+  <div id="challenge-banner">
+    <div class="panel">
+      <h2>Reto superado</h2>
+      <p>Felicitaciones! Has completado el desafio.</p>
+    </div>
+  </div>
   <div id="inventory">
     <div id="inventory-panel">
       <div id="inventory-title">Inventario</div>
       <div id="inventory-grid"></div>
       <div id="inventory-hint">Click para seleccionar. E para cerrar.</div>
+    </div>
+  </div>
+  <div id="worlds">
+    <div id="worlds-panel">
+      <div id="worlds-title">Mundos</div>
+      <div id="worlds-create">
+        <input id="world-name-input" type="text" maxlength="3" placeholder="3 letras o numeros">
+        <button id="world-create" type="button">Crear</button>
+      </div>
+      <div id="worlds-error"></div>
+      <div id="worlds-list"></div>
+      <div id="worlds-actions">
+        <button id="worlds-close" type="button">Cerrar</button>
+      </div>
     </div>
   </div>
   <script type="text/javascript" src="babylon.js"></script>

@@ -1,4 +1,58 @@
 
+# EduCraft
+
+## ¿Qué puedes hacer con EduCraft?
+
+EduCraft es una aplicación basada en el motor noa-engine, pensada para la experimentación, la educación y la creación de mundos voxel interactivos. Incluye demos y ejemplos avanzados.
+
+### Funcionalidades principales
+
+- **Motor voxel avanzado**: chunks, físicas, colisiones, raycasting y renderizado 3D con Babylon.js.
+- **Inventario**: Abre/cierra el inventario, selecciona y mueve bloques.
+- **Hotbar**: Barra rápida para seleccionar bloques y herramientas.
+- **Edición de mundo**: Coloca y quita bloques en tiempo real.
+- **Guardar y cargar**: Guarda ajustes y ediciones del mundo localmente usando IndexedDB (Dexie).
+- **Ajustes**: Modifica y guarda configuraciones del usuario.
+- **Mundos**: Soporta múltiples mundos, puedes guardar/cargar diferentes estados.
+- **Multijugador**: Código para conexión y sincronización (requiere configuración de servidor).
+- **Controles**: Soporte para teclado, ratón y gamepad.
+- **Interfaz gráfica**: UI moderna con paneles, menús y notificaciones.
+- **Físicas**: Motor de físicas para movimiento, gravedad y colisiones.
+- **Renderizado**: Gráficos 3D con Babylon.js, soporte para texturas y materiales personalizados.
+- **Chat**: Soporte para chat en la versión voxelsrv-master.
+- **Soporte móvil**: Detección y adaptación para dispositivos móviles.
+- **Soporte para skins**: Cambia la skin del jugador (en voxelsrv-master).
+
+### Controles de usuario (por defecto)
+
+- **WASD**: Moverse
+- **Ratón**: Mirar/cambiar dirección
+- **Clic izquierdo**: Quitar bloque
+- **Clic derecho**: Colocar bloque
+- **E**: Abrir/cerrar inventario
+- **1-9**: Seleccionar slot en la hotbar
+- **Espacio**: Saltar
+- **Shift**: Agacharse
+- **O**: Cambiar de mundo (en la demo avanzada)
+- **Z**: Abrir inspector Babylon.js (si debug está activo)
+- **F5**: Guardar mundo manualmente (si está implementado)
+
+> Nota: Algunos controles pueden variar según la demo o configuración.
+
+### Guía rápida: Guardar y cargar mundos/configuración
+
+- **Guardar configuración**: Al cambiar opciones en el menú de ajustes, se guardan automáticamente usando IndexedDB. Puedes forzar guardado con F5 (si está implementado).
+- **Guardar mundo**: Las ediciones del mundo se guardan automáticamente al salir o periódicamente. Puedes forzar guardado desde el menú o con F5.
+- **Cargar mundo/configuración**: Al iniciar la aplicación, se cargan automáticamente los datos guardados. Puedes cambiar de mundo desde el menú o con la tecla O.
+
+No necesitas hacer nada especial: todo se almacena localmente en tu navegador. Si borras los datos del navegador, perderás los mundos y configuraciones guardadas.
+
+
+
+
+
+
+
 # noa-engine
 
 An experimental voxel engine.

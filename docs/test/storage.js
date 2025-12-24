@@ -31,9 +31,30 @@ function saveWorldEdits(name, edits) {
 	]).then(function () { return true })
 }
 
+function touchWorld(name) {
+	return db.world.put({ name: name, lastplay: Date.now() })
+}
+
+function getWorldList() {
+	return db.world.orderBy('lastplay').reverse().toArray()
+}
+
+function createWorld(name) {
+	return db.world.where('name').equals(name).first().then(function (row) {
+		if (row) return false
+		return Promise.all([
+			db.world.put({ name: name, lastplay: Date.now() }),
+			db.worlddata.put({ name: name, data: {} })
+		]).then(function () { return true })
+	})
+}
+
 export {
 	getSettings,
 	saveSettings,
 	getWorldEdits,
-	saveWorldEdits
+	saveWorldEdits,
+	touchWorld,
+	getWorldList,
+	createWorld
 };

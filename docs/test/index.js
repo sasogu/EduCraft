@@ -1,5 +1,12 @@
 /* globals BABYLON */
+
 'use strict';
+
+var cameraFov = 0.8
+var defaultFov = 0.8
+var highlightScale = 1.0
+var lastValidPos = null
+var islandAnimal = null
 
 
 /**
@@ -17,19 +24,27 @@ var opts = {
 	chunkSize: 32,
 	chunkAddDistance: 2,
 	chunkRemoveDistance: 3,
-	blockTestDistance: 40,
+	blockTestDistance: 6,
 	texturePath: 'textures/',
 	playerStart: [0.5, 6, 0.5],
 	playerHeight: 1.6,
 	playerWidth: 0.6,
-	playerAutoStep: true,
+	playerAutoStep: false,
 	useAO: false,
 }
 
 
 // create engine
+
 var noa = noaEngine(opts)
+noa.inputs.bind('fov-adjust', 'F')
 var scene = noa.rendering.getScene()
+if (scene && scene.activeCamera) {
+	defaultFov = scene.activeCamera.fov
+	cameraFov = defaultFov
+}
+setupInputFocus(noa)
+configureMovement(noa)
 
 var multiplayer = setupMultiplayer(noa, scene)
 
@@ -65,6 +80,14 @@ var leavesID = registry.ids.leavesID
 var glassID = registry.ids.glassID
 var waterID = registry.ids.waterID
 var fenceID = registry.ids.fenceID
+var dandelionID = registry.ids.dandelionID
+var poppyID = registry.ids.poppyID
+
+noa.blockTargetIdCheck = function (id) {
+	if (!id) return false
+	if (id === dandelionID || id === poppyID) return true
+	return noa.registry.getBlockSolidity(id)
+}
 
 function setupMultiplayer(noa, scene) {
 	var params = new URLSearchParams(window.location.search)
@@ -242,6 +265,30 @@ function setupMultiplayer(noa, scene) {
 	return { tick: tick, updateRemotes: updateRemotes }
 }
 
+function setupInputFocus(noa) {
+	var el = noa.container && noa.container.element
+	if (!el || !el.focus) return
+	el.focus()
+	document.addEventListener('click', function () {
+		el.focus()
+		if (el.requestPointerLock) el.requestPointerLock()
+	})
+}
+
+function configureMovement(noa) {
+	var movement = noa.entities.getMovement(noa.playerEntity)
+	if (!movement) return
+	movement.maxSpeed = 6
+	movement.moveForce = 20
+	movement.responsiveness = 10
+	movement.runningFriction = 1
+	movement.standingFriction = 8
+	movement.airJumps = 0
+	movement.jumpImpulse = 6
+	movement.jumpForce = 8
+	movement.jumpTime = 260
+}
+
 
 var defaultHotbarLabels = [
 	'Do4 Negra',
@@ -276,9 +323,12 @@ noa.world.on('worldDataNeeded', function (id, data, x, y, z) {
 })
 
 var baseHeight = 4
-var treeSpacing = 6
-var treeHeight = 4
 var waterLevel = baseHeight - 1
+var treeCellSize = 7
+var treeDensity = 0.12
+var shrubDensity = 0.02
+var rockDensity = 0.01
+var flowerDensity = 0.03
 
 function getEditKey(x, y, z) {
 	return x + '|' + y + '|' + z
@@ -309,14 +359,29 @@ function decideBlock(x, y, z) {
 
 	if (y <= waterLevel) return waterID
 
-	if (isTreeSpot(x, z, surface)) {
-		var trunkBase = surface
-		if (y >= trunkBase && y < trunkBase + treeHeight) return woodID
-		if (y >= trunkBase + treeHeight - 1 && y <= trunkBase + treeHeight + 1) {
-			var dx = Math.abs((x % treeSpacing + treeSpacing) % treeSpacing - 1)
-			var dz = Math.abs((z % treeSpacing + treeSpacing) % treeSpacing - 1)
-			if (dx <= 2 && dz <= 2) return leavesID
+	var tree = getTreeAt(x, z)
+	if (tree) {
+		var trunkBase = tree.base
+		var trunkTop = trunkBase + tree.height
+		if (x === tree.x && z === tree.z && y >= trunkBase && y < trunkTop) return woodID
+
+		if (y >= trunkTop - 2 && y <= trunkTop + tree.radius) {
+			var dx = x - tree.x
+			var dz = z - tree.z
+			var dist = Math.sqrt(dx * dx + dz * dz)
+			var leafRadius = tree.radius - Math.max(0, y - trunkTop) * 0.6
+			if (dist <= leafRadius) return leavesID
 		}
+	}
+
+	if (y === surface && surface > waterLevel + 1) {
+		var flowerChance = hash2D(x, z, 41)
+		if (flowerChance < flowerDensity) {
+			return (hash2D(x, z, 42) < 0.5) ? dandelionID : poppyID
+		}
+		var shrubChance = hash2D(x, z, 55)
+		if (shrubChance < shrubDensity) return leavesID
+		if (hash2D(x, z, 77) < rockDensity) return stoneID
 	}
 
 	return 0
@@ -329,10 +394,51 @@ function getHeight(x, z) {
 	return Math.max(2, h)
 }
 
-function isTreeSpot(x, z, surface) {
-	if (surface <= waterLevel + 1) return false
-	var hash = Math.abs((x * 73856093) ^ (z * 19349663))
-	return (hash % 100) < 6 && (x % treeSpacing === 1 && z % treeSpacing === 1)
+function getTreeAt(x, z) {
+	var cellX = Math.floor(x / treeCellSize)
+	var cellZ = Math.floor(z / treeCellSize)
+	var best = null
+
+	for (var dx = -1; dx <= 1; dx++) {
+		for (var dz = -1; dz <= 1; dz++) {
+			var tree = getTreeForCell(cellX + dx, cellZ + dz)
+			if (!tree) continue
+			var reach = tree.radius + 1
+			if (Math.abs(x - tree.x) > reach || Math.abs(z - tree.z) > reach) continue
+			if (!best || tree.radius > best.radius) best = tree
+		}
+	}
+
+	return best
+}
+
+function getTreeForCell(cellX, cellZ) {
+	var chance = hash2D(cellX, cellZ, 21)
+	if (chance > treeDensity) return null
+
+	var offsetX = Math.floor(hash2D(cellX, cellZ, 22) * treeCellSize)
+	var offsetZ = Math.floor(hash2D(cellX, cellZ, 23) * treeCellSize)
+	var trunkX = cellX * treeCellSize + offsetX
+	var trunkZ = cellZ * treeCellSize + offsetZ
+	var base = getHeight(trunkX, trunkZ)
+	if (base <= waterLevel + 1) return null
+
+	var height = 4 + Math.floor(hash2D(cellX, cellZ, 24) * 4)
+	var radius = 2 + Math.floor(hash2D(cellX, cellZ, 25) * 2)
+
+	return {
+		x: trunkX,
+		z: trunkZ,
+		base: base,
+		height: height,
+		radius: radius
+	}
+}
+
+function hash2D(x, z, seed) {
+	var n = x * 374761393 + z * 668265263 + seed * 1442695041
+	n = (n ^ (n >> 13)) * 1274126177
+	return ((n ^ (n >> 16)) >>> 0) / 4294967295
 }
 
 
@@ -359,6 +465,95 @@ noa.entities.addComponent(eid, noa.entities.names.mesh, {
 	offset: offset
 })
 
+spawnIslandAnimal()
+
+function spawnIslandAnimal() {
+	var roamCenterX = opts.playerStart[0]
+	var roamCenterZ = opts.playerStart[2]
+	var roamRadius = opts.chunkSize * (opts.chunkRemoveDistance - 0.5)
+	var avoidRadius = 18
+	var spawnMinDist = 8
+	var spawnMaxDist = 14
+	var spawn = findSheepSpot(roamCenterX, roamCenterZ, spawnMinDist, spawnMaxDist)
+	var baseX = Math.floor(spawn.x)
+	var baseZ = Math.floor(spawn.z)
+	var baseY = getHeight(baseX, baseZ)
+	var size = { width: 1.0, height: 1.0 }
+
+	var root = new BABYLON.Mesh('island-sheep-root', scene)
+	var woolMat = new BABYLON.StandardMaterial('island-sheep-wool', scene)
+	woolMat.diffuseColor = new BABYLON.Color3(0.95, 0.95, 0.95)
+	woolMat.specularColor = new BABYLON.Color3(0, 0, 0)
+
+	var headMat = new BABYLON.StandardMaterial('island-sheep-head', scene)
+	headMat.diffuseColor = new BABYLON.Color3(0.75, 0.75, 0.75)
+	headMat.specularColor = new BABYLON.Color3(0, 0, 0)
+
+	var legMat = new BABYLON.StandardMaterial('island-sheep-leg', scene)
+	legMat.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2)
+	legMat.specularColor = new BABYLON.Color3(0, 0, 0)
+
+	var body = BABYLON.MeshBuilder.CreateBox('island-sheep-body', { width: 1.2, height: 0.7, depth: 0.8 }, scene)
+	body.material = woolMat
+	body.parent = root
+	body.position.y = 0.6
+
+	var head = BABYLON.MeshBuilder.CreateBox('island-sheep-head', { width: 0.4, height: 0.4, depth: 0.5 }, scene)
+	head.material = headMat
+	head.parent = root
+	head.position.y = 0.7
+	head.position.z = 0.65
+
+	var legs = []
+	var legOffsets = [
+		[-0.4, 0.2, -0.25],
+		[0.4, 0.2, -0.25],
+		[-0.4, 0.2, 0.25],
+		[0.4, 0.2, 0.25],
+	]
+	for (var i = 0; i < legOffsets.length; i++) {
+		var leg = BABYLON.MeshBuilder.CreateBox('island-sheep-leg-' + i, { width: 0.18, height: 0.4, depth: 0.18 }, scene)
+		leg.material = legMat
+		leg.parent = root
+		leg.position.x = legOffsets[i][0]
+		leg.position.y = legOffsets[i][1]
+		leg.position.z = legOffsets[i][2]
+		legs.push(leg)
+	}
+
+	var eid = noa.entities.add(
+		[baseX + 0.5, baseY, baseZ + 0.5],
+		size.width,
+		size.height,
+		root,
+		[0, 0, 0],
+		false,
+		false
+	)
+
+	islandAnimal = {
+		eid: eid,
+		root: root,
+		legs: legs,
+		homeX: baseX + 0.5,
+		homeZ: baseZ + 0.5,
+		roamCenterX: roamCenterX,
+		roamCenterZ: roamCenterZ,
+		roamRadius: roamRadius,
+		avoidX: roamCenterX,
+		avoidZ: roamCenterZ,
+		avoidRadius: avoidRadius,
+		time: 0,
+		speed: 0.00015,
+		gravity: -0.00012,
+		velY: 0,
+		grounded: true,
+		radius: 2.5,
+		targetX: null,
+		targetZ: null,
+		nextTargetTime: 0,
+	}
+}
 
 
 
@@ -415,6 +610,14 @@ var ui = {
 	musicFeedback: document.getElementById('music-feedback'),
 	musicPulse: document.getElementById('music-pulse'),
 	audioHint: document.getElementById('audio-hint'),
+	worldCurrentName: document.getElementById('world-current-name'),
+	worldOpen: document.getElementById('world-open'),
+	worlds: document.getElementById('worlds'),
+	worldsList: document.getElementById('worlds-list'),
+	worldsError: document.getElementById('worlds-error'),
+	worldsClose: document.getElementById('worlds-close'),
+	worldCreate: document.getElementById('world-create'),
+	worldNameInput: document.getElementById('world-name-input'),
 	classroom: document.getElementById('classroom'),
 	classroomLevel: document.getElementById('classroom-level'),
 	classroomScore: document.getElementById('classroom-score'),
@@ -425,6 +628,7 @@ var ui = {
 	classroomPlay: document.getElementById('classroom-play'),
 	classroomReset: document.getElementById('classroom-reset'),
 	classroomToggle: document.getElementById('classroom-toggle'),
+	challengeBanner: document.getElementById('challenge-banner'),
 }
 
 var hotbarSlots = getDefaultHotbar()
@@ -432,7 +636,8 @@ var hotbarEls = []
 var inventoryEls = []
 var selectedIndex = 0
 var pickedID = hotbarSlots[0].id
-var creativeMode = true
+var creativeMode = false
+var allowFlight = false
 var musicFeedbackTimer = null
 var musicPulseTimer = null
 var audioState = { ctx: null }
@@ -465,6 +670,7 @@ var worldEdits = {}
 var saveSettingsTimer = null
 var saveWorldTimer = null
 var editsApplied = false
+var worldListCache = []
 
 initLocalState()
 
@@ -475,6 +681,11 @@ function setupClassroom() {
 	if (ui.classroomToggle) ui.classroomToggle.addEventListener('click', function () {
 		toggleClassroom(false)
 	})
+	if (ui.challengeBanner) {
+		ui.challengeBanner.addEventListener('click', function () {
+			hideChallengeBanner()
+		})
+	}
 }
 
 function toggleClassroom(force) {
@@ -486,6 +697,127 @@ function toggleClassroom(force) {
 function getWorldName() {
 	var params = new URLSearchParams(window.location.search)
 	return params.get('world') || 'default'
+}
+
+function setupWorldMenu() {
+	if (!ui.worldOpen || !ui.worlds) return
+	ui.worldOpen.addEventListener('click', function () {
+		toggleWorldMenu(true)
+	})
+	if (ui.worldsClose) {
+		ui.worldsClose.addEventListener('click', function () {
+			toggleWorldMenu(false)
+		})
+	}
+	ui.worlds.addEventListener('click', function (event) {
+		if (event.target === ui.worlds) toggleWorldMenu(false)
+	})
+	if (ui.worldCreate) {
+		ui.worldCreate.addEventListener('click', createWorldFromInput)
+	}
+	if (ui.worldNameInput) {
+		ui.worldNameInput.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter') createWorldFromInput()
+		})
+	}
+	noa.inputs.bind('worlds', 'L')
+	noa.inputs.down.on('worlds', function () {
+		toggleWorldMenu(!ui.worlds.classList.contains('open'))
+	})
+	updateWorldDisplay()
+	refreshWorldList()
+}
+
+function toggleWorldMenu(open) {
+	if (!ui.worlds) return
+	ui.worlds.classList.toggle('open', open)
+	if (open) refreshWorldList()
+	if (!open && ui.worldsError) ui.worldsError.textContent = ''
+}
+
+function updateWorldDisplay() {
+	if (ui.worldCurrentName) ui.worldCurrentName.textContent = worldName
+}
+
+function refreshWorldList() {
+	return storage.getWorldList()
+		.then(function (list) {
+			worldListCache = list || []
+			renderWorldList(worldListCache)
+		})
+		.catch(function () {
+			renderWorldList([])
+		})
+}
+
+function renderWorldList(list) {
+	if (!ui.worldsList) return
+	ui.worldsList.innerHTML = ''
+	if (!list || !list.length) {
+		var empty = document.createElement('div')
+		empty.className = 'world-meta'
+		empty.textContent = 'Sin mundos guardados.'
+		ui.worldsList.appendChild(empty)
+		return
+	}
+	list.forEach(function (row) {
+		var item = document.createElement('div')
+		item.className = 'world-item' + (row.name === worldName ? ' active' : '')
+		var nameEl = document.createElement('div')
+		nameEl.textContent = row.name
+		var meta = document.createElement('div')
+		meta.className = 'world-meta'
+		meta.textContent = formatWorldDate(row.lastplay)
+		item.appendChild(nameEl)
+		item.appendChild(meta)
+		item.addEventListener('click', function () {
+			if (row.name === worldName) {
+				toggleWorldMenu(false)
+				return
+			}
+			goToWorld(row.name)
+		})
+		ui.worldsList.appendChild(item)
+	})
+}
+
+function createWorldFromInput() {
+	if (!ui.worldNameInput) return
+	var name = sanitizeWorldName(ui.worldNameInput.value)
+	if (!name) {
+		setWorldError('Escribe un nombre para el mundo.')
+		return
+	}
+	storage.createWorld(name).then(function (created) {
+		if (!created) {
+			setWorldError('Ya existe un mundo con ese nombre.')
+			return
+		}
+		goToWorld(name)
+	})
+}
+
+function sanitizeWorldName(name) {
+	if (!name) return ''
+	var cleaned = name.trim().replace(/\s+/g, '')
+	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3)
+	return cleaned.toUpperCase()
+}
+
+function setWorldError(msg) {
+	if (ui.worldsError) ui.worldsError.textContent = msg || ''
+}
+
+function goToWorld(name) {
+	var params = new URLSearchParams(window.location.search)
+	params.set('world', name)
+	window.location.search = params.toString()
+}
+
+function formatWorldDate(ts) {
+	if (!ts) return 'Nuevo'
+	var date = new Date(ts)
+	return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 function initLocalState() {
@@ -501,8 +833,10 @@ function initLocalState() {
 			selectSlot(selectedIndex)
 			setCreativeMode(creativeMode)
 			setupClassroom()
+			setupWorldMenu()
 			toggleClassroom(settingsClassroomOpen())
 			applySavedEdits()
+			storage.touchWorld(worldName)
 		})
 		.catch(function () {
 			buildHotbar()
@@ -510,7 +844,9 @@ function initLocalState() {
 			selectSlot(selectedIndex)
 			setCreativeMode(creativeMode)
 			setupClassroom()
+			setupWorldMenu()
 			toggleClassroom(true)
+			storage.touchWorld(worldName)
 		})
 }
 
@@ -899,6 +1235,7 @@ function advanceLevel() {
 		}
 		var rewardText = unlocked ? ' Premio desbloqueado: Valla (inventario E).' : ''
 		setClassroomStatus('Reto completado. Puntuacion final: ' + classroom.score + '.' + rewardText)
+		showChallengeBanner('Reto superado!', 'Felicitaciones! Has completado el desafio.')
 		classroom.enabled = false
 		return
 	}
@@ -969,6 +1306,20 @@ function clearClassroomTimers() {
 
 function setClassroomStatus(text) {
 	if (ui.classroomStatus) ui.classroomStatus.textContent = text
+}
+
+function showChallengeBanner(title, subtitle) {
+	if (!ui.challengeBanner) return
+	var heading = ui.challengeBanner.querySelector('h2')
+	var message = ui.challengeBanner.querySelector('p')
+	if (heading) heading.textContent = title
+	if (message) message.textContent = subtitle
+	ui.challengeBanner.classList.add('active')
+}
+
+function hideChallengeBanner() {
+	if (!ui.challengeBanner) return
+	ui.challengeBanner.classList.remove('active')
 }
 
 function ensureAudio() {
@@ -1072,6 +1423,7 @@ noa.on('tick', function (dt) {
 	statusCooldown -= dt
 	lastStepTime -= dt
 	if (multiplayer) multiplayer.tick(dt)
+	updateIslandAnimal(dt)
 
 	if (statusCooldown <= 0) {
 		statusCooldown = 120
@@ -1085,9 +1437,20 @@ noa.on('tick', function (dt) {
 	if (multiplayer) multiplayer.updateRemotes()
 
 	var scroll = noa.inputs.state.scrolly
-	if (scroll && scrollCooldown <= 0) {
-		scrollCooldown = 80
-		selectSlot(selectedIndex + (scroll > 0 ? -1 : 1))
+	if (scroll) {
+		if (noa.inputs.state['fov-adjust']) {
+			cameraFov += scroll * 0.05
+			cameraFov = Math.max(0.4, Math.min(1.6, cameraFov))
+			if (scene && scene.activeCamera) {
+				scene.activeCamera.fov = cameraFov
+			}
+		} else if (noa.inputs.state.ctrl) {
+			highlightScale += scroll * 0.1
+			highlightScale = Math.max(0.2, Math.min(3, highlightScale))
+		} else if (scrollCooldown <= 0) {
+			scrollCooldown = 80
+			selectSlot(selectedIndex + (scroll > 0 ? -1 : 1))
+		}
 	}
 
 	var pos = noa.entities.getPositionData(eid).position
@@ -1095,6 +1458,25 @@ noa.on('tick', function (dt) {
 	var underY = Math.floor(pos[1] - 0.1)
 	var underZ = Math.floor(pos[2])
 	var blockUnder = noa.getBlock(underX, underY, underZ)
+
+	// Impedir caminar sobre el agua (excepto en creativo con vuelo)
+	if (blockUnder === waterID && !(creativeMode && allowFlight)) {
+		var rescue = findNearestLand(pos[0], pos[2], 14)
+		if (rescue) {
+			noa.entities.setPosition(eid, rescue[0], rescue[1], rescue[2])
+		} else if (typeof lastValidPos !== 'undefined' && lastValidPos) {
+			noa.entities.setPosition(eid, lastValidPos[0], lastValidPos[1], lastValidPos[2])
+		} else {
+			noa.entities.setPosition(eid, pos[0], pos[1] + 1, pos[2])
+		}
+		return
+	}
+
+	// Guardar la última posición válida si no está sobre agua
+	if (blockUnder !== waterID) {
+		lastValidPos = [pos[0], pos[1], pos[2]]
+	}
+
 	if (blockUnder && blockUnder !== lastStepBlockId && lastStepTime <= 0) {
 		if (musicBlocks[blockUnder]) {
 			playMusicBlock(blockUnder)
@@ -1103,7 +1485,7 @@ noa.on('tick', function (dt) {
 	}
 	lastStepBlockId = blockUnder
 
-	if (creativeMode) {
+	if (creativeMode && allowFlight) {
 		var body = noa.playerBody
 		var flySpeed = noa.inputs.state.sprint ? 12 : 6
 		var up = noa.inputs.state.jump
@@ -1159,7 +1541,156 @@ function updatePause() {
 
 function setCreativeMode(enabled) {
 	creativeMode = enabled
-	noa.playerBody.gravityMultiplier = creativeMode ? 0 : 2
+	noa.playerBody.gravityMultiplier = (creativeMode && allowFlight) ? 0 : 1
 	updateStatus()
 	scheduleSaveSettings()
+}
+
+function updateIslandAnimal(dt) {
+	if (!islandAnimal) return
+	islandAnimal.time += dt
+	if (islandAnimal.time >= islandAnimal.nextTargetTime || islandAnimal.targetX === null) {
+		var found = false
+		for (var attempt = 0; attempt < 14; attempt++) {
+			var angle = Math.random() * Math.PI * 2
+			var minDist = islandAnimal.avoidRadius
+			var maxDist = islandAnimal.roamRadius
+			var dist = Math.sqrt(Math.random() * (maxDist * maxDist - minDist * minDist) + minDist * minDist)
+			var tx = islandAnimal.roamCenterX + Math.cos(angle) * dist
+			var tz = islandAnimal.roamCenterZ + Math.sin(angle) * dist
+			if (!isWaterAt(tx, tz) && !isTooCloseToAvoid(tx, tz)) {
+				islandAnimal.targetX = tx
+				islandAnimal.targetZ = tz
+				found = true
+				break
+			}
+		}
+		if (!found) {
+			islandAnimal.targetX = islandAnimal.homeX
+			islandAnimal.targetZ = islandAnimal.homeZ
+		}
+		islandAnimal.nextTargetTime = islandAnimal.time + 1500 + Math.random() * 2500
+	}
+
+	var pos = noa.entities.getPositionData(islandAnimal.eid).position
+	var dx = islandAnimal.targetX - pos[0]
+	var dz = islandAnimal.targetZ - pos[2]
+	var distSq = dx * dx + dz * dz
+	if (distSq < 0.05) {
+		islandAnimal.nextTargetTime = islandAnimal.time
+		return
+	}
+
+	var distLen = Math.sqrt(distSq)
+	var step = islandAnimal.speed * dt
+	var move = Math.min(step, distLen)
+	var x = pos[0] + (dx / distLen) * move
+	var z = pos[2] + (dz / distLen) * move
+	if (isWaterAt(x, z)) {
+		islandAnimal.targetX = null
+		islandAnimal.targetZ = null
+		islandAnimal.nextTargetTime = islandAnimal.time
+		return
+	}
+	var y = pos[1]
+	var groundY = getGroundY(x, z, y)
+
+	if (islandAnimal.grounded) {
+		if (groundY === null || groundY < y - 0.01) {
+			islandAnimal.grounded = false
+		} else {
+			y = groundY
+			islandAnimal.velY = 0
+		}
+	}
+
+	if (!islandAnimal.grounded) {
+		islandAnimal.velY += islandAnimal.gravity * dt
+		y += islandAnimal.velY * dt
+		if (groundY !== null && y <= groundY) {
+			y = groundY
+			islandAnimal.velY = 0
+			islandAnimal.grounded = true
+		}
+	}
+
+	noa.entities.setPosition(islandAnimal.eid, x, y, z)
+
+	if (islandAnimal.root) {
+		islandAnimal.root.rotation.y = Math.atan2(dx, dz)
+		var gait = Math.sin(islandAnimal.time * 0.01)
+		for (var i = 0; i < islandAnimal.legs.length; i++) {
+			var leg = islandAnimal.legs[i]
+			var phase = (i % 2 === 0) ? gait : -gait
+			leg.rotation.x = phase * 0.35
+		}
+	}
+}
+
+function getGroundY(x, z, startY) {
+	var xi = Math.floor(x)
+	var zi = Math.floor(z)
+	var y = Math.floor(startY)
+	for (var yy = y; yy >= 0; yy--) {
+		var id = noa.getBlock(xi, yy, zi)
+		if (id && noa.registry.getBlockSolidity(id)) return yy + 1
+	}
+	return null
+}
+
+function findSheepSpot(centerX, centerZ, minDist, maxDist) {
+	for (var attempt = 0; attempt < 30; attempt++) {
+		var angle = Math.random() * Math.PI * 2
+		var dist = Math.sqrt(Math.random() * (maxDist * maxDist - minDist * minDist) + minDist * minDist)
+		var x = centerX + Math.cos(angle) * dist
+		var z = centerZ + Math.sin(angle) * dist
+		if (!isWaterAt(x, z)) return { x: x, z: z }
+	}
+	return { x: centerX + minDist, z: centerZ }
+}
+
+function isTooCloseToAvoid(x, z) {
+	var dx = x - islandAnimal.avoidX
+	var dz = z - islandAnimal.avoidZ
+	return (dx * dx + dz * dz) < islandAnimal.avoidRadius * islandAnimal.avoidRadius
+}
+
+function isWaterAt(x, z) {
+	var xi = Math.floor(x)
+	var zi = Math.floor(z)
+	var surface = getHeight(xi, zi)
+	if (surface <= waterLevel + 1) return true
+	return noa.getBlock(xi, waterLevel, zi) === waterID
+}
+
+function findNearestLand(x, z, maxRadius) {
+	var xi = Math.floor(x)
+	var zi = Math.floor(z)
+	if (!isWaterAt(xi, zi)) {
+		var groundY = getGroundY(xi, zi, waterLevel + 20)
+		if (groundY !== null) return [xi + 0.5, groundY, zi + 0.5]
+	}
+	for (var r = 1; r <= maxRadius; r++) {
+		for (var dx = -r; dx <= r; dx++) {
+			var dz = r
+			if (!isWaterAt(xi + dx, zi + dz)) {
+				return [xi + dx + 0.5, getGroundY(xi + dx, zi + dz, waterLevel + 20), zi + dz + 0.5]
+			}
+			dz = -r
+			if (!isWaterAt(xi + dx, zi + dz)) {
+				return [xi + dx + 0.5, getGroundY(xi + dx, zi + dz, waterLevel + 20), zi + dz + 0.5]
+			}
+		}
+		for (var dz2 = -r + 1; dz2 <= r - 1; dz2++) {
+			var dx2 = r
+			if (!isWaterAt(xi + dx2, zi + dz2)) {
+				return [xi + dx2 + 0.5, getGroundY(xi + dx2, zi + dz2, waterLevel + 20), zi + dz2 + 0.5]
+			}
+			dx2 = -r
+			if (!isWaterAt(xi + dx2, zi + dz2)) {
+				return [xi + dx2 + 0.5, getGroundY(xi + dx2, zi + dz2, waterLevel + 20), zi + dz2 + 0.5]
+			}
+		}
+	}
+	return null
 }

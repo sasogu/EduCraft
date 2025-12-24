@@ -33,20 +33,24 @@ module.exports = function createRegistry(noa, scene) {
 	var glassID = noa.registry.registerBlock(idCounter++, { material: 'glass', opaque: false })
 	var waterID = noa.registry.registerBlock(idCounter++, { material: 'water', fluid: true, opaque: false })
 	var fenceID = noa.registry.registerBlock(idCounter++, { material: 'plank', opaque: false })
+	var dandelionID = registerPlantBlock('Diente de leon', textureAssets.dandelion, idCounter++)
+	var poppyID = registerPlantBlock('Amapola', textureAssets.poppy, idCounter++)
 
 	blockCatalog = [
-		{ name: 'Cesped', id: grassID, icon: { type: 'data', value: textureAssets.grassTop.dataUrl } },
-		{ name: 'Tierra', id: dirtID, icon: { type: 'data', value: textureAssets.dirt.dataUrl } },
-		{ name: 'Piedra', id: stoneID, icon: { type: 'data', value: textureAssets.stone.dataUrl } },
-		{ name: 'Ladrillo', id: brickID, icon: { type: 'data', value: textureAssets.brick.dataUrl } },
-		{ name: 'Madera', id: woodID, icon: { type: 'data', value: textureAssets.woodSide.dataUrl } },
-		{ name: 'Tablon', id: plankID, icon: { type: 'data', value: textureAssets.plank.dataUrl } },
-		{ name: 'Arena', id: sandID, icon: { type: 'data', value: textureAssets.sand.dataUrl } },
-		{ name: 'Grava', id: gravelID, icon: { type: 'data', value: textureAssets.gravel.dataUrl } },
-		{ name: 'Hojas', id: leavesID, icon: { type: 'data', value: textureAssets.leaves.dataUrl } },
-		{ name: 'Cristal', id: glassID, icon: { type: 'data', value: textureAssets.glass.dataUrl } },
-		{ name: 'Agua', id: waterID, icon: { type: 'data', value: textureAssets.water.dataUrl } },
-		{ name: 'Valla', id: fenceID, icon: { type: 'data', value: textureAssets.plank.dataUrl }, locked: true },
+		{ name: 'Cesped', id: grassID, icon: { type: 'texture', value: textureAssets.grassTop.iconPath } },
+		{ name: 'Tierra', id: dirtID, icon: { type: 'texture', value: textureAssets.dirt.iconPath } },
+		{ name: 'Piedra', id: stoneID, icon: { type: 'texture', value: textureAssets.stone.iconPath } },
+		{ name: 'Ladrillo', id: brickID, icon: { type: 'texture', value: textureAssets.brick.iconPath } },
+		{ name: 'Madera', id: woodID, icon: { type: 'texture', value: textureAssets.woodSide.iconPath } },
+		{ name: 'Tablon', id: plankID, icon: { type: 'texture', value: textureAssets.plank.iconPath } },
+		{ name: 'Arena', id: sandID, icon: { type: 'texture', value: textureAssets.sand.iconPath } },
+		{ name: 'Grava', id: gravelID, icon: { type: 'texture', value: textureAssets.gravel.iconPath } },
+		{ name: 'Hojas', id: leavesID, icon: { type: 'texture', value: textureAssets.leaves.iconPath } },
+		{ name: 'Cristal', id: glassID, icon: { type: 'texture', value: textureAssets.glass.iconPath } },
+		{ name: 'Agua', id: waterID, icon: { type: 'texture', value: textureAssets.water.iconPath } },
+		{ name: 'Valla', id: fenceID, icon: { type: 'texture', value: textureAssets.plank.iconPath }, locked: true },
+		{ name: 'Diente de leon', id: dandelionID, icon: { type: 'texture', value: textureAssets.dandelion.iconPath } },
+		{ name: 'Amapola', id: poppyID, icon: { type: 'texture', value: textureAssets.poppy.iconPath } },
 	]
 
 	addMusicBlocks()
@@ -66,7 +70,9 @@ module.exports = function createRegistry(noa, scene) {
 			leavesID: leavesID,
 			glassID: glassID,
 			waterID: waterID,
-			fenceID: fenceID
+			fenceID: fenceID,
+			dandelionID: dandelionID,
+			poppyID: poppyID
 		}
 	}
 
@@ -78,6 +84,33 @@ module.exports = function createRegistry(noa, scene) {
 		if (opts.alpha) mat.alpha = opts.alpha
 		if (opts.hasAlpha) mat.diffuseTexture.hasAlpha = true
 		noa.registry.registerMaterial(name, [1, 1, 1], null, !!opts.hasAlpha, mat)
+	}
+
+	function registerPlantBlock(label, asset, id) {
+		var mesh = createPlantMesh('plant-' + label.toLowerCase().replace(/\s+/g, '-'), asset.texture)
+		return noa.registry.registerBlock(id, { blockMesh: mesh, solid: false, opaque: false })
+	}
+
+	function createPlantMesh(name, texture) {
+		var mat = noa.rendering.flatMaterial.clone(name + '-mat')
+		mat.diffuseTexture = texture
+		mat.diffuseTexture.hasAlpha = true
+		mat.backFaceCulling = false
+		mat.specularColor = new BABYLON.Color3(0, 0, 0)
+
+		var planeA = BABYLON.MeshBuilder.CreatePlane(name + '-a', { size: 1 }, scene)
+		var planeB = BABYLON.MeshBuilder.CreatePlane(name + '-b', { size: 1 }, scene)
+		planeA.material = mat
+		planeB.material = mat
+		planeA.position.y = 0.5
+		planeB.position.y = 0.5
+		planeA.rotation.x = Math.PI
+		planeB.rotation.x = Math.PI
+		planeB.rotation.y = Math.PI / 2
+		var merged = BABYLON.Mesh.MergeMeshes([planeA, planeB], true, true, undefined, false, true)
+		merged.material = mat
+		merged.isVisible = false
+		return merged
 	}
 
 	function addMusicBlocks() {
@@ -174,122 +207,35 @@ module.exports = function createRegistry(noa, scene) {
 	}
 
 	function buildClassicTextures(scene) {
-		var size = 16
+		var basePath = 'textures/block/'
 		return {
-			grassTop: makeTexture(scene, 'grass-top', size, function () {
-				return noisePixel('#5fa644', 18)
-			}),
-			dirt: makeTexture(scene, 'dirt', size, function () {
-				return noisePixel('#8b6b4c', 20)
-			}),
-			grassSide: makeTexture(scene, 'grass-side', size, function (x, y) {
-				if (y < 4) return noisePixel('#5fa644', 18)
-				return noisePixel('#8b6b4c', 20)
-			}),
-			stone: makeTexture(scene, 'stone', size, function () {
-				return noisePixel('#7f7f7f', 24)
-			}),
-			brick: makeTexture(scene, 'brick', size, function (x, y) {
-				var mortar = (y % 4 === 0) || (x % 8 === 0 && y % 8 < 4)
-				if (mortar) return [90, 35, 35, 255]
-				return noisePixel('#b04a3a', 16)
-			}),
-			plank: makeTexture(scene, 'plank', size, function (x, y) {
-				var line = (y % 4 === 0)
-				if (line) return [120, 86, 50, 255]
-				return noisePixel('#c49b6a', 10)
-			}),
-			woodSide: makeTexture(scene, 'wood-side', size, function (x, y) {
-				var stripe = (x % 4 === 0)
-				if (stripe) return [90, 60, 35, 255]
-				return noisePixel('#9b6b43', 14)
-			}),
-			woodTop: makeTexture(scene, 'wood-top', size, function (x, y) {
-				var dx = x - 8
-				var dy = y - 8
-				var dist = Math.sqrt(dx * dx + dy * dy)
-				var ring = (Math.floor(dist) % 3 === 0)
-				if (ring) return [90, 60, 35, 255]
-				return noisePixel('#c49b6a', 8)
-			}),
-			sand: makeTexture(scene, 'sand', size, function () {
-				return noisePixel('#d9c57a', 12)
-			}),
-			gravel: makeTexture(scene, 'gravel', size, function () {
-				return noisePixel('#8b8b8b', 28)
-			}),
-			leaves: makeTexture(scene, 'leaves', size, function (x, y) {
-				var alpha = (Math.random() > 0.25) ? 200 : 0
-				var col = noisePixel('#3f8f3b', 18)
-				col[3] = alpha
-				return col
-			}, true),
-			glass: makeTexture(scene, 'glass', size, function (x, y) {
-				var border = (x === 0 || y === 0 || x === 15 || y === 15)
-				if (border) return [210, 230, 255, 160]
-				if (x === y || x === 15 - y) return [210, 230, 255, 90]
-				return [200, 230, 255, 20]
-			}, true),
-			water: makeTexture(scene, 'water', size, function () {
-				return noisePixel('#3b7dc4', 20, 170)
-			}, true),
+			grassTop: loadTextureAsset(scene, 'grass-top', basePath + 'grass_block_top.png', 'block/grass_block_top.png'),
+			dirt: loadTextureAsset(scene, 'dirt', basePath + 'dirt.png', 'block/dirt.png'),
+			grassSide: loadTextureAsset(scene, 'grass-side', basePath + 'grass_block_side.png', 'block/grass_block_side.png'),
+			stone: loadTextureAsset(scene, 'stone', basePath + 'stone.png', 'block/stone.png'),
+			brick: loadTextureAsset(scene, 'brick', basePath + 'bricks.png', 'block/bricks.png'),
+			plank: loadTextureAsset(scene, 'plank', basePath + 'oak_planks.png', 'block/oak_planks.png'),
+			woodSide: loadTextureAsset(scene, 'wood-side', basePath + 'oak_log.png', 'block/oak_log.png'),
+			woodTop: loadTextureAsset(scene, 'wood-top', basePath + 'oak_log_top.png', 'block/oak_log_top.png'),
+			sand: loadTextureAsset(scene, 'sand', basePath + 'sand.png', 'block/sand.png'),
+			gravel: loadTextureAsset(scene, 'gravel', basePath + 'gravel.png', 'block/gravel.png'),
+			leaves: loadTextureAsset(scene, 'leaves', basePath + 'leaves.png', 'block/leaves.png', true),
+			glass: loadTextureAsset(scene, 'glass', basePath + 'glass.png', 'block/glass.png', true),
+			water: loadTextureAsset(scene, 'water', basePath + 'water.png', 'block/water.png', true),
+			dandelion: loadTextureAsset(scene, 'dandelion', basePath + 'dandelion.png', 'block/dandelion.png', true),
+			poppy: loadTextureAsset(scene, 'poppy', basePath + 'red_flower.png', 'block/red_flower.png', true),
 		}
 	}
 
-	function makeTexture(scene, name, size, pixelFn, hasAlpha) {
-		var canvas = document.createElement('canvas')
-		canvas.width = size
-		canvas.height = size
-		var ctx = canvas.getContext('2d')
-		var img = ctx.createImageData(size, size)
-		for (var y = 0; y < size; y++) {
-			for (var x = 0; x < size; x++) {
-				var idx = (y * size + x) * 4
-				var rgba = pixelFn(x, y)
-				img.data[idx] = rgba[0]
-				img.data[idx + 1] = rgba[1]
-				img.data[idx + 2] = rgba[2]
-				img.data[idx + 3] = (typeof rgba[3] === 'number') ? rgba[3] : 255
-			}
-		}
-		ctx.putImageData(img, 0, 0)
-
-		var texture = new BABYLON.DynamicTexture(name, { width: size, height: size }, scene, false)
-		var tctx = texture.getContext()
-		tctx.drawImage(canvas, 0, 0)
-		texture.update()
+	function loadTextureAsset(scene, name, url, iconPath, hasAlpha) {
+		var texture = new BABYLON.Texture(url, scene, false, false, BABYLON.Texture.NEAREST_SAMPLINGMODE)
 		texture.hasAlpha = !!hasAlpha
 		texture.wrapU = BABYLON.Texture.WRAP_ADDRESSMODE
 		texture.wrapV = BABYLON.Texture.WRAP_ADDRESSMODE
-		texture.updateSamplingMode(BABYLON.Texture.NEAREST_SAMPLINGMODE)
 
 		return {
 			texture: texture,
-			dataUrl: canvas.toDataURL('image/png'),
-		}
-	}
-
-	function noisePixel(hex, variance, alpha) {
-		var rgb = hexToRgb(hex)
-		var spread = variance || 0
-		return [
-			clamp(rgb.r + rand(spread)),
-			clamp(rgb.g + rand(spread)),
-			clamp(rgb.b + rand(spread)),
-			(typeof alpha === 'number') ? alpha : 255
-		]
-	}
-
-	function rand(spread) {
-		return Math.floor((Math.random() * 2 - 1) * spread)
-	}
-
-	function hexToRgb(hex) {
-		var normalized = hex.replace('#', '')
-		return {
-			r: parseInt(normalized.slice(0, 2), 16),
-			g: parseInt(normalized.slice(2, 4), 16),
-			b: parseInt(normalized.slice(4, 6), 16),
+			iconPath: iconPath,
 		}
 	}
 
