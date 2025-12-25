@@ -165,6 +165,23 @@
       color: rgba(255, 255, 255, 0.6);
     }
 
+    #player-panel.minimized {
+      width: auto;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    #player-panel.minimized .row,
+    #player-panel.minimized .actions {
+      display: none;
+    }
+
+    #player-panel.minimized .current {
+      margin-top: 0;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
     #world-current {
       padding: 6px 10px;
       background: linear-gradient(135deg, rgba(7, 12, 24, 0.65), rgba(15, 20, 30, 0.3));
@@ -430,6 +447,7 @@
       justify-items: center;
       cursor: pointer;
       transition: transform 0.12s ease, border-color 0.12s ease;
+      position: relative;
     }
 
     .inventory-item:hover {
@@ -437,10 +455,37 @@
       border-color: var(--ui-highlight);
     }
 
+    .inventory-item.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .inventory-item.locked:hover {
+      transform: none;
+      border-color: var(--slot-border);
+    }
+
     .inventory-item .label {
       font-size: 10px;
       text-transform: uppercase;
       color: rgba(255, 255, 255, 0.75);
+    }
+
+    .inventory-item.locked .label {
+      text-decoration: line-through;
+    }
+
+    .inventory-item.locked::after {
+      content: "BLOQUEADO";
+      position: absolute;
+      inset: 6px auto auto 6px;
+      padding: 2px 6px;
+      font-size: 9px;
+      letter-spacing: 0.6px;
+      border-radius: 6px;
+      color: #fff;
+      background: rgba(166, 76, 46, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .music-badge {
@@ -535,7 +580,7 @@
       position: fixed;
       top: 16px;
       right: 16px;
-      width: 260px;
+      width: 360px;
       padding: 12px 12px 10px;
       background: linear-gradient(160deg, rgba(12, 16, 26, 0.92), rgba(22, 26, 34, 0.92));
       border: 1px solid var(--ui-border);
@@ -591,6 +636,14 @@
       margin: 8px 0 10px;
     }
 
+    #classroom.staff-mode #classroom-seq {
+      display: none;
+    }
+
+    #classroom.staff-mode #staff-panel {
+      display: block;
+    }
+
     .seq-chip {
       padding: 4px 6px;
       border-radius: 6px;
@@ -634,6 +687,120 @@
       color: rgba(255, 255, 255, 0.7);
     }
 
+    #staff-panel {
+      display: none;
+      margin: 8px 0 10px;
+    }
+
+    #staff-board {
+      --staff-padding-left: 16px;
+      --staff-padding-top: 20px;
+      --staff-line-gap: 12px;
+      --staff-note-spacing: 22px;
+      --staff-note-height: 14px;
+      --staff-note-offset: 4px;
+      position: relative;
+      height: 120px;
+      margin: 6px 0;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(9, 13, 22, 0.6);
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    #staff-lines {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: var(--staff-padding-top);
+      height: calc(var(--staff-line-gap) * 4 + 1px);
+      background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.65) 0, rgba(255, 255, 255, 0.65) 1px, transparent 1px, transparent var(--staff-line-gap));
+      background-size: 100% var(--staff-line-gap);
+      pointer-events: none;
+    }
+
+    #staff-notes {
+      position: relative;
+      height: 100%;
+      min-width: 100%;
+    }
+
+    .staff-note {
+      position: absolute;
+      width: 14px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #fff;
+      transform: rotate(-15deg);
+      box-sizing: border-box;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .staff-note::before {
+      content: '';
+      position: absolute;
+      right: -2px;
+      top: -12px;
+      width: 2px;
+      height: 16px;
+      background: #fff;
+    }
+
+    .staff-note.half {
+      background: transparent;
+    }
+
+    .staff-note.eighth::after {
+      content: '';
+      position: absolute;
+      right: -1px;
+      top: -14px;
+      width: 6px;
+      height: 8px;
+      border-top: 2px solid #fff;
+      border-right: 2px solid #fff;
+      transform: skewY(-20deg);
+    }
+
+    .staff-note.rest {
+      width: 12px;
+      height: 6px;
+      border-radius: 2px;
+      background: #fff;
+      border: none;
+      transform: none;
+    }
+
+    .staff-note.rest::before,
+    .staff-note.rest::after {
+      display: none;
+    }
+
+    .staff-ledger {
+      position: absolute;
+      left: -6px;
+      right: -6px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.7);
+      top: 50%;
+    }
+
+    .staff-note.done {
+      opacity: 0.4;
+    }
+
+    .staff-note.current {
+      box-shadow: 0 0 0 2px rgba(133, 214, 255, 0.6);
+      transform: rotate(-15deg) scale(1.08);
+    }
+
+    #staff-hint {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+    }
+
     #music-feedback {
       position: fixed;
       top: 20%;
@@ -652,6 +819,28 @@
     }
 
     #music-feedback.active {
+      opacity: 1;
+    }
+
+    #lock-hint {
+      position: fixed;
+      top: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 8px 14px;
+      background: rgba(30, 16, 12, 0.8);
+      border: 1px solid rgba(255, 184, 146, 0.4);
+      border-radius: 10px;
+      font-size: 12px;
+      letter-spacing: 0.6px;
+      color: rgba(255, 255, 255, 0.9);
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 85;
+      pointer-events: none;
+    }
+
+    #lock-hint.active {
       opacity: 1;
     }
 
@@ -722,6 +911,67 @@
       font-size: 13px;
       color: rgba(255, 255, 255, 0.8);
     }
+
+    #web-panel {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8, 10, 16, 0.8);
+      z-index: 200;
+      pointer-events: auto;
+    }
+
+    #web-panel.active {
+      display: flex;
+    }
+
+    #web-panel .panel {
+      width: min(86vw, 1100px);
+      background: linear-gradient(150deg, rgba(12, 16, 26, 0.95), rgba(22, 26, 34, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+
+    #web-panel .frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    #web-panel iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
+    #web-close {
+      margin: 0 0 8px auto;
+      display: block;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--ui-border);
+      background: rgba(9, 13, 22, 0.9);
+      color: white;
+      cursor: pointer;
+    }
+
+    #web-close:hover {
+      border-color: var(--ui-highlight);
+      color: var(--ui-highlight);
+    }
+
   </style>
 </head>
 
@@ -746,13 +996,14 @@
       <div class="actions">
         <button class="btn" id="player-name-save" type="button">Guardar</button>
       </div>
-      <div class="current">Actual: <span id="player-name-current">---</span></div>
+      <div class="current">Nombre: <span id="player-name-current">---</span></div>
     </div>
     <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · L Mundos · Space/Ctrl Subir/Bajar</div>
     <div id="hotbar"></div>
   </div>
   <div id="music-pulse"></div>
   <div id="music-feedback">---</div>
+  <div id="lock-hint">Bloque bloqueado.</div>
   <div id="audio-hint">Click o tecla para activar audio</div>
   <div id="classroom">
     <h3>Modo aula</h3>
@@ -769,6 +1020,13 @@
       </select>
     </div>
     <div class="row">
+      <span class="label">Reto</span>
+      <select class="select" id="classroom-mode">
+        <option value="ear">Memoria</option>
+        <option value="staff">Pentagrama</option>
+      </select>
+    </div>
+    <div class="row">
       <span class="label">Nivel</span>
       <span class="value" id="classroom-level">--</span>
     </div>
@@ -781,6 +1039,17 @@
       <span class="value" id="classroom-progress">0/0</span>
     </div>
     <div id="classroom-seq"></div>
+    <div id="staff-panel">
+      <div class="row">
+        <span class="label">Cancion</span>
+        <span class="value" id="staff-song">--</span>
+      </div>
+      <div id="staff-board">
+        <div id="staff-lines"></div>
+        <div id="staff-notes"></div>
+      </div>
+      <div id="staff-hint">Recrea la cancion con los bloques musicales.</div>
+    </div>
     <div id="classroom-actions">
       <button class="classroom-btn" id="classroom-start" type="button">Empezar</button>
       <button class="classroom-btn secondary" id="classroom-play" type="button">Repetir</button>
@@ -813,6 +1082,14 @@
       <div id="worlds-list"></div>
       <div id="worlds-actions">
         <button id="worlds-close" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+  <div id="web-panel">
+    <div class="panel">
+      <button id="web-close" type="button">Cerrar</button>
+      <div class="frame">
+        <iframe id="web-iframe" title="Panel web" allowfullscreen></iframe>
       </div>
     </div>
   </div>

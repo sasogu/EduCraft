@@ -22,6 +22,12 @@ EduCraft es una aplicación basada en el motor noa-engine, pensada para la exper
 - **Chat**: Soporte para chat en la versión voxelsrv-master.
 - **Soporte móvil**: Detección y adaptación para dispositivos móviles.
 - **Soporte para skins**: Cambia la skin del jugador (en voxelsrv-master).
+- **Modo aula musical**: Retos por niveles con notas y ritmos, incluyendo pentagrama.
+- **Bloques musicales**: Colores tipo boomwhackers, reproducción por interacción y al pisar.
+- **Clave de sol**: Bloque especial que reproduce secuencias conectadas (acordes por columnas).
+- **Recompensas por reto**: Desbloqueo progresivo de materiales (ej. ladrillo).
+- **Panel web integrado**: Acceso a un juego HTML externo desde un objeto en el mundo.
+- **Panel de nick minimizable**: Oculta el editor y muestra el nombre del jugador.
 
 ### Controles de usuario (por defecto)
 
@@ -36,6 +42,8 @@ EduCraft es una aplicación basada en el motor noa-engine, pensada para la exper
 - **O**: Cambiar de mundo (en la demo avanzada)
 - **Z**: Abrir inspector Babylon.js (si debug está activo)
 - **F5**: Guardar mundo manualmente (si está implementado)
+- **Ctrl + rueda del ratón**: Cambiar tamaño de los menús
+- **Ctrl + F**: Cambiar encuadre
 
 > Nota: Algunos controles pueden variar según la demo o configuración.
 
@@ -169,5 +177,3 @@ consult the source.
 ## Credits
 
 Made by [@fenomas](https://twitter.com/fenomas), license is MIT.
-
-

@@ -5,6 +5,7 @@ module.exports = function createRegistry(noa, scene) {
 	var blockCatalog = []
 
 	var textureAssets = buildClassicTextures(scene)
+	var clefAsset = createClefTexture(scene)
 
 	registerClassicMaterial('grassTop', textureAssets.grassTop)
 	registerClassicMaterial('grassSide', textureAssets.grassSide)
@@ -14,11 +15,13 @@ module.exports = function createRegistry(noa, scene) {
 	registerClassicMaterial('woodSide', textureAssets.woodSide)
 	registerClassicMaterial('woodTop', textureAssets.woodTop)
 	registerClassicMaterial('plank', textureAssets.plank)
+	registerClassicMaterial('bridge', textureAssets.bridge)
 	registerClassicMaterial('sand', textureAssets.sand)
 	registerClassicMaterial('gravel', textureAssets.gravel)
 	registerClassicMaterial('leaves', textureAssets.leaves, { alpha: 0.85, hasAlpha: true })
 	registerClassicMaterial('glass', textureAssets.glass, { alpha: 0.35, hasAlpha: true })
 	registerClassicMaterial('water', textureAssets.water, { alpha: 0.65, hasAlpha: true })
+	registerClefMaterial('clef', clefAsset)
 
 	var idCounter = 1
 	var grassID = noa.registry.registerBlock(idCounter++, { material: ['grassTop', 'dirt', 'grassSide'] })
@@ -27,31 +30,35 @@ module.exports = function createRegistry(noa, scene) {
 	var brickID = noa.registry.registerBlock(idCounter++, { material: 'brick' })
 	var woodID = noa.registry.registerBlock(idCounter++, { material: ['woodTop', 'woodTop', 'woodSide'] })
 	var plankID = noa.registry.registerBlock(idCounter++, { material: 'plank' })
+	var bridgeID = noa.registry.registerBlock(idCounter++, { material: 'bridge' })
 	var sandID = noa.registry.registerBlock(idCounter++, { material: 'sand' })
 	var gravelID = noa.registry.registerBlock(idCounter++, { material: 'gravel' })
 	var leavesID = noa.registry.registerBlock(idCounter++, { material: 'leaves', opaque: false })
 	var glassID = noa.registry.registerBlock(idCounter++, { material: 'glass', opaque: false })
 	var waterID = noa.registry.registerBlock(idCounter++, { material: 'water', fluid: true, opaque: false })
+	var clefID = noa.registry.registerBlock(idCounter++, { material: 'clef' })
 	var fenceMesh = createFenceMesh('fence', textureAssets.plank.texture)
 	var fenceID = noa.registry.registerBlock(idCounter++, { blockMesh: fenceMesh, solid: true, opaque: false })
 	var dandelionID = registerPlantBlock('Diente de leon', textureAssets.dandelion, idCounter++)
 	var poppyID = registerPlantBlock('Amapola', textureAssets.poppy, idCounter++)
 
 	blockCatalog = [
-		{ name: 'Cesped', id: grassID, icon: { type: 'texture', value: textureAssets.grassTop.iconPath } },
-		{ name: 'Tierra', id: dirtID, icon: { type: 'texture', value: textureAssets.dirt.iconPath } },
-		{ name: 'Piedra', id: stoneID, icon: { type: 'texture', value: textureAssets.stone.iconPath } },
-		{ name: 'Ladrillo', id: brickID, icon: { type: 'texture', value: textureAssets.brick.iconPath } },
-		{ name: 'Madera', id: woodID, icon: { type: 'texture', value: textureAssets.woodSide.iconPath } },
-		{ name: 'Tablon', id: plankID, icon: { type: 'texture', value: textureAssets.plank.iconPath } },
-		{ name: 'Arena', id: sandID, icon: { type: 'texture', value: textureAssets.sand.iconPath } },
-		{ name: 'Grava', id: gravelID, icon: { type: 'texture', value: textureAssets.gravel.iconPath } },
-		{ name: 'Hojas', id: leavesID, icon: { type: 'texture', value: textureAssets.leaves.iconPath } },
-		{ name: 'Cristal', id: glassID, icon: { type: 'texture', value: textureAssets.glass.iconPath } },
-		{ name: 'Agua', id: waterID, icon: { type: 'texture', value: textureAssets.water.iconPath } },
+		{ name: 'Cesped', id: grassID, icon: { type: 'texture', value: textureAssets.grassTop.iconPath }, locked: true },
+		{ name: 'Tierra', id: dirtID, icon: { type: 'texture', value: textureAssets.dirt.iconPath }, locked: true },
+		{ name: 'Piedra', id: stoneID, icon: { type: 'texture', value: textureAssets.stone.iconPath }, locked: true },
+		{ name: 'Ladrillo', id: brickID, icon: { type: 'texture', value: textureAssets.brick.iconPath }, locked: true },
+		{ name: 'Madera', id: woodID, icon: { type: 'texture', value: textureAssets.woodSide.iconPath }, locked: true },
+		{ name: 'Tablon', id: plankID, icon: { type: 'texture', value: textureAssets.plank.iconPath }, locked: true },
+		{ name: 'Puente', id: bridgeID, icon: { type: 'texture', value: textureAssets.bridge.iconPath }, locked: true },
+		{ name: 'Arena', id: sandID, icon: { type: 'texture', value: textureAssets.sand.iconPath }, locked: true },
+		{ name: 'Grava', id: gravelID, icon: { type: 'texture', value: textureAssets.gravel.iconPath }, locked: true },
+		{ name: 'Hojas', id: leavesID, icon: { type: 'texture', value: textureAssets.leaves.iconPath }, locked: true },
+		{ name: 'Cristal', id: glassID, icon: { type: 'texture', value: textureAssets.glass.iconPath }, locked: true },
+		{ name: 'Agua', id: waterID, icon: { type: 'texture', value: textureAssets.water.iconPath }, locked: true },
+		{ name: 'Clave de sol', id: clefID, icon: { type: 'data', value: clefAsset.iconPath } },
 		{ name: 'Valla', id: fenceID, icon: { type: 'texture', value: textureAssets.plank.iconPath }, locked: true },
-		{ name: 'Diente de leon', id: dandelionID, icon: { type: 'texture', value: textureAssets.dandelion.iconPath } },
-		{ name: 'Amapola', id: poppyID, icon: { type: 'texture', value: textureAssets.poppy.iconPath } },
+		{ name: 'Diente de leon', id: dandelionID, icon: { type: 'texture', value: textureAssets.dandelion.iconPath }, locked: true },
+		{ name: 'Amapola', id: poppyID, icon: { type: 'texture', value: textureAssets.poppy.iconPath }, locked: true },
 	]
 
 	addMusicBlocks()
@@ -66,11 +73,13 @@ module.exports = function createRegistry(noa, scene) {
 			brickID: brickID,
 			woodID: woodID,
 			plankID: plankID,
+			bridgeID: bridgeID,
 			sandID: sandID,
 			gravelID: gravelID,
 			leavesID: leavesID,
 			glassID: glassID,
 			waterID: waterID,
+			clefID: clefID,
 			fenceID: fenceID,
 			dandelionID: dandelionID,
 			poppyID: poppyID
@@ -85,6 +94,31 @@ module.exports = function createRegistry(noa, scene) {
 		if (opts.alpha) mat.alpha = opts.alpha
 		if (opts.hasAlpha) mat.diffuseTexture.hasAlpha = true
 		noa.registry.registerMaterial(name, [1, 1, 1], null, !!opts.hasAlpha, mat)
+	}
+
+	function registerClefMaterial(name, asset) {
+		var mat = noa.rendering.flatMaterial.clone(name + '-mat')
+		mat.diffuseTexture = asset.texture
+		mat.specularColor = new BABYLON.Color3(0, 0, 0)
+		noa.registry.registerMaterial(name, [1, 1, 1], null, false, mat)
+	}
+
+	function createClefTexture(scene) {
+		var size = 64
+		var texture = new BABYLON.DynamicTexture('clef-texture', { width: size, height: size }, scene, false)
+		var ctx = texture.getContext()
+		ctx.fillStyle = '#151821'
+		ctx.fillRect(0, 0, size, size)
+		ctx.strokeStyle = '#f5f5f5'
+		ctx.lineWidth = 3
+		ctx.strokeRect(4, 4, size - 8, size - 8)
+		ctx.fillStyle = '#f5f5f5'
+		ctx.font = "bold 26px 'Silkscreen'"
+		ctx.textAlign = 'center'
+		ctx.textBaseline = 'middle'
+		ctx.fillText('SOL', size / 2, size / 2)
+		texture.update()
+		return { texture: texture, iconPath: ctx.canvas.toDataURL('image/png') }
 	}
 
 	function registerPlantBlock(label, asset, id) {
@@ -161,7 +195,7 @@ module.exports = function createRegistry(noa, scene) {
 			{ name: 'La', letter: 'A', freq: 440.0 },
 			{ name: 'Si', letter: 'B', freq: 493.88 },
 		]
-		var palette = ['#ff6b6b', '#ffa94d', '#ffd43b', '#69db7c', '#4dabf7', '#9775fa', '#f783ac']
+		var palette = ['#d32f2f', '#f57c00', '#fbc02d', '#4caf50', '#29b6f6', '#1976d2', '#7b1fa2']
 		var notes = []
 		var octaves = [
 			{ label: '4', mult: 1 },
@@ -250,6 +284,7 @@ module.exports = function createRegistry(noa, scene) {
 			stone: loadTextureAsset(scene, 'stone', basePath + 'stone.png', 'block/stone.png'),
 			brick: loadTextureAsset(scene, 'brick', basePath + 'bricks.png', 'block/bricks.png'),
 			plank: loadTextureAsset(scene, 'plank', basePath + 'oak_planks.png', 'block/oak_planks.png'),
+			bridge: loadTextureAsset(scene, 'bridge', basePath + 'dark_oak_planks.png', 'block/dark_oak_planks.png'),
 			woodSide: loadTextureAsset(scene, 'wood-side', basePath + 'oak_log.png', 'block/oak_log.png'),
 			woodTop: loadTextureAsset(scene, 'wood-top', basePath + 'oak_log_top.png', 'block/oak_log_top.png'),
 			sand: loadTextureAsset(scene, 'sand', basePath + 'sand.png', 'block/sand.png'),

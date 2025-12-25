@@ -9,6 +9,7 @@ var lastValidPos = null
 var islandAnimal = null
 var playerNameCurrent = null
 var localPlayerNametag = null
+var playerPanelMinimized = false
 
 
 /**
@@ -63,6 +64,8 @@ light.intensity = 0.9
 noa.inputs.unbind('alt-fire')
 noa.inputs.bind('alt-fire', '<mouse 3>')
 
+createWebScreen(scene)
+
 
 //		World generation
 
@@ -71,6 +74,7 @@ noa.inputs.bind('alt-fire', '<mouse 3>')
 var registry = createRegistry(noa, scene)
 var blockCatalog = registry.blockCatalog
 var musicBlocks = registry.musicBlocks
+var defaultLockState = blockCatalog.map(function (block) { return !!block.locked })
 var grassID = registry.ids.grassID
 var dirtID = registry.ids.dirtID
 var stoneID = registry.ids.stoneID
@@ -82,9 +86,12 @@ var gravelID = registry.ids.gravelID
 var leavesID = registry.ids.leavesID
 var glassID = registry.ids.glassID
 var waterID = registry.ids.waterID
+var clefID = registry.ids.clefID
 var fenceID = registry.ids.fenceID
+var bridgeID = registry.ids.bridgeID
 var dandelionID = registry.ids.dandelionID
 var poppyID = registry.ids.poppyID
+var snowID = null
 
 noa.blockTargetIdCheck = function (id) {
 	if (!id) return false
@@ -365,17 +372,32 @@ function setupPlayerPanel() {
 	if (!ui.playerNameInput) return
 	ui.playerNameInput.value = playerNameCurrent || ''
 	updatePlayerPanel()
+	if (playerNameCurrent) {
+		setPlayerPanelMinimized(true)
+	}
 	if (ui.playerNameSave) {
 		ui.playerNameSave.addEventListener('click', function () {
 			var next = ui.playerNameInput.value || ''
 			if (!setPlayerName(next)) return
+			setPlayerPanelMinimized(true)
 		})
 	}
 	ui.playerNameInput.addEventListener('keydown', function (event) {
 		if (event.key === 'Enter') {
-			setPlayerName(ui.playerNameInput.value || '')
+			if (setPlayerName(ui.playerNameInput.value || '')) {
+				setPlayerPanelMinimized(true)
+			}
 		}
 	})
+	if (ui.playerPanel) {
+		ui.playerPanel.addEventListener('click', function () {
+			if (!playerPanelMinimized) return
+			setPlayerPanelMinimized(false)
+			if (ui.playerNameInput && ui.playerNameInput.focus) {
+				ui.playerNameInput.focus()
+			}
+		})
+	}
 }
 
 function updatePlayerPanel() {
@@ -384,6 +406,16 @@ function updatePlayerPanel() {
 	}
 	if (ui.playerNameCurrent) {
 		ui.playerNameCurrent.textContent = playerNameCurrent || '--'
+	}
+	if (ui.playerPanel) {
+		ui.playerPanel.classList.toggle('minimized', playerPanelMinimized)
+	}
+}
+
+function setPlayerPanelMinimized(minimized) {
+	playerPanelMinimized = !!minimized
+	if (ui.playerPanel) {
+		ui.playerPanel.classList.toggle('minimized', playerPanelMinimized)
 	}
 }
 
@@ -411,8 +443,145 @@ function configureMovement(noa) {
 	movement.jumpTime = 260
 }
 
+function setupWebOverlay() {
+	if (!ui.webPanel || !ui.webIframe) return
+	if (ui.webClose) {
+		ui.webClose.addEventListener('click', function () {
+			hideWebPanel()
+		})
+	}
+	ui.webPanel.addEventListener('click', function (event) {
+		if (event.target === ui.webPanel) hideWebPanel()
+	})
+	setupEmbeddedGameBridge()
+}
+
+function showWebPanel() {
+	if (!ui.webPanel || !ui.webIframe) return
+	ui.webIframe.src = webPanelUrl
+	ui.webPanel.classList.add('active')
+	if (document.exitPointerLock) document.exitPointerLock()
+}
+
+function hideWebPanel() {
+	if (!ui.webPanel || !ui.webIframe) return
+	ui.webPanel.classList.remove('active')
+	ui.webIframe.src = ''
+}
+
+function setupEmbeddedGameBridge() {
+	if (webMessageListenerAttached) return
+	webMessageListenerAttached = true
+
+	window.EduCraft = window.EduCraft || {}
+	window.EduCraft.completeEmbeddedGame = function (payload) {
+		handleEmbeddedGameCompletion(payload || {})
+	}
+	window.EduCraft.hasUnlockedBlock = function (name) {
+		if (!name) return false
+		var block = getBlockByName(name)
+		return !!(block && !block.locked)
+	}
+
+	window.addEventListener('message', function (event) {
+		if (!isEmbeddedGameEvent(event)) return
+		if (event.data === 'educraft:challenge-complete') {
+			handleEmbeddedGameCompletion({})
+			return
+		}
+		if (!event.data || typeof event.data !== 'object') return
+		if (event.data.type !== 'educraft:challenge-complete') return
+		handleEmbeddedGameCompletion(event.data.payload || event.data)
+	})
+}
+
+function isEmbeddedGameEvent(event) {
+	if (!event) return false
+	if (event.origin && event.origin !== window.location.origin) return false
+	if (ui.webIframe && ui.webIframe.contentWindow && event.source !== ui.webIframe.contentWindow) return false
+	return true
+}
+
+function handleEmbeddedGameCompletion(payload) {
+	var data = payload || {}
+	var title = (typeof data.title === 'string' && data.title.trim()) ? data.title.trim() : 'Reto completado'
+	var message = (typeof data.message === 'string' && data.message.trim()) ? data.message.trim() : 'Has completado el minijuego.'
+	var rewardName = (typeof data.reward === 'string') ? data.reward.trim() : ''
+
+	if (rewardName) {
+		var unlocked = unlockBlockByName(rewardName)
+		if (unlocked) {
+			message += ' Recompensa desbloqueada: ' + rewardName + '.'
+		} else {
+			message += ' Recompensa: ' + rewardName + '.'
+		}
+		if (rewardName === 'Valla' && data.placeFenceReward && !rewardPlaced) {
+			placeFenceRewardNearPlayer()
+			rewardPlaced = true
+		}
+	}
+
+	showChallengeBanner(title, message)
+	if (data.closePanel) hideWebPanel()
+}
+
+function createWebScreen(scene) {
+	if (!scene) return
+	var post = BABYLON.MeshBuilder.CreateBox('web-post', { width: 0.35, height: 3.2, depth: 0.35 }, scene)
+post.position = new BABYLON.Vector3(4, 5.6, -6.15)
+	post.isPickable = false
+
+	var signBoard = BABYLON.MeshBuilder.CreateBox('web-sign-board', { width: 2.6, height: 1.2, depth: 0.2 }, scene)
+signBoard.position = new BABYLON.Vector3(4, 6.3, -6)
+	signBoard.isPickable = false
+
+	var signFace = BABYLON.MeshBuilder.CreatePlane('web-sign-face', { width: 2.8, height: 1.2 }, scene)
+signFace.position = new BABYLON.Vector3(4, 6.3, -6.22)
+signFace.rotation.y = Math.PI
+	signFace.isPickable = true
+
+	var woodMat = new BABYLON.StandardMaterial('web-sign-wood-mat', scene)
+	woodMat.diffuseColor = new BABYLON.Color3(0.46, 0.3, 0.18)
+	woodMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1)
+	post.material = woodMat
+
+	var signMat = new BABYLON.StandardMaterial('web-sign-mat', scene)
+	signMat.diffuseColor = new BABYLON.Color3(0.5, 0.35, 0.2)
+	signMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1)
+
+	var tex = new BABYLON.DynamicTexture('web-sign-text', { width: 512, height: 256 }, scene, false)
+	var ctx = tex.getContext()
+	ctx.fillStyle = '#5b3a1f'
+	ctx.fillRect(0, 0, 512, 256)
+	ctx.strokeStyle = '#2b1607'
+	ctx.lineWidth = 12
+	ctx.strokeRect(10, 10, 492, 236)
+	ctx.fillStyle = '#f5e7c5'
+	ctx.font = "bold 34px 'Silkscreen'"
+	ctx.textAlign = 'center'
+	ctx.textBaseline = 'middle'
+	ctx.font = "bold 44px 'Silkscreen'"
+	ctx.fillText('EDUBEATRIX', 256, 96)
+	ctx.font = "bold 20px 'Silkscreen'"
+	ctx.fillText('Pulsa V para abrir', 256, 150)
+	tex.update()
+	signMat.diffuseTexture = tex
+	signMat.diffuseTexture.vScale = -1
+	signMat.diffuseTexture.vOffset = 1
+	signMat.diffuseTexture.uScale = -1
+	signMat.diffuseTexture.uOffset = 1
+	signMat.emissiveColor = new BABYLON.Color3(0.15, 0.1, 0.05)
+	signMat.backFaceCulling = false
+	signBoard.material = signMat
+	signFace.material = signMat
+
+	webSignMesh = signFace
+}
+
+
 
 var defaultHotbarLabels = [
+	'Clave de sol',
 	'Do4 Negra',
 	'Re4 Negra',
 	'Mi4 Negra',
@@ -684,6 +853,17 @@ function spawnIslandAnimal() {
 // 		Interactivity:
 
 function applyBlockEdit(blockId, position) {
+	if (blockId !== 0) {
+		var block = getBlockById(blockId)
+		if (block && block.locked) {
+			showLockedNotice('Bloque aun no desbloqueado.')
+			return
+		}
+		var targetBlock = noa.getBlock(position[0], position[1], position[2])
+		if (targetBlock === waterID && blockId !== bridgeID) {
+			return
+		}
+	}
 	var key = getEditKey(position[0], position[1], position[2])
 	worldEdits[key] = blockId
 	scheduleSaveWorld()
@@ -745,7 +925,7 @@ function getStepSoundName(blockId) {
 	if (blockId === gravelID) return 'gravel'
 	if (blockId === snowID) return 'snow'
 	if (blockId === leavesID) return 'leaves'
-	if (blockId === woodID || blockId === plankID || blockId === fenceID) return 'wood'
+	if (blockId === woodID || blockId === plankID || blockId === fenceID || blockId === bridgeID) return 'wood'
 	if (blockId === stoneID || blockId === brickID) return 'stone'
 	if (blockId === grassID || blockId === dirtID) return 'grass'
 	return 'stone'
@@ -755,7 +935,7 @@ function getStepSoundName(blockId) {
 // on left mouse, set targeted block to be air
 noa.inputs.down.on('fire', function () {
 	if (noa.targetedBlock) {
-		playMusicBlock(noa.targetedBlock.blockID)
+		playMusicBlock(noa.targetedBlock.blockID, 'action', noa.targetedBlock.position)
 		if (noa.targetedBlock.blockID) playBreakSound()
 		applyBlockEdit(0, noa.targetedBlock.position)
 	}
@@ -765,7 +945,7 @@ noa.inputs.down.on('fire', function () {
 noa.inputs.down.on('alt-fire', function () {
 	if (noa.targetedBlock) {
 		applyBlockEdit(pickedID, noa.targetedBlock.adjacent)
-		playMusicBlock(pickedID)
+		playMusicBlock(pickedID, 'place', noa.targetedBlock.adjacent)
 	}
 })
 
@@ -776,7 +956,21 @@ noa.inputs.down.on('mid-fire', function () {
 
 noa.inputs.bind('play-note', 'R')
 noa.inputs.down.on('play-note', function () {
-	if (noa.targetedBlock) playMusicBlock(noa.targetedBlock.blockID)
+	if (!noa.targetedBlock) return
+	if (noa.targetedBlock.blockID === clefID) {
+		playClefSequence(
+			noa.targetedBlock.position[0],
+			noa.targetedBlock.position[1],
+			noa.targetedBlock.position[2]
+		)
+		return
+	}
+	playMusicBlock(noa.targetedBlock.blockID, 'action', noa.targetedBlock.position)
+})
+
+noa.inputs.bind('open-web', 'V')
+noa.inputs.down.on('open-web', function () {
+	showWebPanel()
 })
 
 
@@ -792,11 +986,16 @@ var ui = {
 	musicFeedback: document.getElementById('music-feedback'),
 	musicPulse: document.getElementById('music-pulse'),
 	audioHint: document.getElementById('audio-hint'),
+	lockHint: document.getElementById('lock-hint'),
 	worldCurrentName: document.getElementById('world-current-name'),
 	worldOpen: document.getElementById('world-open'),
 	playerNameInput: document.getElementById('player-name-input'),
 	playerNameSave: document.getElementById('player-name-save'),
 	playerNameCurrent: document.getElementById('player-name-current'),
+	playerPanel: document.getElementById('player-panel'),
+	webPanel: document.getElementById('web-panel'),
+	webIframe: document.getElementById('web-iframe'),
+	webClose: document.getElementById('web-close'),
 	worlds: document.getElementById('worlds'),
 	worldsList: document.getElementById('worlds-list'),
 	worldsError: document.getElementById('worlds-error'),
@@ -814,28 +1013,43 @@ var ui = {
 	classroomReset: document.getElementById('classroom-reset'),
 	classroomToggle: document.getElementById('classroom-toggle'),
 	classroomDifficulty: document.getElementById('classroom-difficulty'),
+	classroomMode: document.getElementById('classroom-mode'),
 	classroomWorldName: document.getElementById('classroom-world-name'),
 	challengeBanner: document.getElementById('challenge-banner'),
+	staffPanel: document.getElementById('staff-panel'),
+	staffBoard: document.getElementById('staff-board'),
+	staffLines: document.getElementById('staff-lines'),
+	staffNotes: document.getElementById('staff-notes'),
+	staffSong: document.getElementById('staff-song'),
+	staffHint: document.getElementById('staff-hint'),
 }
 
 var hotbarSlots = getDefaultHotbar()
 var hotbarEls = []
 var inventoryEls = []
+var inventoryElsById = {}
 var selectedIndex = 0
 var pickedID = hotbarSlots[0].id
 var creativeMode = false
 var allowFlight = false
 var musicFeedbackTimer = null
 var musicPulseTimer = null
+var lockHintTimer = null
 var audioState = { ctx: null }
 var audioReady = false
 var breakSoundPool = []
 var breakSoundIndex = 0
 var stepSoundCooldown = 0
 var stepSoundSets = {}
-var lastStepBlockId = null
+var lastStepPosKey = null
+var clefStepCooldown = 0
+var lastClefStepKey = null
+var webPanelUrl = '/embedded-game/EduBeatrix/index.html'
+var webSignMesh = null
+var musicPulseMat = null
 var lastStepTime = 0
 var rewardPlaced = false
+var webMessageListenerAttached = false
 var classroom = {
 	enabled: false,
 	levelIndex: -1,
@@ -846,15 +1060,92 @@ var classroom = {
 	allowInput: false,
 	timeouts: [],
 	challengeIndex: 0,
+	mode: 'ear',
+	staffStage: 'build',
 }
 var classroomConfig = {
 	selectedDifficulty: 0,
+	selectedMode: 'ear',
+}
+var staffLayout = {
+	paddingLeft: 16,
+	paddingTop: 20,
+	lineGap: 12,
+	noteSpacing: 22,
+	noteHeight: 14,
+}
+var staffNoteEls = []
+
+function getStaffLayout() {
+	if (!ui.staffBoard || typeof window === 'undefined' || !window.getComputedStyle) {
+		return staffLayout
+	}
+	var styles = window.getComputedStyle(ui.staffBoard)
+	var paddingLeft = parseFloat(styles.getPropertyValue('--staff-padding-left')) || staffLayout.paddingLeft
+	var paddingTop = parseFloat(styles.getPropertyValue('--staff-padding-top')) || staffLayout.paddingTop
+	var lineGap = parseFloat(styles.getPropertyValue('--staff-line-gap')) || staffLayout.lineGap
+	var noteSpacing = parseFloat(styles.getPropertyValue('--staff-note-spacing')) || staffLayout.noteSpacing
+	var noteHeight = parseFloat(styles.getPropertyValue('--staff-note-height')) || staffLayout.noteHeight
+	var noteOffset = parseFloat(styles.getPropertyValue('--staff-note-offset')) || 0
+	return {
+		paddingLeft: paddingLeft,
+		paddingTop: paddingTop,
+		lineGap: lineGap,
+		noteSpacing: noteSpacing,
+		noteHeight: noteHeight,
+		noteOffset: noteOffset,
+	}
 }
 
 var classroomLevels = [
 	{ name: 'Nivel 1', lengths: [2, 2], notes: ['Do4', 'Re4', 'Mi4'], rhythms: ['Negra'], allowRest: false },
 	{ name: 'Nivel 2', lengths: [3, 4], notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4'], rhythms: ['Negra'], allowRest: false },
 	{ name: 'Nivel 3', lengths: [5, 6], notes: ['Do4', 'Re4', 'Mi4', 'Fa4', 'Sol4', 'La4', 'Si4', 'Do5', 'Re5'], rhythms: ['Blanca', 'Negra', 'Corchea'], allowRest: true },
+]
+var staffSongs = [
+	{
+		name: 'Estrellita (inicio)',
+		notes: [
+			{ note: 'Do4', rhythm: 'Negra' },
+			{ note: 'Do4', rhythm: 'Negra' },
+			{ note: 'Sol4', rhythm: 'Negra' },
+			{ note: 'Sol4', rhythm: 'Negra' },
+			{ note: 'La4', rhythm: 'Negra' },
+			{ note: 'La4', rhythm: 'Negra' },
+		],
+	},
+	{
+		name: 'Estrellita (final)',
+		notes: [
+			{ note: 'Sol4', rhythm: 'Blanca' },
+			{ note: 'Fa4', rhythm: 'Negra' },
+			{ note: 'Fa4', rhythm: 'Negra' },
+			{ note: 'Mi4', rhythm: 'Negra' },
+			{ note: 'Mi4', rhythm: 'Negra' },
+			{ note: 'Re4', rhythm: 'Negra' },
+			{ note: 'Re4', rhythm: 'Negra' },
+			{ note: 'Do4', rhythm: 'Blanca' },
+		],
+	},
+	{
+		name: 'Estrellita (completa)',
+		notes: [
+			{ note: 'Do4', rhythm: 'Negra' },
+			{ note: 'Do4', rhythm: 'Negra' },
+			{ note: 'Sol4', rhythm: 'Negra' },
+			{ note: 'Sol4', rhythm: 'Negra' },
+			{ note: 'La4', rhythm: 'Negra' },
+			{ note: 'La4', rhythm: 'Negra' },
+			{ note: 'Sol4', rhythm: 'Blanca' },
+			{ note: 'Fa4', rhythm: 'Negra' },
+			{ note: 'Fa4', rhythm: 'Negra' },
+			{ note: 'Mi4', rhythm: 'Negra' },
+			{ note: 'Mi4', rhythm: 'Negra' },
+			{ note: 'Re4', rhythm: 'Negra' },
+			{ note: 'Re4', rhythm: 'Negra' },
+			{ note: 'Do4', rhythm: 'Blanca' },
+		],
+	},
 ]
 
 var worldName = getWorldName()
@@ -880,7 +1171,15 @@ function setupClassroom() {
 			scheduleSaveSettings()
 		})
 	}
+	if (ui.classroomMode) {
+		ui.classroomMode.addEventListener('change', function (event) {
+			setClassroomMode(event.target.value)
+			updateClassroomUI()
+			scheduleSaveSettings()
+		})
+	}
 	setClassroomDifficulty(classroomConfig.selectedDifficulty)
+	setClassroomMode(classroomConfig.selectedMode)
 	if (ui.challengeBanner) {
 		ui.challengeBanner.addEventListener('click', function () {
 			hideChallengeBanner()
@@ -893,6 +1192,19 @@ function setClassroomDifficulty(index) {
 	var clamped = Math.max(0, Math.min(classroomLevels.length - 1, index))
 	classroomConfig.selectedDifficulty = clamped
 	if (ui.classroomDifficulty) ui.classroomDifficulty.value = String(clamped)
+}
+
+function setClassroomMode(mode) {
+	var next = (mode === 'staff') ? 'staff' : 'ear'
+	if (classroom.mode !== next) {
+		classroom.mode = next
+		classroomConfig.selectedMode = next
+		resetClassroom()
+	} else {
+		classroomConfig.selectedMode = next
+	}
+	if (ui.classroomMode) ui.classroomMode.value = next
+	if (ui.classroom) ui.classroom.classList.toggle('staff-mode', next === 'staff')
 }
 
 function toggleClassroom(force) {
@@ -1029,13 +1341,11 @@ function formatWorldDate(ts) {
 }
 
 function initLocalState() {
-	storage.getSettings()
-		.then(function (settings) {
-			applySettings(settings)
-			return storage.getWorldEdits(worldName)
-		})
+	storage.getWorldEdits(worldName)
 		.then(function (edits) {
 			if (edits) worldEdits = edits
+			applyWorldUnlocks()
+			applyWorldSettings(worldEdits._settings)
 			buildHotbar()
 			buildInventory()
 			selectSlot(selectedIndex)
@@ -1043,12 +1353,16 @@ function initLocalState() {
 			setupClassroom()
 			setupWorldMenu()
 			setupPlayerPanel()
+			setupWebOverlay()
 			updateClassroomUI()
 			toggleClassroom(settingsClassroomOpen())
 			applySavedEdits()
 			storage.touchWorld(worldName)
 		})
 		.catch(function () {
+			worldEdits = {}
+			applyWorldUnlocks()
+			applyWorldSettings(null)
 			buildHotbar()
 			buildInventory()
 			selectSlot(selectedIndex)
@@ -1056,14 +1370,21 @@ function initLocalState() {
 			setupClassroom()
 			setupWorldMenu()
 			setupPlayerPanel()
+			setupWebOverlay()
 			updateClassroomUI()
 			toggleClassroom(true)
 			storage.touchWorld(worldName)
 		})
 }
 
-function applySettings(settings) {
-	if (!settings) return
+function applyWorldSettings(settings) {
+	if (!settings) {
+		hotbarSlots = getDefaultHotbar()
+		selectedIndex = 0
+		creativeMode = false
+		classroom._open = true
+		return
+	}
 	if (Array.isArray(settings.hotbar)) {
 		hotbarSlots = settings.hotbar.map(function (id) {
 			return getBlockById(id) || blockCatalog[0]
@@ -1081,6 +1402,9 @@ function applySettings(settings) {
 	if (typeof settings.classroomDifficulty === 'number') {
 		setClassroomDifficulty(settings.classroomDifficulty)
 	}
+	if (typeof settings.classroomMode === 'string') {
+		setClassroomMode(settings.classroomMode)
+	}
 }
 
 function settingsClassroomOpen() {
@@ -1088,20 +1412,23 @@ function settingsClassroomOpen() {
 	return true
 }
 
-function collectSettings() {
+function collectWorldSettings() {
 	return {
 		hotbar: hotbarSlots.map(function (slot) { return slot.id }),
 		selectedIndex: selectedIndex,
 		creativeMode: creativeMode,
 		classroomOpen: ui.classroom.classList.contains('open'),
-		classroomDifficulty: classroomConfig.selectedDifficulty
+		classroomDifficulty: classroomConfig.selectedDifficulty,
+		classroomMode: classroomConfig.selectedMode
 	}
 }
 
 function scheduleSaveSettings() {
 	if (saveSettingsTimer) clearTimeout(saveSettingsTimer)
 	saveSettingsTimer = setTimeout(function () {
-		storage.saveSettings(collectSettings())
+		if (!worldEdits) worldEdits = {}
+		worldEdits._settings = collectWorldSettings()
+		scheduleSaveWorld()
 		saveSettingsTimer = null
 	}, 500)
 }
@@ -1144,8 +1471,11 @@ function buildHotbar() {
 }
 
 function buildInventory() {
+	if (!ui.inventoryGrid) return
+	ui.inventoryGrid.innerHTML = ''
+	inventoryEls = []
+	inventoryElsById = {}
 	blockCatalog.forEach(function (block) {
-		if (block.locked) return
 		addInventoryItem(block)
 	})
 }
@@ -1162,6 +1492,10 @@ function createInventoryItem(block) {
 	item.appendChild(label)
 
 	item.addEventListener('click', function () {
+		if (block.locked) {
+			showLockedNotice('Bloque aun no desbloqueado.')
+			return
+		}
 		setSelectedById(block.id)
 		toggleInventory(false)
 	})
@@ -1172,8 +1506,31 @@ function createInventoryItem(block) {
 function addInventoryItem(block) {
 	if (!ui.inventoryGrid) return
 	var item = createInventoryItem(block)
+	updateInventoryItemLock(block, item)
 	ui.inventoryGrid.appendChild(item)
 	inventoryEls.push(item)
+	inventoryElsById[block.id] = item
+}
+
+function updateInventoryItemLock(block, item) {
+	var el = item || inventoryElsById[block.id]
+	if (!el) return
+	el.classList.toggle('locked', !!block.locked)
+}
+
+function applyWorldUnlocks() {
+	resetBlockLocks()
+	if (!worldEdits || !Array.isArray(worldEdits._unlockedBlocks)) return
+	for (var i = 0; i < worldEdits._unlockedBlocks.length; i++) {
+		var block = getBlockByName(worldEdits._unlockedBlocks[i])
+		if (block) block.locked = false
+	}
+}
+
+function resetBlockLocks() {
+	for (var i = 0; i < blockCatalog.length; i++) {
+		blockCatalog[i].locked = !!defaultLockState[i]
+	}
 }
 
 function unlockBlockByName(name) {
@@ -1182,11 +1539,21 @@ function unlockBlockByName(name) {
 		if (block.name === name) {
 			if (!block.locked) return false
 			block.locked = false
-			addInventoryItem(block)
+			trackWorldUnlock(name)
+			updateInventoryItemLock(block)
 			return true
 		}
 	}
 	return false
+}
+
+function trackWorldUnlock(name) {
+	if (!worldEdits) worldEdits = {}
+	if (!Array.isArray(worldEdits._unlockedBlocks)) worldEdits._unlockedBlocks = []
+	if (worldEdits._unlockedBlocks.indexOf(name) === -1) {
+		worldEdits._unlockedBlocks.push(name)
+		scheduleSaveWorld()
+	}
 }
 
 function makeIcon(block) {
@@ -1309,6 +1676,10 @@ function getDefaultHotbar() {
 }
 
 function startClassroom() {
+	if (classroom.mode === 'staff') {
+		startStaffChallenge()
+		return
+	}
 	classroom.enabled = true
 	classroom.levelIndex = classroomConfig.selectedDifficulty || 0
 	classroom.score = 0
@@ -1320,6 +1691,22 @@ function startClassroom() {
 	playSequence()
 }
 
+function startStaffChallenge() {
+	classroom.enabled = true
+	classroom.levelIndex = -1
+	classroom.score = 0
+	classroom.inputIndex = 0
+	classroom.challengeIndex = 0
+	classroom.playing = false
+	classroom.allowInput = false
+	classroom.staffStage = 'build'
+	classroom.sequence = buildStaffSequence(getActiveStaffSong())
+	clearClassroomTimers()
+	updateClassroomUI()
+	setClassroomStatus('Construye la cancion con bloques. Luego pulsa Repetir y camina sobre las notas.')
+	updateStaffProgress()
+}
+
 function resetClassroom() {
 	classroom.enabled = false
 	classroom.levelIndex = -1
@@ -1329,6 +1716,7 @@ function resetClassroom() {
 	classroom.challengeIndex = 0
 	classroom.playing = false
 	classroom.allowInput = false
+	classroom.staffStage = 'build'
 	clearClassroomTimers()
 	updateClassroomUI()
 	setClassroomStatus('Pulsa Empezar para iniciar el reto.')
@@ -1386,7 +1774,121 @@ function getBlockByName(name) {
 	return null
 }
 
+function getActiveStaffSong() {
+	var index = classroomConfig.selectedDifficulty || 0
+	if (index < 0) index = 0
+	if (index >= staffSongs.length) index = staffSongs.length - 1
+	return staffSongs[index] || null
+}
+
+function buildStaffSequence(song) {
+	var sequence = []
+	if (!song || !Array.isArray(song.notes)) return sequence
+	for (var i = 0; i < song.notes.length; i++) {
+		var entry = song.notes[i]
+		var label = entry.note + ' ' + entry.rhythm
+		var block = getBlockByName(label)
+		if (block) sequence.push(block.id)
+	}
+	return sequence
+}
+
+function staffStep(noteLetter, noteOctave) {
+	if (!noteLetter || !noteOctave) return null
+	var letters = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+	var letterIndex = letters.indexOf(noteLetter)
+	if (letterIndex < 0) return null
+	var octave = parseInt(noteOctave, 10)
+	if (Number.isNaN(octave)) return null
+	var baseIndex = 4 * 7 + letters.indexOf('E')
+	var noteIndex = octave * 7 + letterIndex
+	return noteIndex - baseIndex
+}
+
+function staffRhythmClass(rhythm) {
+	if (rhythm === 'Blanca') return 'half'
+	if (rhythm === 'Corchea') return 'eighth'
+	return ''
+}
+
+function renderStaffSequence() {
+	if (!ui.staffNotes) return
+	if (classroom.mode !== 'staff') {
+		ui.staffNotes.innerHTML = ''
+		staffNoteEls = []
+		if (ui.staffSong) ui.staffSong.textContent = '--'
+		return
+	}
+
+	var song = getActiveStaffSong()
+	var previewSequence = classroom.sequence.length ? classroom.sequence : buildStaffSequence(song)
+	ui.staffNotes.innerHTML = ''
+	staffNoteEls = []
+	if (ui.staffSong) ui.staffSong.textContent = song ? song.name : '--'
+	if (!previewSequence.length) return
+
+	var layout = getStaffLayout()
+	var baseLineY = layout.paddingTop + layout.lineGap * 4
+	var noteWidth = layout.paddingLeft * 2 + (previewSequence.length - 1) * layout.noteSpacing + 40
+	var minWidth = ui.staffBoard ? ui.staffBoard.clientWidth : noteWidth
+	ui.staffNotes.style.width = Math.max(minWidth, noteWidth) + 'px'
+
+	for (var i = 0; i < previewSequence.length; i++) {
+		var blockId = previewSequence[i]
+		var music = musicBlocks[blockId]
+		if (!music) continue
+
+		var noteEl = document.createElement('div')
+		var classes = ['staff-note']
+		if (music.isRest) {
+			classes.push('rest')
+		} else {
+			var rhythmClass = staffRhythmClass(music.rhythm)
+			if (rhythmClass) classes.push(rhythmClass)
+		}
+		noteEl.className = classes.join(' ')
+		noteEl.dataset.index = String(i)
+
+		var x = layout.paddingLeft + i * layout.noteSpacing
+		noteEl.style.left = x + 'px'
+
+		var y = baseLineY - layout.lineGap
+		if (!music.isRest) {
+			var step = staffStep(music.noteLetter, music.noteOctave)
+			if (typeof step === 'number') {
+				y = baseLineY - step * (layout.lineGap / 2)
+				if (step % 2 === 0 && (step < 0 || step > 8)) {
+					var ledger = document.createElement('div')
+					ledger.className = 'staff-ledger'
+					noteEl.appendChild(ledger)
+				}
+			}
+		}
+
+		noteEl.style.top = (y - layout.noteHeight / 2 + layout.noteOffset) + 'px'
+		ui.staffNotes.appendChild(noteEl)
+		staffNoteEls.push(noteEl)
+	}
+
+	updateStaffProgress()
+}
+
+function updateStaffProgress(activeIndex) {
+	if (classroom.mode !== 'staff' || !staffNoteEls.length) return
+	for (var i = 0; i < staffNoteEls.length; i++) {
+		var noteEl = staffNoteEls[i]
+		var isDone = i < classroom.inputIndex
+		var isCurrent = (typeof activeIndex === 'number') ? i === activeIndex : (i === classroom.inputIndex && classroom.allowInput)
+		noteEl.classList.toggle('done', isDone)
+		noteEl.classList.toggle('current', isCurrent)
+	}
+}
+
 function playSequence() {
+	if (classroom.mode === 'staff') {
+		startStaffPlayback()
+		return
+	}
 	if (!classroom.enabled || classroom.playing) return
 	if (!audioReady) {
 		// Try to unlock audio from a user gesture (e.g., clicking "Empezar").
@@ -1410,7 +1912,7 @@ function playSequence() {
 	classroom.sequence.forEach(function (blockId, index) {
 		var timer = setTimeout(function () {
 			highlightSequenceIndex(index)
-			playMusicBlock(blockId)
+			playMusicBlock(blockId, 'sequence')
 		}, delay)
 		classroom.timeouts.push(timer)
 		delay += getBlockDuration(blockId) * 1000 + 200
@@ -1426,14 +1928,133 @@ function playSequence() {
 	classroom.timeouts.push(endTimer)
 }
 
+function startStaffPlayback() {
+	if (!classroom.enabled || classroom.playing) return
+	classroom.staffStage = 'play'
+	classroom.allowInput = true
+	classroom.inputIndex = 0
+	clearClassroomTimers()
+	clearSequenceHighlights()
+	updateClassroomUI()
+	setClassroomStatus('Reproduce la cancion caminando sobre las notas.')
+	updateStaffProgress()
+}
+
+function buildClefChordsFromWorld(startX, startY, startZ) {
+	var maxBlocks = 256
+	var maxHeight = 32
+	var queue = [[startX, startY, startZ]]
+	var visited = {}
+	var musicPositions = []
+
+	while (queue.length && musicPositions.length < maxBlocks) {
+		var pos = queue.shift()
+		var x = pos[0]
+		var y = pos[1]
+		var z = pos[2]
+		var key = x + '|' + y + '|' + z
+		if (visited[key]) continue
+		visited[key] = true
+
+		var blockId = noa.getBlock(x, y, z)
+		if (!blockId) continue
+		if (blockId !== clefID && !musicBlocks[blockId]) continue
+		if (musicBlocks[blockId]) {
+			musicPositions.push({ x: x, y: y, z: z, id: blockId })
+		}
+
+		queue.push([x + 1, y, z])
+		queue.push([x - 1, y, z])
+		queue.push([x, y + 1, z])
+		queue.push([x, y - 1, z])
+		queue.push([x, y, z + 1])
+		queue.push([x, y, z - 1])
+	}
+
+	var columnMap = {}
+	musicPositions.forEach(function (pos) {
+		var colKey = pos.x + '|' + pos.z
+		if (!columnMap[colKey]) columnMap[colKey] = { x: pos.x, z: pos.z, notes: [] }
+		columnMap[colKey].notes.push(pos)
+	})
+
+	var columns = Object.keys(columnMap).map(function (key) {
+		var entry = columnMap[key]
+		entry.notes.sort(function (a, b) { return a.y - b.y })
+		return entry
+	})
+
+	columns.sort(function (a, b) {
+		var da = Math.abs(a.x - startX) + Math.abs(a.z - startZ)
+		var db = Math.abs(b.x - startX) + Math.abs(b.z - startZ)
+		if (da !== db) return da - db
+		if (a.x !== b.x) return a.x - b.x
+		return a.z - b.z
+	})
+
+	var chords = []
+	for (var i = 0; i < columns.length; i++) {
+		var chord = []
+		for (var j = 0; j < columns[i].notes.length; j++) {
+			var note = columns[i].notes[j]
+			if (note.y >= startY && note.y < startY + maxHeight) {
+				chord.push(note)
+			}
+		}
+		if (chord.length) chords.push(chord)
+	}
+
+	return chords
+}
+
+function playClefSequence(startX, startY, startZ) {
+	if (classroom.playing) return
+	var chords = buildClefChordsFromWorld(startX, startY, startZ)
+	if (!chords.length) return
+	if (!ensureAudio()) {
+		showAudioHint()
+		return
+	}
+	classroom.playing = true
+	clearClassroomTimers()
+	clearSequenceHighlights()
+
+	var delay = 200
+	chords.forEach(function (chord) {
+		var timer = setTimeout(function () {
+			chord.forEach(function (note) {
+				playMusicBlock(note.id, 'sequence', [note.x, note.y, note.z])
+			})
+		}, delay)
+		classroom.timeouts.push(timer)
+		var maxDuration = 0.3
+		for (var i = 0; i < chord.length; i++) {
+			maxDuration = Math.max(maxDuration, getBlockDuration(chord[i].id))
+		}
+		delay += maxDuration * 1000 + 200
+	})
+
+	var endTimer = setTimeout(function () {
+		classroom.playing = false
+		if (classroom.staffStage === 'play') {
+			classroom.allowInput = true
+		}
+		clearSequenceHighlights()
+		updateClassroomUI()
+	}, delay)
+	classroom.timeouts.push(endTimer)
+}
+
 function getBlockDuration(blockId) {
 	var music = musicBlocks[blockId]
 	return music ? music.duration : 0.3
 }
 
-function recordClassroomInput(blockId) {
+function recordClassroomInput(blockId, source) {
 	if (!classroom.enabled || !classroom.allowInput) return
 	if (!musicBlocks[blockId]) return
+	if (classroom.mode === 'staff' && source !== 'step') return
+	if (classroom.mode === 'staff' && classroom.staffStage !== 'play') return
 
 	var expected = classroom.sequence[classroom.inputIndex]
 	if (blockId === expected) {
@@ -1442,6 +2063,10 @@ function recordClassroomInput(blockId) {
 		updateClassroomUI()
 		if (classroom.inputIndex >= classroom.sequence.length) {
 			classroom.score += 10
+			if (classroom.mode === 'staff') {
+				completeStaffChallenge()
+				return
+			}
 			setClassroomStatus('Bien! Siguiente reto...')
 			advanceLevel()
 		}
@@ -1450,6 +2075,16 @@ function recordClassroomInput(blockId) {
 		classroom.inputIndex = 0
 		updateClassroomUI()
 	}
+}
+
+function completeStaffChallenge() {
+	classroom.allowInput = false
+	classroom.enabled = false
+	updateClassroomUI()
+	var unlocked = unlockBlockByName('Ladrillo')
+	var rewardText = unlocked ? ' Nuevo material: Ladrillo (inventario E).' : ''
+	setClassroomStatus('Partitura completada. Buen trabajo!' + rewardText)
+	showChallengeBanner('Partitura completada', 'Has recreado la cancion en el pentagrama.' + rewardText)
 }
 
 function advanceLevel() {
@@ -1464,7 +2099,7 @@ function advanceLevel() {
 		}
 		var rewardText = unlocked ? ' Premio desbloqueado: Valla (inventario E).' : ''
 		setClassroomStatus('Reto completado. Puntuacion final: ' + classroom.score + '.' + rewardText)
-		showChallengeBanner('Reto superado!', 'Felicitaciones! Has completado el desafio.')
+		showChallengeBanner('Reto superado!', 'Felicitaciones! Has completado el desafio.' + rewardText)
 		classroom.enabled = false
 		return
 	}
@@ -1478,15 +2113,23 @@ function advanceLevel() {
 function updateClassroomUI() {
 	if (!ui.classroomLevel) return
 	var levelLabel = '--'
-	if (classroom.levelIndex >= 0) {
+	if (classroom.mode === 'staff') {
+		var song = getActiveStaffSong()
+		levelLabel = song ? song.name : 'Partitura'
+	} else if (classroom.levelIndex >= 0) {
 		levelLabel = classroomLevels[classroom.levelIndex].name
 	} else if (classroomLevels[classroomConfig.selectedDifficulty]) {
 		levelLabel = classroomLevels[classroomConfig.selectedDifficulty].name
 	}
 	ui.classroomLevel.textContent = levelLabel
 	ui.classroomScore.textContent = String(classroom.score)
-	ui.classroomProgress.textContent = classroom.inputIndex + '/' + classroom.sequence.length
+	var seqLength = classroom.sequence.length
+	if (classroom.mode === 'staff' && seqLength === 0) {
+		seqLength = buildStaffSequence(getActiveStaffSong()).length
+	}
+	ui.classroomProgress.textContent = classroom.inputIndex + '/' + seqLength
 	renderSequence()
+	renderStaffSequence()
 }
 
 function placeFenceRewardNearPlayer() {
@@ -1506,6 +2149,7 @@ function placeFenceRewardNearPlayer() {
 function renderSequence() {
 	if (!ui.classroomSeq) return
 	ui.classroomSeq.innerHTML = ''
+	if (classroom.mode === 'staff') return
 	for (var i = 0; i < classroom.sequence.length; i++) {
 		var blockId = classroom.sequence[i]
 		var chip = document.createElement('div')
@@ -1516,20 +2160,24 @@ function renderSequence() {
 }
 
 function highlightSequenceIndex(index) {
-	if (!ui.classroomSeq) return
-	var chips = ui.classroomSeq.querySelectorAll('.seq-chip')
-	for (var i = 0; i < chips.length; i++) {
-		if (i === index) chips[i].classList.add('active')
-		else chips[i].classList.remove('active')
+	if (ui.classroomSeq) {
+		var chips = ui.classroomSeq.querySelectorAll('.seq-chip')
+		for (var i = 0; i < chips.length; i++) {
+			if (i === index) chips[i].classList.add('active')
+			else chips[i].classList.remove('active')
+		}
 	}
+	updateStaffProgress(index)
 }
 
 function clearSequenceHighlights() {
-	if (!ui.classroomSeq) return
-	var chips = ui.classroomSeq.querySelectorAll('.seq-chip')
-	for (var i = 0; i < chips.length; i++) {
-		chips[i].classList.remove('active')
+	if (ui.classroomSeq) {
+		var chips = ui.classroomSeq.querySelectorAll('.seq-chip')
+		for (var i = 0; i < chips.length; i++) {
+			chips[i].classList.remove('active')
+		}
 	}
+	updateStaffProgress()
 }
 
 function clearClassroomTimers() {
@@ -1572,7 +2220,25 @@ function ensureAudio() {
 	return true
 }
 
-function playMusicBlock(blockId) {
+function pulseMusicBlock(position, duration) {
+	if (!scene || !position) return
+	if (!musicPulseMat) {
+		musicPulseMat = new BABYLON.StandardMaterial('music-pulse-mat', scene)
+		musicPulseMat.emissiveColor = new BABYLON.Color3(0.9, 0.9, 1.0)
+		musicPulseMat.alpha = 0.45
+		musicPulseMat.specularColor = new BABYLON.Color3(0, 0, 0)
+		musicPulseMat.disableLighting = true
+	}
+	var box = BABYLON.MeshBuilder.CreateBox('music-pulse', { size: 1.08 }, scene)
+	box.position = new BABYLON.Vector3(position[0] + 0.5, position[1] + 0.5, position[2] + 0.5)
+	box.material = musicPulseMat
+	box.isPickable = false
+	setTimeout(function () {
+		box.dispose()
+	}, duration || 220)
+}
+
+function playMusicBlock(blockId, source, position) {
 	var music = musicBlocks[blockId]
 	if (!music) return
 	if (!ensureAudio()) {
@@ -1585,7 +2251,10 @@ function playMusicBlock(blockId) {
 		updateStatus()
 	}
 
-	recordClassroomInput(blockId)
+	recordClassroomInput(blockId, source)
+	if (position) {
+		pulseMusicBlock(position, Math.max(180, music.duration * 800))
+	}
 
 	if (!music.isRest && music.frequency) {
 		var osc = audioState.ctx.createOscillator()
@@ -1630,6 +2299,16 @@ function hideAudioHint() {
 	if (ui.audioHint) ui.audioHint.style.display = 'none'
 }
 
+function showLockedNotice(message) {
+	if (!ui.lockHint) return
+	if (lockHintTimer) clearTimeout(lockHintTimer)
+	ui.lockHint.textContent = message || 'Bloque bloqueado.'
+	ui.lockHint.classList.add('active')
+	lockHintTimer = setTimeout(function () {
+		ui.lockHint.classList.remove('active')
+	}, 1400)
+}
+
 function updateHotbarSlot(index) {
 	var slot = hotbarEls[index]
 	while (slot.firstChild) slot.removeChild(slot.firstChild)
@@ -1656,6 +2335,7 @@ noa.on('tick', function (dt) {
 	scrollCooldown -= dt
 	statusCooldown -= dt
 	lastStepTime -= dt
+	clefStepCooldown -= dt
 	stepSoundCooldown -= dt
 	if (multiplayer) multiplayer.tick(dt)
 	updateIslandAnimal(dt)
@@ -1712,13 +2392,19 @@ noa.on('tick', function (dt) {
 		lastValidPos = [pos[0], pos[1], pos[2]]
 	}
 
-	if (blockUnder && blockUnder !== lastStepBlockId && lastStepTime <= 0) {
+	var stepKey = underX + '|' + underY + '|' + underZ
+	if (blockUnder === clefID && stepKey !== lastClefStepKey && clefStepCooldown <= 0) {
+		playClefSequence(underX, underY, underZ)
+		clefStepCooldown = 400
+	}
+	lastClefStepKey = (blockUnder === clefID) ? stepKey : null
+	if (blockUnder && stepKey !== lastStepPosKey && lastStepTime <= 0) {
 		if (musicBlocks[blockUnder]) {
-			playMusicBlock(blockUnder)
+			playMusicBlock(blockUnder, 'step', [underX, underY, underZ])
 			lastStepTime = 120
 		}
 	}
-	lastStepBlockId = blockUnder
+	lastStepPosKey = blockUnder ? stepKey : null
 
 	if (!musicBlocks[blockUnder] && blockUnder && stepSoundCooldown <= 0) {
 		var vel = noa.playerBody.velocity
@@ -1890,9 +2576,7 @@ function isAnimalBlockedAt(x, z, feetY, groundY) {
 	var zi = Math.floor(z)
 	var footBlock = Math.floor(feetY)
 	if (isFenceBlockAt(xi, footBlock, zi) || isFenceBlockAt(xi, footBlock + 1, zi)) return true
-	if (noa.registry.getBlockSolidity(noa.getBlock(xi, footBlock, zi))) return true
-	if (noa.registry.getBlockSolidity(noa.getBlock(xi, footBlock + 1, zi))) return true
-	if (groundY !== null && groundY - feetY > 1.2) return true
+	if (groundY !== null && isFenceBlockAt(xi, Math.floor(groundY - 1), zi)) return true
 	return false
 }
 
