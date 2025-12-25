@@ -1,0 +1,98 @@
+(function() {
+  const payload = {
+    es: {
+      'quiz.title': 'Quiz Musical',
+      'quiz.subtitle': 'Pon a prueba vuestros conocimientos musicales solos o por parejas.',
+      'quiz.controls.title': 'Configura la partida',
+      'quiz.controls.questions': 'Número de preguntas',
+      'quiz.controls.level': 'Nivel',
+      'quiz.controls.mode': 'Modo de juego',
+      'quiz.level.easy': 'Fácil',
+      'quiz.level.medium': 'Medio',
+      'quiz.level.hard': 'Difícil',
+      'quiz.mode.solo': 'Individual',
+      'quiz.mode.pairs': 'Por parejas',
+      'quiz.actions.start': 'Comenzar',
+      'quiz.actions.next': 'Siguiente pregunta',
+      'quiz.actions.play_again': 'Jugar de nuevo',
+      'quiz.progress.label': 'Preguntas respondidas:',
+      'quiz.progress.value': '%{current} / %{total}',
+      'quiz.player.one': 'Jugador 1',
+      'quiz.player.two': 'Jugador 2',
+      'quiz.player.correct': 'Aciertos: 0',
+      'quiz.player.correct_count': 'Aciertos: %{count}',
+      'quiz.feedback.correct': '¡Correcto! +%{points} pts',
+      'quiz.feedback.wrong': 'Respuesta incorrecta, ¡sigue intentándolo!',
+      'quiz.summary.score': 'Puntuación final: %{score} pts',
+      'quiz.summary.correct': 'Respuestas correctas: %{count} / %{total}',
+      'quiz.errors.no_questions': 'No hay preguntas disponibles para este nivel.',
+      'quiz.overlay.subtitle': 'Partida completada. Guarda la puntuación si quieres aparecer en el ranking.',
+      'quiz.rank.title': 'Ranking de Quiz Musical'
+    },
+    val: {
+      'quiz.title': 'Quiz Musical',
+      'quiz.subtitle': 'Poseu a prova els vostres coneixements musicals sols o per parelles.',
+      'quiz.controls.title': 'Configura la partida',
+      'quiz.controls.questions': 'Nombre de preguntes',
+      'quiz.controls.level': 'Nivell',
+      'quiz.controls.mode': 'Mode de joc',
+      'quiz.level.easy': 'Fàcil',
+      'quiz.level.medium': 'Mitjà',
+      'quiz.level.hard': 'Difícil',
+      'quiz.mode.solo': 'Individual',
+      'quiz.mode.pairs': 'Per parelles',
+      'quiz.actions.start': 'Començar',
+      'quiz.actions.next': 'Pregunta següent',
+      'quiz.actions.play_again': 'Tornar a jugar',
+      'quiz.progress.label': 'Preguntes respostes:',
+      'quiz.progress.value': '%{current} / %{total}',
+      'quiz.player.one': 'Jugador 1',
+      'quiz.player.two': 'Jugador 2',
+      'quiz.player.correct': 'Encerts: 0',
+      'quiz.player.correct_count': 'Encerts: %{count}',
+      'quiz.feedback.correct': 'Correcte! +%{points} pts',
+      'quiz.feedback.wrong': 'Resposta incorrecta, continua provant!',
+      'quiz.summary.score': 'Puntuació final: %{score} pts',
+      'quiz.summary.correct': 'Respostes correctes: %{count} / %{total}',
+      'quiz.errors.no_questions': 'No hi ha preguntes disponibles per a este nivell.',
+      'quiz.overlay.subtitle': 'Partida completada. Guarda la puntuació per aparèixer al rànquing.',
+      'quiz.rank.title': 'Rànquing de Quiz Musical'
+    },
+    en: {
+      'quiz.title': 'Music Quiz',
+      'quiz.subtitle': 'Challenge your musical knowledge on your own or in pairs.',
+      'quiz.controls.title': 'Set up the game',
+      'quiz.controls.questions': 'Number of questions',
+      'quiz.controls.level': 'Level',
+      'quiz.controls.mode': 'Game mode',
+      'quiz.level.easy': 'Easy',
+      'quiz.level.medium': 'Medium',
+      'quiz.level.hard': 'Hard',
+      'quiz.mode.solo': 'Solo',
+      'quiz.mode.pairs': 'Pairs',
+      'quiz.actions.start': 'Start',
+      'quiz.actions.next': 'Next question',
+      'quiz.actions.play_again': 'Play again',
+      'quiz.progress.label': 'Questions answered:',
+      'quiz.progress.value': '%{current} / %{total}',
+      'quiz.player.one': 'Player 1',
+      'quiz.player.two': 'Player 2',
+      'quiz.player.correct': 'Correct answers: 0',
+      'quiz.player.correct_count': 'Correct answers: %{count}',
+      'quiz.feedback.correct': 'Correct! +%{points} pts',
+      'quiz.feedback.wrong': 'Not quite. Keep trying!',
+      'quiz.summary.score': 'Final score: %{score} pts',
+      'quiz.summary.correct': 'Correct answers: %{count} / %{total}',
+      'quiz.errors.no_questions': 'No questions are available for this level.',
+      'quiz.overlay.subtitle': 'Quiz complete. Save the score to appear on the leaderboard.',
+      'quiz.rank.title': 'Music Quiz Leaderboard'
+    }
+  };
+
+  if (window.i18n && typeof window.i18n.registerBundle === 'function') {
+    window.i18n.registerBundle('quiz', payload);
+  } else {
+    window.__i18nPendingBundles = window.__i18nPendingBundles || [];
+    window.__i18nPendingBundles.push({ name: 'quiz', payload });
+  }
+})();

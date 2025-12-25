@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="pianohero.title">Arcade Piano Hero</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/piano-hero.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <div class="pianohero-page">
+    <header class="pianohero-header">
+      <h1 data-i18n="pianohero.title">Arcade Piano Hero</h1>
+      <p data-i18n="pianohero.subtitle">Prototipo lúdico con teclado: atrapa las notas en el punto justo para sumar combo y subir al ranking.</p>
+    </header>
+
+    <div class="pianohero-layout">
+      <section class="pianohero-stage" aria-labelledby="pianoheroPlayArea">
+        <h2 id="pianoheroPlayArea" class="sr-only" data-i18n="pianohero.playarea">Zona de juego</h2>
+
+        <div class="pianohero-hud" aria-live="polite">
+          <span><span data-i18n="pianohero.hud.score">Puntos</span>: <output data-score>0</output></span>
+          <span><span data-i18n="pianohero.hud.combo">Combo</span>: <output data-combo>0</output></span>
+          <span><span data-i18n="pianohero.hud.lives">Vidas</span>: <output data-lives>3</output></span>
+          <span><span data-i18n="pianohero.hud.best">Mejor combo</span>: <output data-best>0</output></span>
+          <span class="pianohero-level-badge"><span data-i18n="pianohero.hud.level">Modo</span>: <output data-level>Intro</output></span>
+        </div>
+
+        <div class="pianohero-board" data-pianohero-board>
+          <div class="pianohero-target" aria-hidden="true"></div>
+          <div class="pianohero-lane" data-lane="0">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.g3">Sol₃</span>
+              <kbd>A</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="1">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.a3">La₃</span>
+              <kbd>S</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="2">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.b3">Si₃</span>
+              <kbd>D</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="3">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.c4">Do₄</span>
+              <kbd>F</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="4">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.d4">Re₄</span>
+              <kbd>G</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="5">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.e4">Mi₄</span>
+              <kbd>H</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="6">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.f4">Fa₄</span>
+              <kbd>J</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="7">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.g4">Sol₄</span>
+              <kbd>K</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="8">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.a4">La₄</span>
+              <kbd>L</kbd>
+            </div>
+          </div>
+          <div class="pianohero-lane" data-lane="9">
+            <div class="pianohero-lane__badge">
+              <span data-lane-note data-i18n="pianohero.lane.b4">Si₄</span>
+              <kbd>&semi;</kbd>
+            </div>
+          </div>
+        </div>
+
+        <div class="pianohero-keys" data-pianohero-keys>
+          <button type="button" class="pianohero-key" data-lane="0" data-i18n="pianohero.button.g3">Sol₃ · A</button>
+          <button type="button" class="pianohero-key" data-lane="1" data-i18n="pianohero.button.a3">La₃ · S</button>
+          <button type="button" class="pianohero-key" data-lane="2" data-i18n="pianohero.button.b3">Si₃ · D</button>
+          <button type="button" class="pianohero-key" data-lane="3" data-i18n="pianohero.button.c4">Do₄ · F</button>
+          <button type="button" class="pianohero-key" data-lane="4" data-i18n="pianohero.button.d4">Re₄ · G</button>
+          <button type="button" class="pianohero-key" data-lane="5" data-i18n="pianohero.button.e4">Mi₄ · H</button>
+          <button type="button" class="pianohero-key" data-lane="6" data-i18n="pianohero.button.f4">Fa₄ · J</button>
+          <button type="button" class="pianohero-key" data-lane="7" data-i18n="pianohero.button.g4">Sol₄ · K</button>
+          <button type="button" class="pianohero-key" data-lane="8" data-i18n="pianohero.button.a4">La₄ · L</button>
+          <button type="button" class="pianohero-key" data-lane="9" data-i18n="pianohero.button.b4">Si₄ · ;</button>
+        </div>
+
+        <p class="pianohero-status" data-status role="status" aria-live="polite" data-i18n="pianohero.status.ready">Prepara tus manos y pulsa «Iniciar partida».</p>
+
+        <div class="pianohero-controls">
+          <button type="button" class="pianohero-start" data-start data-i18n="pianohero.controls.start">Iniciar partida</button>
+          <p class="pianohero-controls__hint" data-i18n="pianohero.controls.hint">El juego empieza muy fácil y añade carriles y velocidad poco a poco.</p>
+          <label class="pianohero-training">
+            <input type="checkbox" data-training>
+            <span data-i18n="pianohero.training.label">Modo entrenamiento (sin vidas ni puntos)</span>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <section class="pianohero-extra">
+      <section class="pianohero-instructions">
+        <h2 data-i18n="pianohero.instructions.title">Cómo jugar</h2>
+        <ul>
+          <li data-i18n="pianohero.instructions.step1">Pulsa «Iniciar partida» y observa cómo caen las notas por los carriles.</li>
+          <li data-i18n="pianohero.instructions.step2">Toca la tecla indicada (A, S, D, F, G o H) cuando el bloque entre en el rectángulo punteado.</li>
+          <li data-i18n="pianohero.instructions.step3">Al sumar puntos se desbloquean nuevos carriles y el tempo aumenta.</li>
+          <li data-i18n="pianohero.instructions.step4">Encadena aciertos para aumentar el combo y sumar más puntos.</li>
+          <li data-i18n="pianohero.instructions.step5">Si fallas o se escapa un bloque pierdes una vida. Con 0 vidas la partida termina.</li>
+        </ul>
+        <p data-i18n="pianohero.instructions.tip">En pantallas táctiles, usa los botones de colores. El volumen sigue los controles generales de la aplicación.</p>
+
+        <div class="pianohero-legend">
+          <div class="pianohero-legend__row" style="--lane-color:#2563eb;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.g3">Sol₃ · A</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#0ea5e9;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.a3">La₃ · S</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#f97316;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.b3">Si₃ · D</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#a855f7;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.c4">Do₄ · F</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#ec4899;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.d4">Re₄ · G</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#f43f5e;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.e4">Mi₄ · H</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#facc15;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.f4">Fa₄ · J</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#22d3ee;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.g4">Sol₄ · K</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#34d399;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.a4">La₄ · L</span>
+          </div>
+          <div class="pianohero-legend__row" style="--lane-color:#fb7185;">
+            <div class="pianohero-legend__swatch"></div>
+            <span data-i18n="pianohero.legend.b4">Si₄ · ;</span>
+          </div>
+        </div>
+      </section>
+
+    <div class="game-rankings">
+      <div class="game-ranking-section">
+        <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+        <section
+          class="pianohero-ranking"
+          data-scoreboard
+          data-game="piano-hero"
+          data-period="all-time"
+          data-heading-key="rankings.pianohero"
+          data-heading="Arcade Piano Hero"
+          data-show-save-at="500"
+        ></section>
+      </div>
+      <div class="game-ranking-section">
+        <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+        <section
+          class="pianohero-ranking"
+          data-scoreboard
+          data-game="piano-hero"
+          data-period="weekly"
+          data-heading-key="rankings.pianohero"
+          data-heading="Arcade Piano Hero"
+        ></section>
+      </div>
+    </div>
+    </section>
+
+  </div>
+
+  <a href="../index.html" class="home-link" style="margin-top:18px;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/piano-hero.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/piano-hero.js" defer></script>
+</body>
+</html>

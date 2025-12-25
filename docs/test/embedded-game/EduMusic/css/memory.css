@@ -1,0 +1,226 @@
+
+    .memory-wrapper {
+      max-width: 960px;
+      margin: 0 auto 40px;
+      display: grid;
+      gap: 20px;
+    }
+    .memory-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      padding: 16px 20px;
+    }
+    .memory-controls .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .memory-mode {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #eff6ff;
+      border-radius: 999px;
+      padding: 6px 12px;
+    }
+    .memory-mode label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #0f172a;
+      cursor: pointer;
+    }
+    .memory-deck {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .memory-deck select {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 14px;
+      background: #fff;
+      color: #0f172a;
+    }
+    .memory-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .memory-controls button {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .memory-controls button:active {
+      transform: scale(0.97);
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+    }
+    .memory-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .memory-stats {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: #0f172a;
+    }
+    .memory-board {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+      padding: 20px;
+    }
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(64px, 1fr));
+      gap: 12px;
+    }
+    .memory-card {
+      position: relative;
+      width: 100%;
+      padding-bottom: 120%; /* maintain aspect ratio */
+      perspective: 900px;
+    }
+    .memory-card button {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+    }
+    .memory-card button.flipped {
+      transform: rotateY(180deg);
+      cursor: default;
+    }
+    .memory-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      color: #fff;
+      font-weight: 600;
+    }
+    .memory-face.back {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+    .memory-face.front {
+      transform: rotateY(180deg);
+      background: #f8fafc;
+      border: 2px solid rgba(148, 163, 184, 0.45);
+      color: #0f172a;
+      font-size: 15px;
+      text-align: center;
+      gap: 6px;
+    }
+    .memory-face.front span.family {
+      font-size: 12px;
+      color: #475569;
+      font-weight: 500;
+    }
+    .memory-message {
+      min-height: 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #2563eb;
+      padding: 0 2px;
+    }
+    @media (max-width: 1024px) {
+      .memory-wrapper {
+        padding: 0 16px;
+      }
+      .memory-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+      }
+      .memory-controls .buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .memory-mode,
+      .memory-deck,
+      .memory-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .memory-stats {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .memory-board {
+        padding: 16px;
+      }
+      .memory-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .memory-card {
+        padding-bottom: 110%;
+      }
+    }
+    @media (max-width: 640px) {
+      .memory-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .memory-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .memory-controls .buttons {
+        width: 100%;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .memory-mode {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .memory-deck {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .memory-buttons {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .memory-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="quiz.title">Quiz Musical</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/quiz.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="quiz.title">Quiz Musical</h1>
+  <p class="quiz-subtitle" data-i18n="quiz.subtitle">Pon a prueba vuestros conocimientos musicales solo o por parejas.</p>
+
+  <section class="quiz-controls" aria-labelledby="quizControlsTitle">
+    <h2 id="quizControlsTitle" data-i18n="quiz.controls.title">Configura la partida</h2>
+    <div class="quiz-controls__row">
+      <label for="quizQuestionCount">
+        <span data-i18n="quiz.controls.questions">Número de preguntas</span>
+      </label>
+      <select id="quizQuestionCount">
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+      </select>
+    </div>
+    <div class="quiz-controls__row">
+      <label for="quizLevel">
+        <span data-i18n="quiz.controls.level">Nivel</span>
+      </label>
+      <select id="quizLevel">
+        <option value="easy" selected data-i18n="quiz.level.easy">Fácil</option>
+        <option value="medium" data-i18n="quiz.level.medium">Medio</option>
+        <option value="hard" data-i18n="quiz.level.hard">Difícil</option>
+      </select>
+    </div>
+    <div class="quiz-controls__row">
+      <label for="quizMode">
+        <span data-i18n="quiz.controls.mode">Modo de juego</span>
+      </label>
+      <select id="quizMode">
+        <option value="solo" selected data-i18n="quiz.mode.solo">Individual</option>
+        <option value="pairs" data-i18n="quiz.mode.pairs">Por parejas</option>
+      </select>
+    </div>
+    <button id="quizStart" class="quiz-primary" data-i18n="quiz.actions.start">Comenzar</button>
+  </section>
+
+  <section class="quiz-status" aria-live="polite">
+    <div class="quiz-progress">
+      <span data-i18n="quiz.progress.label">Preguntas respondidas:</span>
+      <strong id="quizProgressValue">0 / 0</strong>
+    </div>
+    <div class="quiz-players" id="quizPlayers">
+      <div class="quiz-player" data-player="0">
+        <span class="quiz-player__label" data-i18n="quiz.player.one">Jugador 1</span>
+        <strong class="quiz-player__score" data-score>0</strong>
+        <span class="quiz-player__detail" data-correct data-i18n="quiz.player.correct">Aciertos: 0</span>
+      </div>
+      <div class="quiz-player" data-player="1">
+        <span class="quiz-player__label" data-i18n="quiz.player.two">Jugador 2</span>
+        <strong class="quiz-player__score" data-score>0</strong>
+        <span class="quiz-player__detail" data-correct data-i18n="quiz.player.correct">Aciertos: 0</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="quiz-card" aria-live="polite">
+    <div class="quiz-card__header">
+      <h2 class="quiz-question" id="quizQuestionText">—</h2>
+      <p class="quiz-explanation" id="quizQuestionInfo" hidden>—</p>
+    </div>
+    <div class="quiz-options" id="quizOptions" role="list"></div>
+    <div class="quiz-feedback" id="quizFeedback" role="status" aria-live="assertive"></div>
+    <button id="quizNext" class="quiz-secondary" data-i18n="quiz.actions.next" hidden>Siguiente pregunta</button>
+  </section>
+
+  <section
+    data-scoreboard
+  <section class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="quiz"
+        data-heading-key="quiz.rank.title"
+        data-heading="Ranking de Quiz Musical"
+        data-show-save-at="1"
+        style="max-width: 900px; margin: 24px auto; text-align: left;"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="quiz"
+        data-period="weekly"
+        data-heading-key="quiz.rank.title"
+        data-heading="Ranking de Quiz Musical"
+        data-show-save-at="1"
+        style="max-width: 900px; margin: 24px auto; text-align: left;"
+      ></section>
+    </div>
+  </section>
+
+  <a href="../index.html" class="home-link">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/quiz.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/quiz.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+.dictation-hud {
+  margin: 1em 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.dictation-hud .hud-sep {
+  margin: 0 0.75em;
+  color: #94a3b8;
+}
+
+.dictation-controls {
+  margin: 0 0 1.5em;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.dictation-controls label {
+  font-weight: 600;
+}
+
+.dictation-controls select,
+.dictation-controls button {
+  padding: 0.6em 1.2em;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+#repeatBtn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dictation-feedback {
+  text-align: center;
+  margin-bottom: 1.2em;
+  min-height: 1.5em;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 2em;
+}
+
+.pattern-card {
+  border: 2px solid #c4b5fd;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.1em 0.9em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #0f172a;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pattern-card:not(:disabled):hover,
+.pattern-card:not(:disabled):focus {
+  transform: translateY(-2px);
+  border-color: #8b5cf6;
+  box-shadow: 0 10px 22px rgba(139, 92, 246, 0.25);
+}
+
+.pattern-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pattern-card.is-correct {
+  border-color: #10b981;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+}
+
+.pattern-card.is-error {
+  border-color: #ef4444;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+}
+
+.pattern-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+}
+
+.pattern-token {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  padding: 0.45em 0.3em;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  font-size: 0.98rem;
+  min-height: 38px;
+}
+
+.pattern-token.sol {
+  background: #bfdbfe;
+  border-color: #3b82f6;
+}
+
+.pattern-token.mi {
+  background: #fed7aa;
+  border-color: #f97316;
+}
+
+.pattern-token.la {
+  background: #fde68a;
+  border-color: #f59e0b;
+}
+
+.pattern-token.do {
+  background: #fecdd3;
+  border-color: #f43f5e;
+}
+
+.pattern-token.fa {
+  background: #d1fae5;
+  border-color: #10b981;
+}
+
+.pattern-token.re {
+  background: #e0f2fe;
+  border-color: #0ea5e9;
+}
+
+.pattern-token.si {
+  background: #f5d0fe;
+  border-color: #a855f7;
+}
+
+.pattern-staff {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pattern-staff svg {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+}
+
+.pattern-staff line {
+  stroke: #0f172a;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.pattern-staff .note-head {
+  fill: #0f172a;
+}
+
+.pattern-staff .stem {
+  stroke: #0f172a;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.pattern-staff .ledger {
+  stroke: #0f172a;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 16px;
+  }
+
+  .dictation-controls {
+    gap: 8px;
+  }
+
+  .pattern-card {
+    padding: 0.85em 0.6em;
+  }
+
+  .pattern-token {
+    font-size: 0.9rem;
+    min-height: 32px;
+  }
+}

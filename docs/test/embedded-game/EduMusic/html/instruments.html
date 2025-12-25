@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="game.instruments.title">Familias de instrusmentos</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <img src="../assets/icon-512.png" alt="Logo EduMúsic" style="display:block;width:80px;height:80px;margin:0 auto 8px;">
+  <h1 data-i18n="game.instruments.title">Familias de instrusmentos</h1>
+  <p class="about-subtitle" data-i18n="game.instruments.instructions">Identifica rápidamente a qué familia pertenece cada instrumento para familiarizarte con la orquesta.</p>
+
+  <div id="langSwitcher" data-lang-switch></div>
+
+  <section class="instrument-panel">
+    <div class="instrument-card">
+      <p class="instrument-label" data-i18n="game.instruments.prompt">¿A qué familia pertenece?</p>
+      <img id="instrumentImage" class="instrument-image" src="" alt="Instrumento destacado" data-instrument-image>
+      <p id="instrumentName" class="instrument-name">Violín</p>
+      <p id="instrumentInfo" class="instrument-info">Cuerdas frotadas, siempre en el registro agudo.</p>
+      <button id="playInstrumentSound" class="instrument-sound-btn" data-i18n="game.instruments.sound_button">Escuchar sonido</button>
+    </div>
+
+    <div id="familyButtons" class="instrument-families">
+      <button type="button" class="family-btn" data-family="cuerdas" data-i18n="game.instruments.family.cuerdas">Cuerdas</button>
+      <button type="button" class="family-btn" data-family="viento_madera" data-i18n="game.instruments.family.viento_madera">Viento madera</button>
+      <button type="button" class="family-btn" data-family="viento_metal" data-i18n="game.instruments.family.viento_metal">Viento metal</button>
+      <button type="button" class="family-btn" data-family="percusion" data-i18n="game.instruments.family.percusion">Percusión</button>
+    </div>
+
+    <div id="feedback" class="instrument-feedback" aria-live="polite"></div>
+
+    <div class="instrument-stats">
+      <div>
+        <span id="correctCount">0</span>
+        <span data-i18n="game.instruments.correct_label">Respuestas correctas</span>
+      </div>
+      <div>
+        <span id="missedCount">0</span>
+        <span data-i18n="game.instruments.missed_label">Errores</span>
+      </div>
+      <div>
+        <span id="streakCount">0</span>
+        <span data-i18n="game.instruments.streak_label">Racha</span>
+      </div>
+      <div>
+        <span id="highScore">0</span>
+        <span data-i18n="game.instruments.highscore_label">Mejor racha</span>
+      </div>
+      <div>
+        <span id="livesCount">3</span>
+        <span data-i18n="game.instruments.lives_label">Vidas</span>
+      </div>
+    </div>
+
+    <div class="instrument-controls">
+      <button id="nextInstrument" class="game-btn" data-i18n="game.instruments.button.next">Siguiente instrumento</button>
+    </div>
+
+  </section>
+
+  <section class="instrument-rankings" aria-label="Ranking de mejor racha">
+    <h2 data-i18n="game.instruments.ranking_title">Ranking de mejor racha</h2>
+    <div class="instrument-rankings__boards">
+      <div class="instrument-rankings__board">
+        <h3 data-i18n="game.instruments.ranking_general">General</h3>
+        <section data-scoreboard data-game="instrument-families" data-period="all-time" data-heading-key="rankings.instrumentfamilies" data-heading="Familias de instrusmentos"></section>
+      </div>
+      <div class="instrument-rankings__board">
+        <h3 data-i18n="game.instruments.ranking_weekly">Semanal</h3>
+        <section data-scoreboard data-game="instrument-families" data-period="weekly" data-heading-key="rankings.instrumentfamilies" data-heading="Familias de instrusmentos"></section>
+      </div>
+    </div>
+  </section>
+
+  <a href="../index.html" class="home-link" style="margin-top:24px;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <div id="instrumentModal" class="instrument-modal" aria-hidden="true">
+    <div class="instrument-modal__backdrop" data-image-close></div>
+    <div class="instrument-modal__content" role="dialog" aria-modal="true">
+      <button type="button" class="instrument-modal__close" data-image-close aria-label="Cerrar"><span aria-hidden="true">×</span></button>
+      <img id="instrumentModalImage" alt="">
+      <p id="instrumentModalLabel" class="instrument-modal__label"></p>
+    </div>
+  </div>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/i18n/instruments.js" defer></script>
+  <script src="../js/instruments.js" defer></script>
+</body>
+</html>

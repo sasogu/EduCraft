@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="duration.title">Duraciones largas y cortas</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/duration-choice.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="duration.title">Duraciones largas y cortas</h1>
+  <p data-i18n="duration.instructions">
+    Escucha el patrón de sonidos largos y cortos y elige la tarjeta con la misma combinación rítmica.
+  </p>
+
+  <section class="durationgame-wrapper">
+    <div class="durationgame-hud">
+      <div class="durationgame-stat">
+        <span data-i18n="duration.stats.score">Puntuación:</span>
+        <strong id="durationScore">0</strong>
+      </div>
+      <div class="durationgame-stat">
+        <span data-i18n="duration.stats.streak">Racha:</span>
+        <strong id="durationStreak">0</strong>
+      </div>
+      <div class="durationgame-stat">
+        <span data-i18n="duration.stats.lives">Vidas:</span>
+        <strong id="durationLives">3</strong>
+      </div>
+      <div class="durationgame-stat">
+        <span data-i18n="duration.stats.level">Nivel:</span>
+        <strong id="durationLevel">1</strong>
+      </div>
+    </div>
+
+    <div class="durationgame-controls">
+      <button id="durationStart" class="game-btn" data-i18n="duration.controls.start">Comenzar</button>
+      <button id="durationListen" class="game-btn ghost" data-i18n="duration.controls.listen" hidden>Escuchar patrón</button>
+      <button id="durationReset" class="game-btn secondary" data-i18n="duration.controls.reset" hidden>Reiniciar</button>
+    </div>
+
+    <div class="durationgame-prompt" role="status" aria-live="polite">
+      <span id="durationPrompt" data-i18n="duration.prompt.idle">Pulsa “Comenzar” para generar un patrón de duraciones.</span>
+    </div>
+
+    <div class="durationgame-view">
+      <button type="button" class="durationview-btn is-active" data-duration-view="lines" data-i18n="duration.view.lines">
+        Líneas
+      </button>
+      <button type="button" class="durationview-btn" data-duration-view="notation" data-i18n="duration.view.symbols">
+        Representación musical
+      </button>
+    </div>
+
+    <div id="durationCards" class="durationgame-grid" role="group" aria-live="polite"></div>
+
+    <p id="durationFeedback" class="durationgame-feedback" role="status" aria-live="polite" data-i18n="duration.feedback.idle">
+      Escucha el patrón y elige la tarjeta correcta.
+    </p>
+  </section>
+
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="duration-choice"
+        data-period="all-time"
+        data-heading-key="rankings.duration_choice"
+        data-heading="Duraciones largas y cortas"
+        data-show-save-at="1"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="duration-choice"
+        data-period="weekly"
+        data-heading-key="rankings.duration_choice"
+        data-heading="Duraciones largas y cortas"
+      ></section>
+    </div>
+  </div>
+
+  <a href="../index.html" class="home-link" style="margin-top:12px;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/duration-choice.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/i18n/hud.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/duration-choice.js" defer></script>
+</body>
+</html>

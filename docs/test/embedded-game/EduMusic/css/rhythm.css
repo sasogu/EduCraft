@@ -1,0 +1,57 @@
+
+    .controls {
+      margin: 1em 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .answer-btns {
+      margin: 0.5em 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    /* Diferenciar botones de respuesta (TA, SU, TITI) */
+    .answer-btns button {
+      font-weight: 700;
+      padding: 0.8em 1.4em;
+      border-radius: 10px;
+      color: #fff;
+    }
+    /* Colores específicos por respuesta */
+    #ansTa { background: #f59e0b; }      /* ámbar */
+    #ansTa:hover { background: #d97706; }
+    #ansSu { background: #ef4444; }      /* rojo */
+    #ansSu:hover { background: #dc2626; }
+    #ansTiti { background: #10b981; }    /* verde */
+    #ansTiti:hover { background: #059669; }
+
+    /* Mobile tweaks */
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      .controls { gap: 6px; }
+      .controls label { font-size: 14px; }
+      .controls select, .controls button, .controls a {
+        font-size: 16px;
+        padding: 10px 14px;
+      }
+      .answer-btns { gap: 10px; }
+      .answer-btns button {
+        font-size: 18px;
+        padding: 14px 16px;
+        min-width: 96px;
+      }
+      button, .controls a {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+    }
+    @media (max-width: 360px) {
+      .answer-btns { justify-content: stretch; }
+      .answer-btns button { flex: 1 1 100%; min-width: 0; }
+    }
+ 

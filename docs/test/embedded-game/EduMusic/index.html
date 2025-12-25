@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduMúsic</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <img src="assets/icon-512.png" alt="Logo EduMúsic" style="display:block;width:96px;height:96px;margin:0 auto 16px;">
+
+  <h1>EduMúsic</h1>
+  <br>
+  <div data-lang-switch></div>
+      <!-- <p data-i18n="index.choose">Selecciona una actividad para empezar:</p>
+   -->
+  <section class="tag-filter" data-tag-filter>
+    <header class="tag-filter__header">
+      <h2 data-i18n="tags.filter.title">Filtrar por etiquetas</h2>
+      <button type="button" class="tag-filter__clear" data-tag-filter-clear data-i18n="tags.filter.clear">Limpiar filtros</button>
+    </header>
+    <p class="tag-filter__hint" data-i18n="tags.filter.hint">Selecciona etiquetas para ver actividades relacionadas.</p>
+    <div class="tag-filter__list" data-tag-filter-list></div>
+    <p class="tag-filter__empty" data-tag-filter-empty data-i18n="tags.filter.noResults" hidden>No hay actividades con esas etiquetas.</p>
+  </section>
+
+  <div class="activity-grid">
+    <a href="html/game.html" class="activity-card" data-tags="juego,melodia" data-theme="catch" data-emoji="🎯">
+      <h2 data-i18n="index.card.title">Atrapa Notas</h2>
+      <p data-i18n="index.card.desc">Elige un reto para atrapar notas en el pentagrama.</p>
+      <small data-i18n="index.card.small">Disponibles: Sol &amp; Mi · Sol, Mi y La · Sol, Mi, La y Do</small>
+    </a>
+    <a href="html/memory.html" class="activity-card" data-tags="memoria,audicion,inicial" data-theme="memory" data-emoji="🧠">
+      <h2 data-i18n="index.memory.title">Memory de Instrumentos</h2>
+      <p data-i18n="index.memory.desc">Encuentra las parejas de instrumentos reconociendo su timbre y su imagen.</p>
+      <small data-i18n="index.memory.small">Modos base y orquesta · Juegos auditivos + visuales</small>
+    </a>
+    <a href="html/palabras-musicales.html" class="activity-card" data-tags="intermedio" data-theme="wordguess" data-emoji="📝">
+      <h2 data-i18n="index.wordguess.title">Palabras Musicales Secretas</h2>
+      <p data-i18n="index.wordguess.desc">Adivina términos musicales antes de que se acaben tus notas.</p>
+      <small data-i18n="index.wordguess.small">Categorías temáticas · Pistas opcionales · Letras desde teclado</small>
+    </a>
+    <a href="html/quiz.html" class="activity-card" data-tags="quiz,audicion,intermedio" data-theme="quiz" data-emoji="❓">
+      <h2 data-i18n="index.quiz.title">Quiz Musical</h2>
+      <p data-i18n="index.quiz.desc">Responde preguntas musicales solo o en pareja y suma puntos para el ranking.</p>
+      <small data-i18n="index.quiz.small">Selecciona 10, 20 o 30 preguntas · Tres niveles de dificultad</small>
+    </a>
+    <a href="html/compas.html" class="activity-card" data-tags="ritmo,avanzado,arrastrar" data-theme="compas" data-emoji="📏">
+      <h2 data-i18n="index.compas.title">Puzzle de Compases</h2>
+      <p data-i18n="index.compas.desc">Completa compases arrastrando fichas rítmicas.</p>
+      <small data-i18n="index.compas.small">2/4, 3/4 y 4/4 · Duraciones básicas</small>
+    </a>
+    <a href="html/melody.html" class="activity-card" data-tags="melodia,memoria,intermedio,avanzado" data-theme="melody" data-emoji="🎶">
+      <h2 data-i18n="index.melody.title">Secuencia de Melodías</h2>
+      <p data-i18n="index.melody.desc">Escucha, memoriza y repite las notas en el teclado virtual.</p>
+      <small data-i18n="index.melody.small">Estilo “Simon dice” · Teclado interactivo · Pentagrama</small>
+    </a>
+    <a href="html/piano-hero.html" class="activity-card" data-tags="piano,ritmo,juego,intermedio" data-theme="pianohero" data-emoji="🎮">
+      <h2 data-i18n="index.pianohero.title">Arcade Piano Hero</h2>
+      <p data-i18n="index.pianohero.desc">Toca las notas que caen, encadena combos y escala posiciones en el ranking.</p>
+      <small data-i18n="index.pianohero.small">Modos relax, clásico y turbo · Ranking integrado</small>
+    </a>
+    <a href="html/duration-choice.html" class="activity-card" data-tags="ritmo,audicion,inicial" data-theme="duration" data-emoji="⏱️">
+      <h2 data-i18n="index.duration.title">Duraciones largas y cortas</h2>
+      <p data-i18n="index.duration.desc">Escucha los patrones y decide qué tarjeta muestra los sonidos largos y cortos.</p>
+      <small data-i18n="index.duration.small">Empieza con negras y corcheas · Añade silencios, blancas y semicorcheas</small>
+    </a>
+    <!--
+    <a href="html/clave-sol.html" class="activity-card">
+      <h2 data-i18n="index.clef.title">Dibuja la Clave de Sol</h2>
+      <p data-i18n="index.clef.desc">Sigue los puntos y traza la clave, rodeando la línea de SOL.</p>
+      <small>Práctica guiada · Ratón o táctil</small>
+    </a>
+    -->
+   
+    <a href="html/rhythm.html" class="activity-card" data-tags="ritmo,inicial" data-theme="rhythm" data-emoji="🥁">
+      <h2 data-i18n="index.rhythm.title">Ritmo: TA, SU (y TITI)</h2>
+      <p data-i18n="index.rhythm.desc">Identifica patrones rítmicos: negra (TA), silencio (SU) y dos corcheas (TITI).</p>
+      <small data-i18n="index.rhythm.small">Modo básico: TA y SU · Activable TITI</small>
+    </a>
+    <a href="html/rhythm-dictation.html" class="activity-card" data-tags="ritmo,dictado,intermedio" data-theme="rhythm-dictation" data-emoji="👂">
+      <h2 data-i18n="index.dictation.title">Dictado Rítmico</h2>
+      <p data-i18n="index.dictation.desc">Escucha un patrón con TA y TI-TI y elige la respuesta correcta.</p>
+      <small data-i18n="index.dictation.small">Cuatro tiempos · 2, 3 o 4 opciones</small>
+    </a>
+    <a href="html/melody-dictation.html" class="activity-card" data-tags="melodia,dictado,intermedio" data-theme="melody-dictation" data-emoji="🎧">
+      <h2 data-i18n="index.melodic.title">Dictado Melódico</h2>
+      <p data-i18n="index.melodic.desc">Escucha una melodía con SOL y MI y elige la secuencia correcta.</p>
+      <small data-i18n="index.melodic.small">Nivel 1: nombres · Nivel 2: pentagrama</small>
+    </a>
+    <a href="html/pitch-direction.html" class="activity-card" data-tags="audicion,melodia,inicial" data-theme="pitch" data-emoji="📈">
+      <h2 data-i18n="index.pitchdir.title">Dirección del Sonido</h2>
+      <p data-i18n="index.pitchdir.desc">Escucha dos tonos y decide si el segundo sube, baja o se mantiene.</p>
+      <small data-i18n="index.pitchdir.small">Respuestas rápidas · Tonos generados · Práctica auditiva</small>
+    </a>
+    <a href="html/pitch-height.html" class="activity-card" data-tags="audicion,melodia,inicial" data-theme="pitchheight" data-emoji="📶">
+      <h2 data-i18n="index.pitchheight.title">Altura del Sonido</h2>
+      <p data-i18n="index.pitchheight.desc">Compara patrones de líneas y elige la tarjeta correcta.</p>
+      <small data-i18n="index.pitchheight.small">Empieza con dos opciones · Hasta cuatro tarjetas por ronda</small>
+    </a>
+    <a href="html/melo-rhythm-dictation.html" class="activity-card" data-tags="melodia,ritmo,dictado,avanzado" data-theme="melo-rhythm" data-emoji="🎼">
+      <h2 data-i18n="index.melorhythm.title">Dictado Melódico-Rítmico</h2>
+      <p data-i18n="index.melorhythm.desc">Escucha un compás con notas y ritmos y selecciona el patrón correcto.</p>
+      <small data-i18n="index.melorhythm.small">Progresión de notas y figuras · Audio interactivo</small>
+    </a>
+    <a href="html/piano.html" class="activity-card" data-tags="piano,melodia,exploracion" data-theme="piano" data-emoji="🎹">
+      <h2 data-i18n="index.piano.title">Teclado y Partituras</h2>
+      <p data-i18n="index.piano.desc">Explora un teclado de dos octavas y visualiza partituras seleccionables.</p>
+      <small data-i18n="index.piano.small">Selector de partituras · Piano interactivo</small>
+    </a>
+    <a href="html/instruments.html" class="activity-card" data-tags="audicion,avanzado" data-emoji="🎻">
+      <h2 data-i18n="index.instruments.title">Familias de instrusmentos</h2>
+      <p data-i18n="index.instruments.desc">Aprende a clasificar los instrumentos de la orquesta mediante un juego rápido.</p>
+      <small data-i18n="index.instruments.small">Memoria auditiva · Estadísticas de racha</small>
+    </a>
+    <a href="html/rankings.html" class="activity-card" data-tags="ranking,docentes" data-theme="rankings" data-emoji="🏆">
+      <h2 data-i18n="index.rankings.title">Rankings de juegos</h2>
+      <p data-i18n="index.rankings.desc">Consulta los marcadores globales y comparte los resultados con tu alumnado.</p>
+      <small data-i18n="index.rankings.small">Incluye todos los juegos con Top-10</small>
+    </a>
+    <a href="html/recursos.html" class="activity-card" data-tags="recursos,docentes" data-theme="resources" data-emoji="🔗">
+      <h2 data-i18n="index.resources.title">Recursos de Juegos Musicales</h2>
+      <p data-i18n="index.resources.desc">Explora enlaces a actividades musicales externas seleccionadas.</p>
+      <small data-i18n="index.resources.small">Incluye aprendomusica.com y otras propuestas educativas</small>
+    </a>
+    
+  </div>
+  <footer class="page-footer" data-sw-status></footer>
+  <script src="js/app.js" defer></script>
+  <script src="js/audio-settings.js" defer></script>
+  <script src="js/i18n/index.js" defer></script>
+  <script src="js/i18n/gamehub.js" defer></script>
+  <script src="js/index-tags.js" defer></script>
+</body>
+
+</html>

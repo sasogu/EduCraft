@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="piano.title">Teclado y Partituras</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/piano.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <img src="../assets/icon-512.png" alt="Logo EduMúsic" style="display:block;width:96px;height:96px;margin:0 auto 16px;">
+
+ 
+
+  <h1 data-i18n="piano.title">Teclado y Partituras</h1>
+  <p data-i18n="piano.intro" class="piano-intro">Selecciona una partitura y acompáñala con el teclado (Do4-Fa5).</p>
+
+  <section class="piano-page">
+    <div class="score-panel">
+      <label for="scoreSelect" class="score-label" data-i18n="piano.selector.label">Elige una partitura:</label>
+      <select id="scoreSelect" class="score-select">
+        <option value="" data-i18n="piano.selector.none" disabled>Selecciona una partitura</option>
+        <option value="enriqueta" data-src="../assets/partituras/enriqueta.png" data-i18n="piano.scores.enriqueta">En la tienda de Enriqueta</option>
+        <option value="frerejacques" data-src="../assets/partituras/frerejacques.png" data-i18n="piano.scores.frerejacques">Frère Jacques</option>
+        <option value="bellaciao" data-src="../assets/partituras/bellaciao.png" data-i18n="piano.scores.bellaciao">Bella Ciao</option>
+        <option value="carabu" data-src="../assets/partituras/carabu.png" data-i18n="piano.scores.carabu">Carabú</option>
+      </select>
+      <figure class="score-preview">
+        <img id="scoreImage" src="" alt="" loading="lazy">
+        <figcaption id="scoreStatus" data-i18n="piano.score.hint">Si la partitura tarda en aparecer, comprueba tu conexión.</figcaption>
+      </figure>
+    </div>
+
+    <div class="keyboard-panel">
+      <h2 data-i18n="piano.keyboard.title">Teclado interactivo</h2>
+      <p data-i18n="piano.keyboard.help" class="keyboard-help">Pulsa o toca las teclas del piano para practicar. También puedes usar tu teclado del ordenador.</p>
+      <div class="piano-board" id="pianoKeyboard" aria-label="Piano interactivo">
+        <!-- keys rendered via JS -->
+      </div>
+      <div class="piano-status">
+        <span data-i18n="piano.keyboard.last">Última nota:</span>
+        <output id="pianoDisplay" data-i18n="piano.keyboard.none" aria-live="polite">—</output>
+      </div>
+    </div>
+    
+  </section>
+
+  <a href="../index.html" class="home-link" style="margin:24px auto 0;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/piano.js" defer></script>
+  <script src="../js/piano.js" defer></script>
+</body>
+</html>

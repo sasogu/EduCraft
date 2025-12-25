@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="dictation.title">Dictado rítmico</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/rhythm-dictation.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="dictation.title">Dictado rítmico</h1>
+  <p data-i18n="dictation.instructions">
+    Escucha un patrón de cuatro tiempos con negras (TA) y dos corcheas (TI-TI). A partir de 5 puntos aparece SU (silencio). Elige la opción correcta.
+  </p>
+
+  <div id="hud" class="dictation-hud">
+    <span id="score" data-i18n="hud.points">Puntos: {n}</span>
+    <span class="hud-sep">|</span>
+    <span id="lives" data-i18n="hud.lives">Vidas: {n}</span>
+  </div>
+
+  <div class="dictation-controls">
+    <label for="optionsSelect" data-i18n="dictation.options.label">Opciones:</label>
+    <select id="optionsSelect">
+      <option value="2" data-i18n="dictation.options.2">2 opciones</option>
+      <option value="3" data-i18n="dictation.options.3" selected>3 opciones</option>
+      <option value="4" data-i18n="dictation.options.4">4 opciones</option>
+    </select>
+    <label for="difficultySelect" data-i18n="dictation.difficulty.label">Modo:</label>
+    <select id="difficultySelect">
+      <option value="text" data-i18n="dictation.difficulty.text">Nivel 1: TA / TI-TI</option>
+      <option value="symbols" data-i18n="dictation.difficulty.symbols">Nivel 2: ♩ / ♫</option>
+    </select>
+    <button id="startBtn" class="game-btn" data-i18n="hud.start">Iniciar</button>
+    <button id="repeatBtn" disabled data-i18n="dictation.repeat">Escuchar ritmo</button>
+  </div>
+
+  <div id="feedback" class="dictation-feedback" data-i18n="dictation.feedback.welcome">
+    Pulsa Iniciar para comenzar un nuevo dictado.
+  </div>
+
+  <div id="optionGrid" class="pattern-grid" aria-live="polite"></div>
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="rhythm-dictation"
+        data-period="all-time"
+        data-heading-key="rankings.rhythm_dictation"
+        data-heading="Dictado rítmico"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="rhythm-dictation"
+        data-period="weekly"
+        data-heading-key="rankings.rhythm_dictation"
+        data-heading="Dictado rítmico"
+      ></section>
+    </div>
+  </div>
+
+  <footer class="page-footer" data-sw-status></footer>
+  <a href="../index.html" class="home-link">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="game.back">Volver al inicio</span>
+  </a>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/hud.js" defer></script>
+  <script src="../js/i18n/rhythm-dictation.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/rhythm-dictation.js" defer></script>
+</body>
+</html>

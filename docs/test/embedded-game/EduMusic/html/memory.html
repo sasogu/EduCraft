@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="memory.title">Memory de Instrumentos</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/memory.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+  
+</head>
+<body>
+  <h1 data-i18n="memory.title">Memory de Instrumentos</h1>
+ 
+
+  <p data-i18n="memory.subtitle">Boceto interactivo: gira las cartas para descubrir instrumentos y empareja cada timbre con su imagen.</p>
+
+  <section class="memory-wrapper">
+    <div class="memory-controls">
+      <div class="buttons">
+        <div class="memory-mode">
+          <label>
+            <input type="radio" name="memoryMode" value="solo" checked>
+            <span data-i18n="memory.controls.mode.solo">1 jugador</span>
+          </label>
+          <label>
+            <input type="radio" name="memoryMode" value="versus">
+            <span data-i18n="memory.controls.mode.versus">2 jugadores</span>
+          </label>
+        </div>
+        <div class="memory-deck">
+          <span data-i18n="memory.controls.deck.label">Colección:</span>
+          <select id="memoryDeck">
+            <option value="base" data-i18n="memory.controls.deck.standard">Grupo base (piano, violín…)</option>
+            <option value="orchestra" data-i18n="memory.controls.deck.orchestra">Orquesta clásica</option>
+            <option value="notation" data-i18n="memory.controls.deck.notation">Signos musicales</option>
+            <option value="notation-advanced" data-i18n="memory.controls.deck.notationAdvanced">Signos musicales avanzados</option>
+          </select>
+        </div>
+        <div class="memory-buttons">
+          <button id="memoryStart" data-i18n="memory.controls.start">Comenzar partida</button>
+          <button id="memoryReset" data-i18n="memory.controls.reset">Reiniciar</button>
+        </div>
+      </div>
+      <label class="memory-toggle">
+        <input type="checkbox" id="memoryAudio" checked>
+        <span data-i18n="memory.controls.audio">Reproducir sonidos al descubrir cartas</span>
+      </label>
+      <div class="memory-stats">
+        <span id="memoryPairs" data-i18n="memory.stats.matches">Parejas: 0/6</span>
+        <span id="memoryAttempts" data-i18n="memory.stats.attempts">Intentos: 0</span>
+        <span id="memoryTime" data-i18n="memory.stats.time">Tiempo: 00:00</span>
+        <span id="memoryTurn" style="display:none;" data-i18n="memory.stats.turn">Turno: Jugador 1</span>
+        <span id="memoryScores" style="display:none;" data-i18n="memory.stats.scores">Marcador — J1: 0 · J2: 0</span>
+      </div>
+    </div>
+
+    <div class="memory-message" id="memoryMessage"></div>
+
+    <div class="memory-board">
+      <div class="memory-grid" id="memoryGrid"></div>
+    </div>
+  </section>
+  <a href="../index.html" class="home-link" style="margin-top:8px;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/memory.js" defer></script>
+  <script src="../js/memory.js" defer></script>
+</body>
+</html>

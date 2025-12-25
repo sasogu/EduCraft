@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre EduMúsic</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body class="about-page">
+  <header class="about-header">
+    <img src="../assets/icon-512.png" alt="Logo EduMúsic" class="about-logo">
+    <h1 data-i18n="about.title">Sobre EduMúsic</h1>
+    <p class="about-subtitle" data-i18n="about.subtitle">
+      Recursos interactivos creados para el aula de música, listos para usarse tanto online como sin conexión.
+    </p>
+    <div class="about-lang" data-lang-switch></div>
+  </header>
+
+  <a class="about-back" href="../index.html" data-i18n="gamehub.back">Volver al inicio</a>
+
+  <main class="about-layout">
+    <section class="about-card about-card--wide">
+      <h2 data-i18n="about.mission.title">Misión del proyecto</h2>
+      <p data-i18n="about.mission.body">
+        EduMúsic agrupa minijuegos, dictados y retos auditivos pensados para Primaria y Secundaria.
+        El objetivo es ofrecer experiencias rápidas de preparar, compatibles con pantallas táctiles y que funcionen
+        incluso sin conexión gracias al modo PWA.
+      </p>
+      <ul class="about-list">
+        <li data-i18n="about.mission.item1">Actividades categorizadas por destrezas (ritmo, melodía, dictado, memoria...).</li>
+        <li data-i18n="about.mission.item2">Rankings y seguimiento local para dinamizar el aprendizaje en grupo.</li>
+        <li data-i18n="about.mission.item3">Contenidos multilingües (valenciano, castellano e inglés) con selector integrado.</li>
+        <li data-i18n="about.mission.item4">Diseño accesible para pizarras digitales y tabletas.</li>
+      </ul>
+    </section>
+
+    <section class="about-card">
+      <h2 data-i18n="about.author.title">Quién está detrás</h2>
+      <p data-i18n="about.author.bio">
+        <strong>Samuel Soriano</strong><br>
+        Docente de música y desarrollador educativo.
+      </p>
+      <p>
+        <span data-i18n="about.author.contact">Contacto directo:</span><br>
+        <a class="about-link" href="mailto:s.sorianoguardiola@edu.gva.es">s.sorianoguardiola@edu.gva.es</a>
+      </p>
+      <p class="about-note" data-i18n="about.author.note">
+        Si detectas un error o necesitas adaptar un juego a tu aula, escríbeme y lo revisamos.
+      </p>
+    </section>
+
+    <section class="about-card">
+      <h2 data-i18n="about.license.title">Licencia y código abierto</h2>
+      <p data-i18n="about.license.body">
+        Todo el código y los recursos se publican bajo licencia MIT, lo que permite usar, adaptar y compartir
+        EduMúsic sin restricciones siempre que se mantenga el aviso de copyright.
+      </p>
+      <p class="about-note">
+        <span data-i18n="about.license.repoText">El código fuente de esta aplicación está disponible en</span>
+        <a class="about-link" href="https://github.com/sasogu/EduMusic" target="_blank" rel="noopener noreferrer">github.com/sasogu/EduMusic</a>
+      </p>
+      <a class="about-link" href="../LICENSE" download data-i18n="about.license.link">Descargar Licencia MIT</a>
+    </section>
+
+    <section class="about-card">
+      <h2 data-i18n="about.contribute.title">Cómo puedes contribuir</h2>
+      <ul class="about-list">
+        <li data-i18n="about.contribute.item1">Enviando nuevas ideas de juegos o repertorios.</li>
+        <li data-i18n="about.contribute.item2">Reportando incidencias de accesibilidad o compatibilidad.</li>
+        <li data-i18n="about.contribute.item3">Aportando traducciones adicionales o mejoras de UX.</li>
+      </ul>
+      <p data-i18n="about.contribute.note">
+        El repositorio está en constante evolución: cualquier sugerencia ayuda a priorizar las próximas funciones.
+      </p>
+    </section>
+
+    <section class="about-card">
+      <h2 data-i18n="about.credits.title">Créditos y agradecimientos</h2>
+      <p data-i18n="about.credits.body1">
+        EduMúsic integra sonidos generados específicamente para el proyecto (muchos libres de derechos desde Pixabay) y hace uso de APIs Web estándar
+        (Web Audio, Service Workers) junto con tipografías libres como Baloo 2.
+      </p>
+      <p data-i18n="about.credits.body2">
+        Gracias a la comunidad educativa que comparte feedback y materiales para mantener viva la plataforma.
+      </p>
+    </section>
+  </main>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/i18n/about.js" defer></script>
+  <script src="../js/app.js" defer></script>
+</body>
+</html>

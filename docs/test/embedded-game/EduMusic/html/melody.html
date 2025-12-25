@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="melody.title">Secuencia de Melodías</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+   <link rel="stylesheet" href="../css/melody.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+  
+</head>
+<body>
+  <h1 data-i18n="melody.title">Secuencia de Melodías</h1>
+  
+  <p data-i18n="melody.instructions">
+    Escucha la secuencia de notas en el pentagrama y repítela en el teclado virtual. Cada ronda añade una nota nueva. Teclado: M = Mi, F = Fa, S = Sol, L = La, B = Si.
+  </p>
+
+  <div class="melody-wrapper">
+    <div class="melody-controls">
+      <button id="startMelodyBtn" data-i18n="melody.controls.start">Iniciar</button>
+      <button id="repeatMelodyBtn" class="secondary" data-i18n="melody.controls.repeat">Repetir secuencia</button>
+      <button id="resetMelodyBtn" class="secondary" data-i18n="melody.controls.reset">Reiniciar</button>
+    </div>
+
+    <div class="melody-hud">
+      <div><span data-i18n="melody.round">Ronda:</span><span id="melodyRound" class="value">0</span></div>
+      <div><span data-i18n="melody.best">Mejor racha:</span><span id="melodyBest" class="value">0</span></div>
+      <div><span data-i18n="melody.errors">Errores:</span><span id="melodyErrors" class="value">0/3</span></div>
+    </div>
+
+    <canvas id="staffCanvas"></canvas>
+
+    <canvas id="pianoCanvas" aria-label="Teclado virtual"></canvas>
+
+    <div id="melodyStatus" role="status" aria-live="polite"></div>
+  </div>
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="melody"
+        data-period="all-time"
+        data-heading-key="rankings.melody"
+        data-heading="Secuencia de melodías"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="melody"
+        data-period="weekly"
+        data-heading-key="rankings.melody"
+        data-heading="Secuencia de melodías"
+      ></section>
+    </div>
+  </div>
+  <a href="../index.html" class="home-link" style="margin:16px auto 0;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="melody.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/melody.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/melody.js" defer></script>
+</body>
+</html>

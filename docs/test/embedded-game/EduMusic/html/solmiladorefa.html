@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="game.solmiladorefa.title">Atrapa Notas: Sol, Mi, La, Do, Re y Fa</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <div class="game-controls__settings">
+    <div>
+      <label for="levelSelect" data-i18n="game.solmiladorefa.level.label">Nivel:</label>
+      <select id="levelSelect">
+        <option value="color" data-i18n="game.solmiladorefa.level.basic">Nivel 1 · Colores</option>
+        <option value="mono" data-i18n="game.solmiladorefa.level.advanced">Nivel 2 · Notas negras</option>
+        <option value="blind" data-i18n="game.solmiladorefa.level.expert">Nivel 3 · Sin nombres</option>
+      </select>
+    </div>
+    <div>
+      <label for="speedSelect" data-i18n="hud.speed">Velocidad:</label>
+      <select id="speedSelect">
+        <option value="slow" data-i18n="hud.speed.slow">Lento</option>
+        <option value="normal" selected data-i18n="hud.speed.normal">Normal</option>
+        <option value="fast" data-i18n="hud.speed.fast">Rápido</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="hud" style="margin: 1em 0;">
+    <span id="score">Punts: 0</span>
+    <span style="margin: 0 1em;">|</span>
+    <span id="lives">Vides: 3</span>
+  </div>
+
+  <canvas id="game" style="background:#fff;border-radius:12px;max-width: 100%; box-shadow: 0 4px 16px rgba(0,0,0,0.08);"></canvas>
+
+  <div class="game-controls">
+    <div class="game-controls__buttons">
+      <button id="startBtn" class="game-btn" data-i18n="hud.start">Iniciar</button>
+      <button id="pauseBtn" class="game-btn" data-i18n="hud.pause">Pausa</button>
+      <button id="restartBtn" class="game-btn" data-i18n="hud.restart">Reiniciar</button>
+    </div>
+
+    <p data-i18n="game.solmiladorefa.instructions">
+      Las notas (DO grave, RE, MI, FA, SOL y LA) avanzan de izquierda a derecha respetando sus posiciones en el pentagrama. Pulsa la tecla correspondiente del piano inferior antes de que la nota salga por la derecha. Si fallas, pierdes una vida. A partir de 10 puntos se ocultan los nombres sobre las notas y a partir de 20 también los del teclado. Teclado: D = Do, R = Re, M = Mi, F = Fa, S = Sol, L = La.
+    </p>
+  </div>
+  
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section data-scoreboard data-game="solmiladorefa" data-period="all-time" data-heading-key="rankings.solmiladorefa" data-heading="Sol, Mi, La, Do, Re y Fa"></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section data-scoreboard data-game="solmiladorefa" data-period="weekly" data-heading-key="rankings.solmiladorefa" data-heading="Sol, Mi, La, Do, Re y Fa"></section>
+    </div>
+  </div>
+
+  <a href="../html/game.html" class="btn-secondary home-link">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="game.solmi.back">Volver a Atrapa Notas</span>
+  </a>
+
+  <script>
+    (function() {
+      const url = new URL(window.location.href);
+      const allowed = ['color', 'mono', 'blind'];
+      const requested = url.searchParams.get('level');
+      const level = allowed.includes(requested) ? requested : 'color';
+      window.SOLMILADOREFa_LEVEL = level;
+      document.addEventListener('DOMContentLoaded', () => {
+        const sel = document.getElementById('levelSelect');
+        if (!sel) return;
+        sel.value = level;
+        sel.addEventListener('change', () => {
+          const nextUrl = new URL(window.location.href);
+          if (sel.value === 'color') {
+            nextUrl.searchParams.delete('level');
+          } else {
+            nextUrl.searchParams.set('level', sel.value);
+          }
+          window.location.href = nextUrl.pathname + (nextUrl.searchParams.toString() ? `?${nextUrl.searchParams.toString()}` : '') + nextUrl.hash;
+        });
+      });
+    })();
+  </script>
+  <script>
+    window.GAME_CONFIG = {
+      id: 'solmiladorefa',
+      rankKey: 'solmiladorefa',
+      hintKey: 'game.piano_hint.solmiladorefa',
+      pitches: ['do', 're', 'mi', 'fa', 'sol', 'la'],
+      monoAtScore: 40,
+      forceMono: window.SOLMILADOREFa_LEVEL !== 'color',
+      level: window.SOLMILADOREFa_LEVEL,
+    };
+  </script>
+  <footer class="page-footer" data-sw-status></footer>
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/hud.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/game.js" defer></script>
+</body>
+</html>

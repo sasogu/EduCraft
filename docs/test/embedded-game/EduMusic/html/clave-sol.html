@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="clef.title">Dibuja la Clave de Sol</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+  <style>
+    .clef-controls { display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap: wrap; }
+    .clef-controls label { font-weight: 600; }
+    #clefCanvas { background:#fff;border-radius:12px;max-width:100%; box-shadow: 0 4px 16px rgba(0,0,0,0.08); touch-action: none; }
+    .clef-legend { color:#475569; font-size: 14px; margin: 8px 0; }
+  </style>
+  </head>
+<body>
+  <h1 data-i18n="clef.title">Dibuja la Clave de Sol</h1>
+  <p class="clef-legend" data-i18n="clef.instructions">
+    Traza con el dedo o el ratón siguiendo los puntos guía para dibujar la clave de sol. Intenta rodear la 2ª línea (la línea de SOL). Pulsa Evaluar para comprobar tu dibujo.
+  </p>
+
+  <div class="clef-controls" style="margin-bottom:8px;">
+    <button id="resetBtn" data-i18n="clef.reset">Borrar</button>
+    <button id="evaluateBtn" data-i18n="clef.evaluate">Evaluar</button>
+    <label style="display:inline-flex;align-items:center;gap:6px;">
+      <input type="checkbox" id="showGuides" checked>
+      <span data-i18n="clef.show_guides">Mostrar guía</span>
+    </label>
+  <a href="../index.html" class="home-link" style="margin-left:1em;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="game.back">Volver al inicio</span>
+  </a>
+  </div>
+
+  <canvas id="clefCanvas"></canvas>
+
+  <div id="clefResult" class="clef-legend" style="min-height:1.4em;"></div>
+
+  <footer class="page-footer" data-sw-status></footer>
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/clef.js" defer></script>
+  <script src="../js/clave_sol.js" defer></script>
+</body>
+</html>

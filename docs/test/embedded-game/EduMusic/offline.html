@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title data-i18n="offline.metaTitle">EduMúsic — Sin conexión</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body{font-family:system-ui,Arial,Helvetica,sans-serif;background:#f7fafc;color:#0f172a;margin:0;padding:0}
+    main{max-width:720px;margin:3rem auto;text-align:center;padding:1rem}
+    .lang-switch{margin:1.2rem auto;display:inline-flex;align-items:center;gap:0.6rem}
+    a.button{display:inline-block;margin:6px;padding:10px 16px;background:#2563eb;color:#fff;border-radius:10px;text-decoration:none;transition:background 0.15s ease}
+    a.button:hover{background:#1d4ed8}
+    a.button:focus-visible{outline:3px solid rgba(37,99,235,0.4);outline-offset:2px}
+    .button.secondary{background:#475569}
+    .button.secondary:hover{background:#334155}
+    small.offline-hint{display:block;margin-top:12px;color:#64748b}
+    header img{display:block;width:96px;height:96px;margin:0 auto 12px}
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/icon-512.png" alt="Logo EduMúsic">
+  </header>
+
+  <main>
+    <div data-lang-switch></div>
+
+    <h1 data-i18n="offline.heading">Sin conexión</h1>
+    <p data-i18n="offline.message">Parece que no tienes conexión a la red. Puedes seguir usando las actividades que ya estén almacenadas en la aplicación.</p>
+
+    <p style="margin-top:18px;">
+      <a href="index.html" class="button home-link">
+        <span class="home-icon" aria-hidden="true">⌂</span>
+        <span data-i18n="gamehub.back">Volver al inicio</span>
+      </a>
+      <a href="#" class="button secondary" id="retryBtn" data-i18n="offline.retry">Reintentar</a>
+    </p>
+    <small class="offline-hint" data-i18n="offline.hint">La aplicación funcionará sin conexión para las páginas y audios guardados.</small>
+  </main>
+
+  <script src="js/app.js" defer></script>
+  <script src="js/audio-settings.js" defer></script>
+  <script src="js/i18n/offline.js" defer></script>
+  <script>
+    (function(){
+      function setupRetry(){
+        var btn = document.getElementById('retryBtn');
+        if (!btn) return;
+        btn.addEventListener('click', function(ev){
+          ev.preventDefault();
+          window.location.reload();
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupRetry, { once: true });
+      } else {
+        setupRetry();
+      }
+    })();
+  </script>
+</body>
+</html>

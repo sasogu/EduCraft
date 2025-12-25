@@ -1,0 +1,207 @@
+.pitchheight-wrapper {
+  max-width: 960px;
+  margin: 0 auto 32px;
+  padding: 16px;
+  background: #f8fbff;
+  border-radius: 16px;
+  box-shadow: 0 14px 32px rgba(31, 70, 128, 0.12);
+}
+
+.pitchheight-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.pitchheight-stat {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 0.95rem;
+  color: #1f2f50;
+}
+
+.pitchheight-stat strong {
+  font-size: 1.2rem;
+}
+
+.pitchheight-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+#pitchheightStart {
+  background: #2563eb;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
+}
+
+#pitchheightStart:hover {
+  background: #1d4ed8;
+  box-shadow: 0 10px 22px rgba(29, 78, 216, 0.2);
+  transform: translateY(-2px);
+}
+
+#pitchheightStart:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 3px;
+}
+
+#pitchheightReset {
+  background: #475569;
+  box-shadow: 0 6px 16px rgba(71, 85, 105, 0.2);
+}
+
+#pitchheightReset:hover {
+  background: #334155;
+  box-shadow: 0 8px 20px rgba(51, 65, 85, 0.22);
+  transform: translateY(-2px);
+}
+
+#pitchheightReset:focus-visible {
+  outline: 3px solid rgba(51, 65, 85, 0.3);
+  outline-offset: 3px;
+}
+
+#pitchheightListen {
+  background: #0ea5e9;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.22);
+}
+
+#pitchheightListen:hover {
+  background: #0284c7;
+  box-shadow: 0 10px 24px rgba(2, 132, 199, 0.24);
+  transform: translateY(-2px);
+}
+
+#pitchheightListen:focus-visible {
+  outline: 3px solid rgba(14, 165, 233, 0.28);
+  outline-offset: 3px;
+}
+
+.pitchheight-prompt {
+  max-width: 520px;
+  margin: 0 auto 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: rgba(31, 70, 128, 0.07);
+  color: #14325c;
+  font-weight: 600;
+  text-align: center;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pitchheight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.pitchheight-card {
+  position: relative;
+  border: 3px solid transparent;
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.94), rgba(227, 238, 255, 0.9));
+  padding: 16px 14px 20px;
+  min-height: 220px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.pitchheight-card:focus-visible {
+  outline: none;
+  border-color: #1f5ec4;
+  box-shadow: 0 0 0 4px rgba(31, 94, 196, 0.2);
+}
+
+.pitchheight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(31, 70, 128, 0.2);
+}
+
+.pitchheight-card.is-disabled {
+  cursor: default;
+  opacity: 0.75;
+  pointer-events: none;
+  transform: none;
+  box-shadow: none;
+}
+
+.pitchheight-card__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  height: 160px;
+}
+
+.pitchheight-card__slot {
+  position: relative;
+  border-radius: 10px;
+  background: rgba(20, 50, 92, 0.08);
+  overflow: hidden;
+}
+
+.pitchheight-card__line {
+  position: absolute;
+  left: 14%;
+  width: 72%;
+  height: 6px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #2f6fe0, #6ad0ff);
+  box-shadow: 0 6px 18px rgba(39, 111, 208, 0.25);
+  transform: translateZ(0);
+}
+
+.pitchheight-card__line::after {
+  content: '';
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  border-radius: 50%;
+  right: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1f55c6;
+  box-shadow: 0 3px 8px rgba(31, 85, 198, 0.35);
+}
+
+.pitchheight-card[data-state="correct"] {
+  border-color: #1f9e51;
+  box-shadow: 0 12px 28px rgba(31, 158, 81, 0.35);
+}
+
+.pitchheight-card[data-state="wrong"] {
+  border-color: #d33c3c;
+  box-shadow: 0 12px 28px rgba(211, 60, 60, 0.3);
+}
+
+.pitchheight-feedback {
+  min-height: 32px;
+  text-align: center;
+  font-size: 1rem;
+  color: #1b2e4d;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .pitchheight-wrapper {
+    padding: 12px;
+  }
+
+  .pitchheight-card {
+    min-height: 190px;
+  }
+}

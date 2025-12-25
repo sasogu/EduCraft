@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="wordguess.title">Palabras Musicales Secretas</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/word-guess.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="wordguess.title">Palabras Musicales Secretas</h1>
+  <p class="wordguess-subtitle" data-i18n="wordguess.subtitle">Descubre términos de instrumentos, signos y lenguaje musical antes de agotar tus intentos.</p>
+
+  <section class="wordguess-wrapper">
+    <div class="wordguess-panel">
+      <div class="wordguess-controls">
+        <label for="wordguessCategory">
+          <span data-i18n="wordguess.category.label">Colección:</span>
+        </label>
+        <select id="wordguessCategory">
+          <option value="mix" data-i18n="wordguess.category.mix">Mezcla musical</option>
+          <option value="instruments" data-i18n="wordguess.category.instruments">Instrumentos</option>
+          <option value="signs" data-i18n="wordguess.category.signs">Signos musicales</option>
+          <option value="language" data-i18n="wordguess.category.language">Lenguaje musical</option>
+        </select>
+        <button id="wordguessStart" class="wordguess-primary" data-i18n="wordguess.actions.start">Nueva palabra</button>
+        <button id="wordguessHint" class="wordguess-secondary" data-i18n="wordguess.actions.hint" disabled>Pedir pista</button>
+      </div>
+
+      <div class="wordguess-status">
+        <div>
+          <strong data-i18n="wordguess.status.remaining">Intentos disponibles:</strong>
+          <span id="wordguessAttempts">6</span>
+        </div>
+        <div>
+          <strong data-i18n="wordguess.status.completed">Palabras resueltas:</strong>
+          <span id="wordguessSolved">0</span>
+        </div>
+      </div>
+
+      <div class="wordguess-progress" id="wordguessProgress"></div>
+      <div class="wordguess-current" id="wordguessWord">_</div>
+      <div class="wordguess-message" id="wordguessMessage"></div>
+      <div class="wordguess-hint" id="wordguessHintText" hidden></div>
+    </div>
+
+    <div class="wordguess-board">
+      <h2 data-i18n="wordguess.board.title">Elige una letra</h2>
+      <div class="wordguess-keyboard" id="wordguessKeyboard"></div>
+      <p class="wordguess-helper" data-i18n="wordguess.helper.keyboard">También puedes jugar con tu teclado.</p>
+    </div>
+  </section>
+
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="wordguess"
+        data-period="all-time"
+        data-rank-key="wordguess"
+        data-heading-key="wordguess.rank.title"
+        data-heading="Ranking de palabras musicales"
+        style="max-width: 900px; margin: 20px auto; text-align: left;"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="wordguess"
+        data-period="weekly"
+        data-rank-key="wordguess"
+        data-heading-key="wordguess.rank.title"
+        data-heading="Ranking de palabras musicales"
+        style="max-width: 900px; margin: 20px auto; text-align: left;"
+      ></section>
+    </div>
+  </div>
+
+  <a href="../index.html" class="home-link">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/word-guess.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/word-guess.js" defer></script>
+</body>
+</html>

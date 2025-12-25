@@ -1,0 +1,98 @@
+(function() {
+  const payload = {
+    es: {
+      'pitchheight.title': 'Altura del sonido',
+      'pitchheight.instructions': 'Escucha el patrón de sonidos y elige la tarjeta cuyas líneas lo representan.',
+      'pitchheight.stats.score': 'Puntuación:',
+      'pitchheight.stats.streak': 'Racha:',
+      'pitchheight.stats.lives': 'Vidas:',
+      'pitchheight.stats.level': 'Nivel:',
+      'pitchheight.controls.start': 'Comenzar',
+      'pitchheight.controls.playing': 'Jugando…',
+      'pitchheight.controls.listen': 'Escuchar patrón',
+      'pitchheight.controls.reset': 'Reiniciar',
+      'pitchheight.prompt.idle': 'Pulsa “Comenzar” para crear un patrón.',
+      'pitchheight.prompt.listen': 'Escucha el patrón y elige la tarjeta correcta.',
+      'pitchheight.prompt.levelup': 'Nuevo nivel: {cards} tarjetas en juego.',
+      'pitchheight.feedback.idle': 'Selecciona la tarjeta que corresponde al patrón escuchado.',
+      'pitchheight.feedback.ready': 'Escucha el patrón y elige la tarjeta correcta.',
+      'pitchheight.feedback.listening': 'Escucha el patrón y prepárate para elegir.',
+      'pitchheight.feedback.correct': '¡Correcto! Puntuación: {score}',
+      'pitchheight.feedback.levelup': 'Nuevo nivel: ahora se muestran {cards} tarjetas.',
+      'pitchheight.feedback.wrong': 'No coincide. Te quedan {lives} vidas.',
+      'pitchheight.feedback.lastlife': 'No coincide. ¡Última vida!',
+      'pitchheight.feedback.gameover': 'Partida terminada. Puntuación: {score}',
+      'pitchheight.pattern.low_mid_high': 'grave → medio → agudo',
+      'pitchheight.pattern.low_high_mid': 'grave → agudo → medio',
+      'pitchheight.pattern.mid_low_high': 'medio → grave → agudo',
+      'pitchheight.pattern.mid_high_low': 'medio → agudo → grave',
+      'pitchheight.pattern.high_mid_low': 'agudo → medio → grave',
+      'pitchheight.pattern.high_low_mid': 'agudo → grave → medio'
+    },
+    val: {
+      'pitchheight.title': 'Altura del so',
+      'pitchheight.instructions': 'Escolta el patró de sons i tria la targeta les línies del qual el representen.',
+      'pitchheight.stats.score': 'Puntuació:',
+      'pitchheight.stats.streak': 'Ratxa:',
+      'pitchheight.stats.lives': 'Vides:',
+      'pitchheight.stats.level': 'Nivell:',
+      'pitchheight.controls.start': 'Començar',
+      'pitchheight.controls.playing': 'Jugant…',
+      'pitchheight.controls.listen': 'Escoltar patró',
+      'pitchheight.controls.reset': 'Reiniciar',
+      'pitchheight.prompt.idle': 'Prem «Començar» per a crear un patró.',
+      'pitchheight.prompt.listen': 'Escolta el patró i tria la targeta correcta.',
+      'pitchheight.prompt.levelup': 'Nou nivell: {cards} targetes en joc.',
+      'pitchheight.feedback.idle': 'Selecciona la targeta que correspon al patró escoltat.',
+      'pitchheight.feedback.ready': 'Escolta el patró i tria la targeta adequada.',
+      'pitchheight.feedback.listening': 'Escolta el patró i prepara\'t per a triar.',
+      'pitchheight.feedback.correct': 'Correcte! Puntuació: {score}',
+      'pitchheight.feedback.levelup': 'Nou nivell: ara es mostren {cards} targetes.',
+      'pitchheight.feedback.wrong': 'No coincidix. Et queden {lives} vides.',
+      'pitchheight.feedback.lastlife': 'No coincidix. Última vida!',
+      'pitchheight.feedback.gameover': 'Partida acabada. Puntuació: {score}',
+      'pitchheight.pattern.low_mid_high': 'greu → mitjà → agut',
+      'pitchheight.pattern.low_high_mid': 'greu → agut → mitjà',
+      'pitchheight.pattern.mid_low_high': 'mitjà → greu → agut',
+      'pitchheight.pattern.mid_high_low': 'mitjà → agut → greu',
+      'pitchheight.pattern.high_mid_low': 'agut → mitjà → greu',
+      'pitchheight.pattern.high_low_mid': 'agut → greu → mitjà'
+    },
+    en: {
+      'pitchheight.title': 'Pitch Heights',
+      'pitchheight.instructions': 'Listen to the pattern and choose the card whose lines match it.',
+      'pitchheight.stats.score': 'Score:',
+      'pitchheight.stats.streak': 'Streak:',
+      'pitchheight.stats.lives': 'Lives:',
+      'pitchheight.stats.level': 'Level:',
+      'pitchheight.controls.start': 'Start',
+      'pitchheight.controls.playing': 'In play…',
+      'pitchheight.controls.listen': 'Play pattern',
+      'pitchheight.controls.reset': 'Restart',
+      'pitchheight.prompt.idle': 'Press “Start” to generate a pattern.',
+      'pitchheight.prompt.listen': 'Listen to the pattern and pick the matching card.',
+      'pitchheight.prompt.levelup': 'New level: {cards} cards on screen.',
+      'pitchheight.feedback.idle': 'Select the card that matches the pattern you heard.',
+      'pitchheight.feedback.ready': 'Listen to the pattern and pick the matching card.',
+      'pitchheight.feedback.listening': 'Listen to the pattern and get ready to choose.',
+      'pitchheight.feedback.correct': 'Correct! Score: {score}',
+      'pitchheight.feedback.levelup': 'Level up! There are now {cards} cards.',
+      'pitchheight.feedback.wrong': 'Not quite. You have {lives} lives left.',
+      'pitchheight.feedback.lastlife': 'Not quite. Last life!',
+      'pitchheight.feedback.gameover': 'Game over. Score: {score}',
+      'pitchheight.pattern.low_mid_high': 'low → middle → high',
+      'pitchheight.pattern.low_high_mid': 'low → high → middle',
+      'pitchheight.pattern.mid_low_high': 'middle → low → high',
+      'pitchheight.pattern.mid_high_low': 'middle → high → low',
+      'pitchheight.pattern.high_mid_low': 'high → middle → low',
+      'pitchheight.pattern.high_low_mid': 'high → low → middle'
+    }
+  };
+
+  if (window.i18n && typeof window.i18n.registerBundle === 'function') {
+    window.i18n.registerBundle('pitch-height', payload);
+  } else {
+    window.__i18nPendingBundles = window.__i18nPendingBundles || [];
+    window.__i18nPendingBundles.push({ name: 'pitch-height', payload });
+  }
+})();

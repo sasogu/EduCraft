@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="pitchdir.title">Dirección del sonido</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/pitch-direction.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="pitchdir.title">Dirección del sonido</h1>
+  <p data-i18n="pitchdir.subtitle">Escucha dos sonidos y elige si el segundo sube, baja o se mantiene.</p>
+
+  <section class="pitchdir-wrapper">
+    <div class="pitchdir-stats">
+      <span id="pitchdirAttempts" data-i18n="pitchdir.stats.attempts">Intentos: 0</span>
+      <span id="pitchdirCorrect" data-i18n="pitchdir.stats.correct">Aciertos: 0</span>
+      <span id="pitchdirLives" data-i18n="pitchdir.stats.lives">Vidas: 3</span>
+      <span id="pitchdirStreak" class="pitchdir-badge" data-i18n="pitchdir.stats.streak">Racha: 0</span>
+    </div>
+
+    <div class="pitchdir-controls">
+      <button id="pitchdirPlay" class="game-btn" data-i18n="pitchdir.controls.start">Iniciar</button>
+    </div>
+
+    <div class="pitchdir-options">
+      <button class="pitchdir-option" data-choice="up" data-i18n="pitchdir.option.up">Sube ⤴</button>
+      <button class="pitchdir-option" data-choice="same" data-i18n="pitchdir.option.same">Igual ↔</button>
+      <button class="pitchdir-option" data-choice="down" data-i18n="pitchdir.option.down">Baja ⤵</button>
+    </div>
+
+    <p id="pitchdirFeedback" role="status" data-i18n="pitchdir.feedback.prompt">Escucha la secuencia y elige si sube, baja o se mantiene.</p>
+  </section>
+
+  <div id="pitchdirModal" class="pitchdir-modal" hidden>
+    <div class="pitchdir-modal__backdrop"></div>
+    <div class="pitchdir-modal__dialog" role="alertdialog" aria-modal="true" aria-labelledby="pitchdirModalTitle" aria-describedby="pitchdirModalBody">
+      <h2 id="pitchdirModalTitle" data-i18n="pitchdir.modal.title">Doble secuencia</h2>
+      <p id="pitchdirModalBody" data-i18n="pitchdir.modal.body">Has avanzado de nivel. Ahora escucharás dos secuencias seguidas: responde después de cada una.</p>
+      <button id="pitchdirModalClose" class="game-btn" data-i18n="pitchdir.modal.close">¡Entendido!</button>
+    </div>
+  </div>
+
+  <section class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section data-scoreboard data-game="pitch-direction" style="max-width:720px;margin:18px auto;text-align:left;"></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="pitch-direction"
+        data-period="weekly"
+        data-heading-key="rankings.weekly"
+        data-heading="Ranking Semanal"
+        data-show-save-at="1"
+        style="max-width:720px;margin:18px auto;text-align:left;"
+      ></section>
+    </div>
+  </section>
+  <section
+    data-scoreboard
+    data-game="pitch-direction"
+    data-period="weekly"
+    data-heading-key="rankings.weekly"
+    data-heading="Ranking Semanal"
+    data-show-save-at="1"
+    style="max-width:720px;margin:18px auto;text-align:left;"
+  ></section>
+
+  <a href="../index.html" class="home-link" style="margin-top:12px;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/pitch-direction.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/pitch-direction.js" defer></script>
+</body>
+</html>

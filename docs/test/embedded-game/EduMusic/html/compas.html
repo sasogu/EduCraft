@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="compas.title">Puzzle de Compases</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/compas.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+ 
+</head>
+<body>
+  <h1 data-i18n="compas.title">Puzzle de Compases</h1>
+  
+  <p data-i18n="compas.instructions">
+    Arrastra las fichas rítmicas al compás objetivo hasta completar el número de tiempos indicado. Puedes devolver fichas al área inicial si te equivocas.
+  </p>
+
+  <div class="compas-wrapper">
+    <div class="compas-controls">
+      <button id="newPuzzleBtn" data-i18n="compas.controls.new">Nuevo puzzle</button>
+      <button id="checkBtn" class="secondary" data-i18n="compas.controls.check">Comprobar</button>
+      <button id="resetBtn" class="secondary" data-i18n="compas.controls.reset">Reiniciar</button>
+    </div>
+
+    <div class="compas-board">
+      <section class="compas-panel">
+        <div class="panel-header">
+          <h2 class="panel-title" data-i18n="compas.available.title">Fichas disponibles</h2>
+          <span class="panel-subtitle" data-i18n="compas.available.hint">Arrastra hacia el compás</span>
+        </div>
+        <div id="tilePool" class="tile-dropzone" data-zone="pool" aria-live="polite"></div>
+      </section>
+
+      <section class="compas-panel">
+        <div class="panel-header">
+          <h2 class="panel-title" data-i18n="compas.target.title">Compás objetivo</h2>
+          <span id="targetInfo" class="panel-subtitle"></span>
+        </div>
+        <div id="measureZone" class="tile-dropzone" data-zone="measure" aria-live="polite"></div>
+        <div id="measureSummary" class="summary">
+          <span data-i18n="compas.target.progress">Tiempos utilizados:</span>
+          <span id="usedBeats">0</span>/<span id="totalBeats">0</span>
+        </div>
+      </section>
+    </div>
+
+    <div id="statusMessage"></div>
+    <div class="metrics">
+      <div><span data-i18n="compas.metrics.solved">Resueltos:</span> <span id="solvedCount">0</span></div>
+      <div><span data-i18n="compas.metrics.streak">Racha actual:</span> <span id="currentStreak">0</span></div>
+    </div>
+  </div>
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="compas"
+        data-period="all-time"
+        data-heading-key="rankings.compas"
+        data-heading="Puzzle de compases"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="compas"
+        data-period="weekly"
+        data-heading-key="rankings.compas"
+        data-heading="Puzzle de compases"
+      ></section>
+    </div>
+  </div>
+  <a href="../index.html" class="home-link" style="margin:16px auto 0;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="compas.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/compas.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/compas.js" defer></script>
+</body>
+</html>

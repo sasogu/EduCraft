@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="melodic.title">Dictado melódico</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/melody-dictation.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="melodic.title">Dictado melódico</h1>
+  <p data-i18n="melodic.instructions">
+    Escucha una secuencia de cuatro negras con las notas SOL y MI. A partir de 5 puntos se añade LA, a los 10 aparece DO, a los 15 llega FA, a los 20 se suma RE y a los 25 se incorpora SI. Elige la opción correcta.
+  </p>
+
+  <div id="hud" class="dictation-hud">
+    <span id="score" data-i18n="hud.points">Puntos: {n}</span>
+    <span class="hud-sep">|</span>
+    <span id="lives" data-i18n="hud.lives">Vidas: {n}</span>
+  </div>
+
+  <div class="dictation-controls">
+    <label for="optionsSelect" data-i18n="melodic.options.label">Opciones:</label>
+    <select id="optionsSelect">
+      <option value="2" data-i18n="melodic.options.2">2 opciones</option>
+      <option value="3" data-i18n="melodic.options.3" selected>3 opciones</option>
+      <option value="4" data-i18n="melodic.options.4">4 opciones</option>
+    </select>
+    <label for="difficultySelect" data-i18n="melodic.difficulty.label">Modo:</label>
+    <select id="difficultySelect">
+      <option value="names" data-i18n="melodic.difficulty.names">Nivel 1: SOL / MI + desbloqueos progresivos</option>
+      <option value="staff" data-i18n="melodic.difficulty.staff">Nivel 2: Pentagrama</option>
+    </select>
+    <button id="startBtn" class="game-btn" data-i18n="hud.start">Iniciar</button>
+    <button id="repeatBtn" disabled data-i18n="melodic.repeat">Escuchar melodía</button>
+  </div>
+
+  <div id="feedback" class="dictation-feedback" data-i18n="melodic.feedback.welcome">
+    Pulsa Iniciar para comenzar un nuevo dictado.
+  </div>
+
+  <div id="optionGrid" class="pattern-grid" aria-live="polite"></div>
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="melody-dictation"
+        data-period="all-time"
+        data-heading-key="rankings.melody_dictation"
+        data-heading="Dictado melódico"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="melody-dictation"
+        data-period="weekly"
+        data-heading-key="rankings.melody_dictation"
+        data-heading="Dictado melódico"
+      ></section>
+    </div>
+  </div>
+
+  <footer class="page-footer" data-sw-status></footer>
+  <a href="../index.html" class="home-link">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="game.back">Volver al inicio</span>
+  </a>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/hud.js" defer></script>
+  <script src="../js/i18n/melody-dictation.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/melody-dictation.js" defer></script>
+</body>
+</html>

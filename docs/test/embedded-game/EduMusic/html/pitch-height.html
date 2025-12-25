@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="pitchheight.title">Altura del sonido</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/pitch-height.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="pitchheight.title">Altura del sonido</h1>
+  <p data-i18n="pitchheight.instructions">
+    Escucha el patrón de sonidos y elige la tarjeta cuyas líneas lo representan.
+  </p>
+
+  <section class="pitchheight-wrapper">
+    <div class="pitchheight-hud">
+      <div class="pitchheight-stat">
+        <span data-i18n="pitchheight.stats.score">Puntuación:</span>
+        <strong id="pitchheightScore">0</strong>
+      </div>
+      <div class="pitchheight-stat">
+        <span data-i18n="pitchheight.stats.streak">Racha:</span>
+        <strong id="pitchheightStreak">0</strong>
+      </div>
+      <div class="pitchheight-stat">
+        <span data-i18n="pitchheight.stats.lives">Vidas:</span>
+        <strong id="pitchheightLives">3</strong>
+      </div>
+      <div class="pitchheight-stat">
+        <span data-i18n="pitchheight.stats.level">Nivel:</span>
+        <strong id="pitchheightLevel">1</strong>
+      </div>
+    </div>
+
+    <div class="pitchheight-controls">
+      <button id="pitchheightStart" class="game-btn" data-i18n="pitchheight.controls.start">Comenzar</button>
+      <button id="pitchheightListen" class="game-btn ghost" data-i18n="pitchheight.controls.listen" hidden>Escuchar patrón</button>
+      <button id="pitchheightReset" class="game-btn secondary" data-i18n="pitchheight.controls.reset" hidden>Reiniciar</button>
+    </div>
+
+    <div class="pitchheight-prompt" role="status" aria-live="polite">
+      <span id="pitchheightPrompt" data-i18n="pitchheight.prompt.idle">Pulsa “Comenzar” para crear un patrón.</span>
+    </div>
+
+    <div id="pitchheightCards" class="pitchheight-grid" role="group" aria-live="polite"></div>
+
+    <p id="pitchheightFeedback" class="pitchheight-feedback" role="status" aria-live="polite" data-i18n="pitchheight.feedback.idle">
+      Selecciona la tarjeta que corresponde al patrón escuchado.
+    </p>
+  </section>
+
+  <div class="game-rankings">
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+      <section
+        data-scoreboard
+        data-game="pitch-height"
+        data-period="all-time"
+        data-heading-key="rankings.pitch_direction"
+        data-heading="Dirección del sonido"
+        data-show-save-at="1"
+      ></section>
+    </div>
+    <div class="game-ranking-section">
+      <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+      <section
+        data-scoreboard
+        data-game="pitch-height"
+        data-period="weekly"
+        data-heading-key="rankings.pitch_direction"
+        data-heading="Dirección del sonido"
+      ></section>
+    </div>
+  </div>
+
+  <a href="../index.html" class="home-link" style="margin-top:12px;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/pitch-height.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/game.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/pitch-height.js" defer></script>
+</body>
+</html>
