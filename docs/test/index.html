@@ -212,6 +212,9 @@
     }
 
     #tutorial-open {
+      position: fixed;
+      bottom: 18px;
+      right: 16px;
       font-family: var(--font-ui);
       font-size: 11px;
       text-transform: uppercase;
@@ -222,6 +225,8 @@
       background: rgba(9, 13, 22, 0.9);
       color: white;
       cursor: pointer;
+      pointer-events: auto;
+      z-index: 60;
     }
 
     #tutorial-open:hover {
@@ -1128,7 +1133,6 @@
     <div id="world-ui">
       <div id="world-current">Mundo: <span id="world-current-name">--</span></div>
       <button id="world-open" type="button">Mundos</button>
-      <button id="tutorial-open" type="button">Tutorial</button>
     </div>
     <div id="player-panel">
       <div class="row">
@@ -1143,6 +1147,7 @@
     <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · L Mundos · Space/Ctrl Subir/Bajar</div>
     <div id="hotbar"></div>
   </div>
+  <button id="tutorial-open" type="button">Tutorial</button>
   <div id="music-pulse"></div>
   <div id="music-feedback">---</div>
   <div id="lock-hint">Bloque bloqueado.</div>

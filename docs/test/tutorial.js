@@ -114,7 +114,7 @@ function setupTutorial(noa, ui, options) {
 
 			var number = document.createElement('div')
 			number.className = 'tutorial-step-number'
-			number.textContent = step.done ? 'OK' : String(index + 1)
+			number.textContent = step.done ? '✓' : String(index + 1)
 			item.appendChild(number)
 
 			var text = document.createElement('div')

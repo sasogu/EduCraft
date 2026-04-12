@@ -113,10 +113,10 @@ module.exports = function createRegistry(noa, scene) {
 		ctx.lineWidth = 3
 		ctx.strokeRect(4, 4, size - 8, size - 8)
 		ctx.fillStyle = '#f5f5f5'
-		ctx.font = "bold 26px 'Silkscreen'"
+		ctx.font = 'bold 42px serif'
 		ctx.textAlign = 'center'
 		ctx.textBaseline = 'middle'
-		ctx.fillText('SOL', size / 2, size / 2)
+		ctx.fillText('\uD834\uDD1E', size / 2, size / 2 + 4)
 		texture.update()
 		return { texture: texture, iconPath: ctx.canvas.toDataURL('image/png') }
 	}
