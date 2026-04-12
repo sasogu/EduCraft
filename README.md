@@ -133,12 +133,16 @@ Edita `scripts/deploy.config` con tus valores reales:
 - `VPS_HOST`: IP o dominio del VPS
 - `VPS_USER`: usuario SSH
 - `VPS_PORT`: puerto SSH
+- `SSH_IDENTITY_FILE`: ruta a una clave SSH concreta si no usas la predeterminada
 - `REMOTE_BASE_DIR`: ruta base del proyecto
 - `REMOTE_WEB_DIR`: carpeta donde se publican los archivos estáticos
 - `REMOTE_SERVER_DIR`: carpeta del backend
 - `REMOTE_SERVICE`: nombre del servicio `systemd`, por ejemplo `educraft-ws`
+- `SYSTEMCTL_BIN`: ruta completa de `systemctl`, por ejemplo `/usr/bin/systemctl`
 
 El archivo `scripts/deploy.config` está ignorado en Git.
+
+En Debian suele ser buena idea dejar `SYSTEMCTL_BIN="/usr/bin/systemctl"` para que el despliegue use exactamente la misma ruta que se permite en `sudoers`.
 
 ### Ejecutar despliegue
 

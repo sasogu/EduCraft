@@ -3,13 +3,15 @@
 VPS_HOST="tu-servidor.com"
 VPS_USER="tu_usuario"
 VPS_PORT="22"
+# SSH_IDENTITY_FILE="$HOME/.ssh/id_ed25519"
 
 REMOTE_BASE_DIR="/opt/educraft"
 REMOTE_WEB_DIR="/opt/educraft/www"
 REMOTE_SERVER_DIR="/opt/educraft/server"
 REMOTE_SERVICE="educraft-ws"
+SYSTEMCTL_BIN="/usr/bin/systemctl"
 
 # Puedes sobreescribir estos comandos si tu VPS necesita otro flujo.
 FRONTEND_BUILD_CMD="cd docs/test && NODE_OPTIONS=--openssl-legacy-provider npx webpack --config webpack.config.js"
 REMOTE_PREPARE_CMD="mkdir -p '${REMOTE_WEB_DIR}' '${REMOTE_SERVER_DIR}'"
-REMOTE_DEPLOY_CMD="cd '${REMOTE_SERVER_DIR}' && npm install && npm run build && sudo systemctl restart '${REMOTE_SERVICE}' && sudo systemctl status '${REMOTE_SERVICE}' --no-pager"
+REMOTE_DEPLOY_CMD="cd '${REMOTE_SERVER_DIR}' && npm install && npm run build && sudo '${SYSTEMCTL_BIN}' restart '${REMOTE_SERVICE}' && sudo '${SYSTEMCTL_BIN}' status '${REMOTE_SERVICE}' --no-pager"
