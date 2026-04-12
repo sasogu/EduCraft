@@ -211,6 +211,24 @@
       color: var(--ui-highlight);
     }
 
+    #tutorial-open {
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--ui-border);
+      background: rgba(9, 13, 22, 0.9);
+      color: white;
+      cursor: pointer;
+    }
+
+    #tutorial-open:hover {
+      border-color: var(--ui-accent);
+      color: var(--ui-accent);
+    }
+
     #music-status {
       color: var(--ui-highlight);
     }
@@ -912,6 +930,129 @@
       color: rgba(255, 255, 255, 0.8);
     }
 
+    #tutorial-intro,
+    #tutorial-panel {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5, 7, 12, 0.72);
+      z-index: 125;
+      pointer-events: auto;
+    }
+
+    #tutorial-intro.active,
+    #tutorial-panel.active {
+      display: flex;
+    }
+
+    .tutorial-card {
+      width: min(460px, 92vw);
+      padding: 22px 22px 18px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, rgba(12, 16, 26, 0.96), rgba(22, 26, 34, 0.92));
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: 12px;
+    }
+
+    .tutorial-eyebrow {
+      font-size: 10px;
+      letter-spacing: 1.8px;
+      color: var(--ui-accent);
+      text-transform: uppercase;
+    }
+
+    .tutorial-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+      color: var(--ui-highlight);
+      text-transform: uppercase;
+    }
+
+    .tutorial-copy {
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.82);
+    }
+
+    .tutorial-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tutorial-btn {
+      padding: 8px 10px;
+      font-size: 11px;
+      font-family: var(--font-ui);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(35, 45, 70, 0.85);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .tutorial-btn.secondary {
+      background: rgba(20, 28, 45, 0.78);
+    }
+
+    .tutorial-btn.warn {
+      background: rgba(72, 34, 22, 0.85);
+    }
+
+    #tutorial-steps {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tutorial-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(24, 30, 42, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .tutorial-step.done {
+      border-color: rgba(133, 214, 255, 0.45);
+      background: rgba(20, 44, 54, 0.78);
+    }
+
+    .tutorial-step-number {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 10px;
+    }
+
+    .tutorial-step.done .tutorial-step-number {
+      background: rgba(133, 214, 255, 0.22);
+      color: #d9f6ff;
+    }
+
+    .tutorial-step-text {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    #tutorial-hint {
+      font-size: 11px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.72);
+      min-height: 32px;
+    }
+
     #web-panel {
       position: fixed;
       inset: 0;
@@ -987,6 +1128,7 @@
     <div id="world-ui">
       <div id="world-current">Mundo: <span id="world-current-name">--</span></div>
       <button id="world-open" type="button">Mundos</button>
+      <button id="tutorial-open" type="button">Tutorial</button>
     </div>
     <div id="player-panel">
       <div class="row">
@@ -1062,6 +1204,29 @@
     <div class="panel">
       <h2>Reto superado</h2>
       <p>Felicitaciones! Has completado el desafio.</p>
+    </div>
+  </div>
+  <div id="tutorial-intro">
+    <div class="tutorial-card">
+      <div class="tutorial-eyebrow">Bienvenida</div>
+      <h2 class="tutorial-title">Quieres un recorrido rapido?</h2>
+      <div class="tutorial-copy">Puedes entrar directamente a jugar o hacer un minitutorial opcional para aprender a moverte, saltar, romper bloques, colocar y abrir el inventario.</div>
+      <div class="tutorial-actions">
+        <button id="tutorial-start" class="tutorial-btn" type="button">Ver tutorial</button>
+        <button id="tutorial-later" class="tutorial-btn secondary" type="button">Ahora no</button>
+        <button id="tutorial-never" class="tutorial-btn warn" type="button">No volver a mostrar</button>
+      </div>
+    </div>
+  </div>
+  <div id="tutorial-panel">
+    <div class="tutorial-card">
+      <div class="tutorial-eyebrow">Primeros pasos</div>
+      <h2 id="tutorial-title" class="tutorial-title">Tutorial rapido</h2>
+      <div id="tutorial-steps"></div>
+      <div id="tutorial-hint"></div>
+      <div class="tutorial-actions">
+        <button id="tutorial-close" class="tutorial-btn secondary" type="button">Cerrar</button>
+      </div>
     </div>
   </div>
   <div id="inventory">

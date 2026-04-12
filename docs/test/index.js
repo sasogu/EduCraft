@@ -24,6 +24,7 @@ var noaEngine = require('../..')
 var createRegistry = require('./registry')
 var multiplayerLib = require('./multiplayer')
 var storage = require('./storage')
+var tutorialLib = require('./tutorial')
 
 var opts = {
 	debug: runtimeDebug,
@@ -524,6 +525,7 @@ playerMesh.scaling.y = h
 var offset = [0, h / 2, 0]
 
 localPlayerNametag = createNametag(playerMesh, getPlayerName(), h, scene)
+var tutorial = tutorialLib.setupTutorial(noa, ui, { playerEntity: eid })
 
 // a "mesh" component to the player entity
 noa.entities.addComponent(eid, noa.entities.names.mesh, {
@@ -711,6 +713,7 @@ noa.inputs.down.on('fire', function () {
 		playMusicBlock(noa.targetedBlock.blockID, 'action', noa.targetedBlock.position)
 		if (noa.targetedBlock.blockID) playBreakSound()
 		applyBlockEdit(0, noa.targetedBlock.position)
+		if (tutorial) tutorial.onAction('break')
 	}
 })
 
@@ -719,6 +722,7 @@ noa.inputs.down.on('alt-fire', function () {
 	if (noa.targetedBlock) {
 		applyBlockEdit(pickedID, noa.targetedBlock.adjacent)
 		playMusicBlock(pickedID, 'place', noa.targetedBlock.adjacent)
+		if (tutorial) tutorial.onAction('place')
 	}
 })
 
@@ -789,6 +793,16 @@ var ui = {
 	classroomMode: document.getElementById('classroom-mode'),
 	classroomWorldName: document.getElementById('classroom-world-name'),
 	challengeBanner: document.getElementById('challenge-banner'),
+	tutorialOpen: document.getElementById('tutorial-open'),
+	tutorialIntro: document.getElementById('tutorial-intro'),
+	tutorialStart: document.getElementById('tutorial-start'),
+	tutorialLater: document.getElementById('tutorial-later'),
+	tutorialNever: document.getElementById('tutorial-never'),
+	tutorialPanel: document.getElementById('tutorial-panel'),
+	tutorialTitle: document.getElementById('tutorial-title'),
+	tutorialSteps: document.getElementById('tutorial-steps'),
+	tutorialHint: document.getElementById('tutorial-hint'),
+	tutorialClose: document.getElementById('tutorial-close'),
 	staffPanel: document.getElementById('staff-panel'),
 	staffBoard: document.getElementById('staff-board'),
 	staffLines: document.getElementById('staff-lines'),
@@ -2111,6 +2125,7 @@ noa.on('tick', function (dt) {
 	clefStepCooldown -= dt
 	stepSoundCooldown -= dt
 	if (multiplayer) multiplayer.tick(dt)
+	if (tutorial) tutorial.tick(dt)
 	updateIslandAnimal(dt)
 
 	if (statusCooldown <= 0) {
@@ -2211,6 +2226,7 @@ noa.inputs.bind('inventory', 'E')
 noa.inputs.bind('inventory', 'I')
 noa.inputs.down.on('inventory', function () {
 	toggleInventory()
+	if (tutorial) tutorial.onAction('inventory')
 })
 
 noa.inputs.bind('toggle-creative', 'G')
