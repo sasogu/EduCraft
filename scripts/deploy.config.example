@@ -10,8 +10,10 @@ REMOTE_WEB_DIR="/opt/educraft/www"
 REMOTE_SERVER_DIR="/opt/educraft/server"
 REMOTE_SERVICE="educraft-ws"
 SYSTEMCTL_BIN="/usr/bin/systemctl"
+HEALTHCHECK_URL="http://127.0.0.1:8080/health"
 
 # Puedes sobreescribir estos comandos si tu VPS necesita otro flujo.
-FRONTEND_BUILD_CMD="cd docs/test && NODE_OPTIONS=--openssl-legacy-provider npx webpack --config webpack.config.js"
+FRONTEND_BUILD_CMD="npm run build:test"
 REMOTE_PREPARE_CMD="mkdir -p '${REMOTE_WEB_DIR}' '${REMOTE_SERVER_DIR}'"
 REMOTE_DEPLOY_CMD="cd '${REMOTE_SERVER_DIR}' && npm install && npm run build && sudo '${SYSTEMCTL_BIN}' restart '${REMOTE_SERVICE}' && sudo '${SYSTEMCTL_BIN}' status '${REMOTE_SERVICE}' --no-pager"
+REMOTE_HEALTHCHECK_CMD="curl --fail --silent '${HEALTHCHECK_URL}'"

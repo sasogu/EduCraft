@@ -67,15 +67,20 @@ npm test
 ```
 
 Esto arranca el entorno de prueba con `webpack-dev-server` usando `docs/test/`.
+En local se mantienen activas las ayudas visuales de depuración.
 
 ### Compilar frontend
 
 ```sh
-cd docs/test
-NODE_OPTIONS=--openssl-legacy-provider npx webpack --config webpack.config.js
+npm run build:test
 ```
 
 El bundle generado se escribe como `docs/test/bundle.js`.
+Si necesitas recompilar también la demo `hello-world`, usa:
+
+```sh
+npm run build
+```
 
 ### Compilar backend
 
@@ -119,6 +124,7 @@ Hace lo siguiente:
 3. Sincroniza `docs/test/` al directorio web del VPS con `rsync`.
 4. Sincroniza `server/` al directorio backend del VPS con `rsync`.
 5. Ejecuta en remoto `npm install`, `npm run build` y reinicia el servicio `systemd`.
+6. Ejecuta un healthcheck remoto para confirmar que el backend responde.
 
 ### Configuración inicial
 
@@ -139,6 +145,7 @@ Edita `scripts/deploy.config` con tus valores reales:
 - `REMOTE_SERVER_DIR`: carpeta del backend
 - `REMOTE_SERVICE`: nombre del servicio `systemd`, por ejemplo `educraft-ws`
 - `SYSTEMCTL_BIN`: ruta completa de `systemctl`, por ejemplo `/usr/bin/systemctl`
+- `HEALTHCHECK_URL`: URL interna para validar el backend tras el reinicio
 
 El archivo `scripts/deploy.config` está ignorado en Git.
 
@@ -176,6 +183,11 @@ curl http://127.0.0.1:8080/health
 - `docs/test/` incluye `index.html`, texturas, audio, fuentes, modelos y minijuegos embebidos.
 - Si cambias dependencias del backend, el despliegue ya ejecuta `npm install` en remoto.
 - Si más adelante quieres acelerar despliegues, puedes ajustar el script para omitir `npm install` cuando no cambien `server/package.json` o `server/package-lock.json`.
+- Las trazas visuales del cliente pueden activarse en local o con `?debug=1`.
+
+## Roadmap técnico
+
+El plan de mejoras priorizado está documentado en [docs/ROADMAP.md](/home/sasogu/github/web/EduCraft/docs/ROADMAP.md:1) para continuar el trabajo más adelante.
 
 ## Origen técnico
 

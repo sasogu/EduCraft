@@ -7,3 +7,9 @@ server/node_modules
 .aider*
 scripts/deploy.config
 .codex
+docs/test/bundle.js
+docs/hello-world/bundle.js
+bundle.js
+cd
+eval:*
+noa-engine@*

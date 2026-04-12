@@ -10,6 +10,10 @@ var islandAnimal = null
 var playerNameCurrent = null
 var localPlayerNametag = null
 var playerPanelMinimized = false
+var runtimeParams = new URLSearchParams(window.location.search)
+var runtimeHost = window.location.hostname || ''
+var runtimeIsLocal = runtimeHost === 'localhost' || runtimeHost === '127.0.0.1' || runtimeHost === '0.0.0.0'
+var runtimeDebug = runtimeParams.get('debug') === '1' || runtimeIsLocal
 
 
 /**
@@ -21,8 +25,8 @@ var createRegistry = require('./registry')
 var storage = require('./storage')
 
 var opts = {
-	debug: true,
-	showFPS: true,
+	debug: runtimeDebug,
+	showFPS: runtimeDebug,
 	inverseY: true,
 	chunkSize: 32,
 	chunkAddDistance: 2,
@@ -100,8 +104,7 @@ noa.blockTargetIdCheck = function (id) {
 }
 
 function setupMultiplayer(noa, scene) {
-	var params = new URLSearchParams(window.location.search)
-	var serverUrl = params.get('server')
+	var serverUrl = runtimeIsLocal ? runtimeParams.get('server') : null
 	var playerName = getPlayerName()
 	var proto = window.location.protocol === 'https:' ? 'wss' : 'ws'
 	if (!serverUrl) serverUrl = proto + '://' + window.location.host + '/ws'
@@ -122,10 +125,12 @@ function setupMultiplayer(noa, scene) {
 
 	function scheduleReconnect() {
 		if (reconnectTimer) return
+		var baseDelay = 2000
+		var retryJitter = Math.floor(Math.random() * 500)
 		reconnectTimer = setTimeout(function () {
 			reconnectTimer = null
 			connect()
-		}, 2000)
+		}, baseDelay + retryJitter)
 	}
 
 	function connect() {
@@ -309,8 +314,7 @@ function getPlayerName() {
 }
 
 function getPlayerNameFromParams() {
-	var params = new URLSearchParams(window.location.search)
-	return sanitizePlayerName(params.get('name') || params.get('player') || '')
+	return sanitizePlayerName(runtimeParams.get('name') || runtimeParams.get('player') || '')
 }
 
 function sanitizePlayerName(name) {

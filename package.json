@@ -4,9 +4,15 @@
   "description": "Experimental voxel game engine",
   "main": "src/index.js",
   "scripts": {
+    "dev": "npm test",
     "start": "cd docs/hello-world && webpack-dev-server",
     "test": "cd docs/test && webpack-dev-server",
-    "build": "cd docs/hello-world && webpack && cd ../test && webpack"
+    "build": "npm run build:hello && npm run build:test",
+    "build:hello": "cd docs/hello-world && NODE_OPTIONS=--openssl-legacy-provider webpack --mode production",
+    "build:test": "cd docs/test && NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --config webpack.config.js",
+    "build:dev": "cd docs/test && NODE_OPTIONS=--openssl-legacy-provider webpack --mode development --config webpack.config.js",
+    "check": "npm run build && npm --prefix server run build",
+    "deploy": "./scripts/deploy-vps.sh"
   },
   "author": "Andy Hall",
   "keywords": [
