@@ -4,3 +4,5 @@ node_modules
 /.vs
 server/dist
 server/node_modules
+.aider*
+scripts/deploy.config

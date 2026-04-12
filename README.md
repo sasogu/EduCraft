@@ -1,179 +1,178 @@
-
 # EduCraft
 
-## ¿Qué puedes hacer con EduCraft?
+EduCraft es una experiencia voxel educativa construida sobre `noa-engine` y Babylon.js. El proyecto combina exploración 3D, edición de bloques, guardado local, multijugador por WebSocket y minijuegos integrados orientados al aprendizaje musical.
 
-EduCraft es una aplicación basada en el motor noa-engine, pensada para la experimentación, la educación y la creación de mundos voxel interactivos. Incluye demos y ejemplos avanzados.
+## Estructura del proyecto
 
-### Funcionalidades principales
+- `docs/test/`: frontend estático del juego, recursos, texturas, audio y minijuegos embebidos.
+- `server/`: backend Node.js para presencia multijugador y sincronización por WebSocket.
+- `src/`: base del motor y código heredado de `noa-engine`.
+- `build-and-deploy.sh`: build manual del bundle del frontend.
+- `scripts/deploy-vps.sh`: despliegue rápido al VPS.
 
-- **Motor voxel avanzado**: chunks, físicas, colisiones, raycasting y renderizado 3D con Babylon.js.
-- **Inventario**: Abre/cierra el inventario, selecciona y mueve bloques.
-- **Hotbar**: Barra rápida para seleccionar bloques y herramientas.
-- **Edición de mundo**: Coloca y quita bloques en tiempo real.
-- **Guardar y cargar**: Guarda ajustes y ediciones del mundo localmente usando IndexedDB (Dexie).
-- **Ajustes**: Modifica y guarda configuraciones del usuario.
-- **Mundos**: Soporta múltiples mundos, puedes guardar/cargar diferentes estados.
-- **Multijugador**: Código para conexión y sincronización (requiere configuración de servidor).
-- **Controles**: Soporte para teclado, ratón y gamepad.
-- **Interfaz gráfica**: UI moderna con paneles, menús y notificaciones.
-- **Físicas**: Motor de físicas para movimiento, gravedad y colisiones.
-- **Renderizado**: Gráficos 3D con Babylon.js, soporte para texturas y materiales personalizados.
-- **Chat**: Soporte para chat en la versión voxelsrv-master.
-- **Soporte móvil**: Detección y adaptación para dispositivos móviles.
-- **Soporte para skins**: Cambia la skin del jugador (en voxelsrv-master).
-- **Modo aula musical**: Retos por niveles con notas y ritmos, incluyendo pentagrama.
-- **Bloques musicales**: Colores tipo boomwhackers, reproducción por interacción y al pisar.
-- **Clave de sol**: Bloque especial que reproduce secuencias conectadas (acordes por columnas).
-- **Recompensas por reto**: Desbloqueo progresivo de materiales (ej. ladrillo).
-- **Panel web integrado**: Acceso a un juego HTML externo desde un objeto en el mundo.
-- **Panel de nick minimizable**: Oculta el editor y muestra el nombre del jugador.
+## Funcionalidades principales
 
-### Controles de usuario (por defecto)
+- Mundo voxel interactivo con colocación y eliminación de bloques.
+- Inventario y hotbar.
+- Guardado local de ajustes y progreso con IndexedDB.
+- Múltiples mundos.
+- Multijugador básico con sincronización de posición y nombre.
+- Interfaz in-game personalizada.
+- Soporte de teclado, ratón y detección de entorno móvil.
+- Bloques y dinámicas musicales.
+- Panel web integrado con minijuegos HTML externos.
 
-- **WASD**: Moverse
-- **Ratón**: Mirar/cambiar dirección
-- **Clic izquierdo**: Quitar bloque
-- **Clic derecho**: Colocar bloque
-- **E**: Abrir/cerrar inventario
-- **1-9**: Seleccionar slot en la hotbar
-- **Espacio**: Saltar
-- **Shift**: Agacharse
-- **O**: Cambiar de mundo (en la demo avanzada)
-- **Z**: Abrir inspector Babylon.js (si debug está activo)
-- **F5**: Guardar mundo manualmente (si está implementado)
-- **Ctrl + rueda del ratón**: Cambiar tamaño de los menús
-- **Ctrl + F**: Cambiar encuadre
+## Controles por defecto
 
-> Nota: Algunos controles pueden variar según la demo o configuración.
+- `WASD`: mover
+- `Ratón`: mirar
+- `Clic izquierdo`: quitar bloque
+- `Clic derecho`: colocar bloque
+- `E`: abrir o cerrar inventario
+- `1-9`: seleccionar slot de hotbar
+- `Espacio`: saltar
+- `Shift`: agacharse
+- `O`: cambiar de mundo en la demo avanzada
+- `Z`: abrir inspector Babylon.js cuando `debug` está activo
 
-### Guía rápida: Guardar y cargar mundos/configuración
+Algunos controles pueden variar según la demo o la configuración activa.
 
-- **Guardar configuración**: Al cambiar opciones en el menú de ajustes, se guardan automáticamente usando IndexedDB. Puedes forzar guardado con F5 (si está implementado).
-- **Guardar mundo**: Las ediciones del mundo se guardan automáticamente al salir o periódicamente. Puedes forzar guardado desde el menú o con F5.
-- **Cargar mundo/configuración**: Al iniciar la aplicación, se cargan automáticamente los datos guardados. Puedes cambiar de mundo desde el menú o con la tecla O.
+## Requisitos
 
-No necesitas hacer nada especial: todo se almacena localmente en tu navegador. Si borras los datos del navegador, perderás los mundos y configuraciones guardadas.
+- `node` y `npm`
+- `rsync` para despliegues al VPS
+- `ssh` para acceso al servidor
+- `systemd` en el VPS para el backend
+- `nginx` o equivalente si se sirve el frontend con proxy inverso a `/ws`
 
+## Desarrollo local
 
-
-
-
-
-
-# noa-engine
-
-An experimental voxel engine.
-
-Examples:
- * [Minecraft Classic](https://classic.minecraft.net/) - a game from Mojang(!) built on this engine
- * [noa-testbed](https://andyhall.github.io/noa-testbed/) - An old demo, outdated but colorful
- * [test example](https://andyhall.github.io/noa/test/) - test world from this repo, implements most of the engine's features
- * [hello-world example](https://andyhall.github.io/noa/hello-world/) - bare minimum world, suitable for using as a base to build something out of
-
-
-## Usage
-
-Under active development, best way to try it is to clone and hack on the `develop` branch:
+Instala dependencias del frontend:
 
 ```sh
-(clone this repo)
-cd noa
 npm install
-git checkout develop   # newest version is in develop
-npm test               # runs demo world in /docs/test
 ```
 
-The `start` and `test` scripts run the minimal demo projects locally, via `webpack` and `webpack-dev-server` (which will be installed as dev dependencies). The `build` script rebuilds static bundles for both demos.
-
-To build a new world, use `noa` as a dependency:
+Instala dependencias del backend:
 
 ```sh
-npm install --save noa-engine
+cd server
+npm install
 ```
 
-```js
-var engine = require('noa-engine')
-var noa = engine({
-    inverseY: true,
-    // see source or /docs/ examples for more options and usage
-})
+### Ejecutar frontend en local
+
+```sh
+npm test
 ```
 
-----
+Esto arranca el entorno de prueba con `webpack-dev-server` usando `docs/test/`.
 
-## Status, contributing, etc.
+### Compilar frontend
 
-This library attempts to be something you can build a voxel game on top of. 
-It's not a fully-featured game engine; it just tries to manage the painful parts 
-of using voxels (e.g. chunking, meshing), and certain things that are 
-tightly coupled to voxel implementation (physics, raycasting, collisions..), 
-but otherwise stay out of your way.
+```sh
+cd docs/test
+NODE_OPTIONS=--openssl-legacy-provider npx webpack --config webpack.config.js
+```
 
-Contributions are welcome! But please open an issue before building any 
-nontrivial new features. I'd like to keep this library lean, 
-so if a given feature could be done as a separate module then that's probably what I'll suggest.
+El bundle generado se escribe como `docs/test/bundle.js`.
 
-> Please note I do all dev work on the `develop` branch; please send any PRs against that branch!
+### Compilar backend
 
+```sh
+cd server
+npm run build
+```
 
-## Docs
+### Ejecutar backend en desarrollo
 
-The source is pretty fully commented, mostly with JSDoc-style comments, 
-but I don't currently have a good docgen tool, so for now it's best to 
-consult the source.
+```sh
+cd server
+npm run dev
+```
 
-----
+Por defecto el backend escucha en el puerto `8080`.
 
-## Recent changes:
+## Arquitectura de despliegue
 
- * 0.25.0
-   * Adds `debug` option: populates `window` with useful references, binds `Z` to BJS inspector
-   * Now current with Babylon.js 4.0
-   * Updates many dependencies, many small bug fixes.
- * 0.24.0
-   * Terrain materials can specify a renderMaterial (see `registry.registerMaterial()`)
-   * Targeting and `noa.pick` can take a function for which block IDs to target - #36
-   * `every` component is removed (client apps using this, please define it separately)
- * 0.23.0
-   * Now uses octrees for scene selection for all meshes, even moving ones
-   * Option `useOctreesForDynamicMeshes` (default `true`) to disable previous
-   * `noa.rendering.addDynamicMesh` changed to `addMeshToScene(mesh, isStatic)`
-   * Entities can now be cylindrical w.r.t. `collideEntities` component
-   * Adds pairwise entity collision handler `noa.entities.onPairwiseEntityCollision`
- * 0.22.0
-   * Large/complicated scenes should mesh and render much faster
-   * Chunk terrain/object meshing now merges results. Block object meshes must be static!
-   * Removed redundant `player` component - use `noa.playerEntity` property
-   * Added `showFPS` option
-   * Many internal changes that hopefully don't break compatibility
- * 0.21.0
-   * Support unloading/reloading new world data.  
-     Sample implementation in the `docs/test` app (hit "O" to swap world data)
-   * changes `noa.world#setChunkData` params: `id, array, userData`
-   * changes `noa.world#chunkBeingRemoved` event params: `id, array, userData`
- * 0.20.0
-   * Near chunks get loaded and distant ones get unloaded faster and more sensibly
-   * Greatly speeds up chunk init, meshing, and disposal (and fixes some new Chrome deopts)
- * 0.19.0
-   * Revise per-block callbacks:
-     * `onLoad` when a block is created as part of a newly-loaded chunk  
-     * `onUnload` - when the block goes away because its chunk was unloaded
-     * `onSet` - when a block gets set to that particular id
-     * `onUnset` - when a block that had that id gets set to something else
-     * `onCustomMeshCreate` - when that block's custom mesh is instantiated (either due to load or set)
- * 0.18.0
-   * Simplifies block targeting. Instead of several accessor methods, now there's a persistent `noa.targetedBlock` with details on whatever block is currently targeted.
-   * `noa` now emits `targetBlockChanged`
-   * Built-in block highlighting can now be overridden or turned off with option `skipDefaultHighlighting`
- * 0.17.0
-   * Adds per-block callbacks: `onCreate`, `onDestroy`, `onCustomMeshCreate`
- * 0.16.0
-   * Simplifies block registration - now takes an options argument, and the same API is used for custom mesh blocks
-   * Removes the idea of registration for meshes
+La forma recomendada de desplegar EduCraft en producción es:
 
-----
+- `docs/test/` servido como sitio estático.
+- `server/` ejecutándose como servicio Node.js.
+- `nginx` haciendo proxy WebSocket desde `/ws` al backend.
 
-## Credits
+El cliente usa por defecto:
 
-Made by [@fenomas](https://twitter.com/fenomas), license is MIT.
+- `ws://TU_HOST/ws` si la página va por HTTP
+- `wss://TU_HOST/ws` si la página va por HTTPS
+
+Ese comportamiento está implementado en [docs/test/index.js](/home/sasogu/github/web/EduCraft/docs/test/index.js:98).
+
+## Despliegue al VPS con un comando
+
+El script [scripts/deploy-vps.sh](/home/sasogu/github/web/EduCraft/scripts/deploy-vps.sh:1) automatiza el flujo de despliegue.
+
+Hace lo siguiente:
+
+1. Compila el frontend.
+2. Crea las rutas remotas si faltan.
+3. Sincroniza `docs/test/` al directorio web del VPS con `rsync`.
+4. Sincroniza `server/` al directorio backend del VPS con `rsync`.
+5. Ejecuta en remoto `npm install`, `npm run build` y reinicia el servicio `systemd`.
+
+### Configuración inicial
+
+Copia la plantilla:
+
+```sh
+cp scripts/deploy.config.example scripts/deploy.config
+```
+
+Edita `scripts/deploy.config` con tus valores reales:
+
+- `VPS_HOST`: IP o dominio del VPS
+- `VPS_USER`: usuario SSH
+- `VPS_PORT`: puerto SSH
+- `REMOTE_BASE_DIR`: ruta base del proyecto
+- `REMOTE_WEB_DIR`: carpeta donde se publican los archivos estáticos
+- `REMOTE_SERVER_DIR`: carpeta del backend
+- `REMOTE_SERVICE`: nombre del servicio `systemd`, por ejemplo `educraft-ws`
+
+El archivo `scripts/deploy.config` está ignorado en Git.
+
+### Ejecutar despliegue
+
+```sh
+./scripts/deploy-vps.sh
+```
+
+Si quieres usar un archivo de configuración distinto:
+
+```sh
+DEPLOY_CONFIG=./scripts/mi-config-vps.sh ./scripts/deploy-vps.sh
+```
+
+## Flujo recomendado de trabajo
+
+1. Hacer cambios en local.
+2. Probar frontend y backend localmente.
+3. Confirmar cambios en Git.
+4. Ejecutar `./scripts/deploy-vps.sh`.
+5. Verificar en el VPS que el servicio sigue sano.
+
+Comprobación útil del backend en el servidor:
+
+```sh
+curl http://127.0.0.1:8080/health
+```
+
+## Notas sobre producción
+
+- El frontend necesita subir la carpeta completa `docs/test/`, no solo `bundle.js`.
+- `docs/test/` incluye `index.html`, texturas, audio, fuentes, modelos y minijuegos embebidos.
+- Si cambias dependencias del backend, el despliegue ya ejecuta `npm install` en remoto.
+- Si más adelante quieres acelerar despliegues, puedes ajustar el script para omitir `npm install` cuando no cambien `server/package.json` o `server/package-lock.json`.
+
+## Origen técnico
+
+EduCraft parte de una base de `noa-engine`, pero este repositorio ya está orientado a la aplicación final y a su despliegue. Para trabajo diario conviene tomar este `README` como referencia principal en lugar de la documentación original del motor.
