@@ -525,7 +525,6 @@ playerMesh.scaling.y = h
 var offset = [0, h / 2, 0]
 
 localPlayerNametag = createNametag(playerMesh, getPlayerName(), h, scene)
-var tutorial = tutorialLib.setupTutorial(noa, ui, { playerEntity: eid })
 
 // a "mesh" component to the player entity
 noa.entities.addComponent(eid, noa.entities.names.mesh, {
@@ -810,6 +809,8 @@ var ui = {
 	staffSong: document.getElementById('staff-song'),
 	staffHint: document.getElementById('staff-hint'),
 }
+
+var tutorial = tutorialLib.setupTutorial(noa, ui, { playerEntity: noa.playerEntity })
 
 var hotbarSlots = getDefaultHotbar()
 var hotbarEls = []
