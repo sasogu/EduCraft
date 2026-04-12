@@ -11,7 +11,8 @@
     "build:hello": "cd docs/hello-world && NODE_OPTIONS=--openssl-legacy-provider webpack --mode production",
     "build:test": "cd docs/test && NODE_OPTIONS=--openssl-legacy-provider webpack --mode production --config webpack.config.js",
     "build:dev": "cd docs/test && NODE_OPTIONS=--openssl-legacy-provider webpack --mode development --config webpack.config.js",
-    "check": "npm run build && npm --prefix server run build",
+    "smoke:build": "npm run build && test -s docs/hello-world/bundle.js && test -s docs/test/bundle.js",
+    "check": "npm run smoke:build && npm --prefix server test",
     "deploy": "./scripts/deploy-vps.sh"
   },
   "author": "Andy Hall",

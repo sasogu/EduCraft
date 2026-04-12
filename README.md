@@ -89,6 +89,14 @@ cd server
 npm run build
 ```
 
+### Ejecutar comprobaciones rápidas
+
+```sh
+npm run check
+```
+
+Este comando recompila el frontend, verifica que los bundles esperados existen y ejecuta los tests mínimos del protocolo del backend.
+
 ### Ejecutar backend en desarrollo
 
 ```sh

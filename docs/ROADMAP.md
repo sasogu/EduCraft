@@ -20,13 +20,15 @@ Este documento recoge el plan de mejora acordado para EduCraft y sirve como punt
 - `scripts/deploy-vps.sh` ya ejecuta un healthcheck remoto tras el reinicio.
 - `server/src/index.ts` ya aplica `maxPayload`, heartbeat, timeout de cliente, rate limit y cierre por mensajes invalidos repetidos.
 - `.gitignore` ya cubre artefactos comunes generados por este repo.
+- `server/test/protocol.test.mjs` ya cubre validaciones basicas del protocolo con `node:test`.
+- `npm run check` ya incluye smoke check del build y tests minimos del backend.
 
 ## Siguiente bloque recomendado
 
-1. Anadir tests minimos para protocolo del servidor y scripts de build.
-2. Extraer `multiplayer`, `ui`, `worlds` y `classroom` de `docs/test/index.js`.
-3. Introducir configuracion centralizada para flags de runtime del cliente y del servidor.
-4. Revisar la persistencia de mundos para evolucionar de blob completo a guardado incremental.
+1. Extraer `multiplayer`, `ui`, `worlds` y `classroom` de `docs/test/index.js`.
+2. Introducir configuracion centralizada para flags de runtime del cliente y del servidor.
+3. Revisar la persistencia de mundos para evolucionar de blob completo a guardado incremental.
+4. Ampliar los tests del backend para cubrir rate limiting, heartbeat y control de origen.
 
 ## Fase Media
 
