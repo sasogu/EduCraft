@@ -242,12 +242,15 @@
       position: fixed;
       bottom: 18px;
       left: 16px;
+      max-width: min(360px, calc(100vw - 32px));
       padding: 6px 10px;
       background: var(--ui-bg);
       border: 1px solid var(--ui-border);
       border-radius: 6px;
       font-size: 11px;
+      line-height: 1.4;
       pointer-events: none;
+      z-index: 55;
     }
 
     #hotbar {
@@ -1215,7 +1218,7 @@
     <div class="tutorial-card">
       <div class="tutorial-eyebrow">Bienvenida</div>
       <h2 class="tutorial-title">Quieres un recorrido rapido?</h2>
-      <div class="tutorial-copy">Puedes entrar directamente a jugar o hacer un minitutorial opcional para aprender a moverte, saltar, romper bloques, colocar y abrir el inventario.</div>
+      <div class="tutorial-copy">Puedes entrar directamente a jugar o hacer un minitutorial opcional para aprender los controles: W A S D para moverte, Espacio para saltar, clic izquierdo para romper, clic derecho para colocar y E para abrir el inventario.</div>
       <div class="tutorial-actions">
         <button id="tutorial-start" class="tutorial-btn" type="button">Ver tutorial</button>
         <button id="tutorial-later" class="tutorial-btn secondary" type="button">Ahora no</button>

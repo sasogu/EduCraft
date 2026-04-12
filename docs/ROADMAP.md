@@ -29,6 +29,7 @@ Este documento recoge el plan de mejora acordado para EduCraft y sirve como punt
 2. Introducir configuracion centralizada para flags de runtime del cliente y del servidor.
 3. Revisar la persistencia de mundos para evolucionar de blob completo a guardado incremental.
 4. Ampliar los tests del backend para cubrir rate limiting, heartbeat y control de origen.
+5. Implementar diferencias funcionales reales entre modos `Survival` y `Creativo` (activar vuelo en creativo, ajustar gravedad y comportamiento sobre agua segun modo).
 
 ## Fase Media
 

@@ -6,11 +6,11 @@ var STORAGE_KEYS = {
 }
 
 var STEP_DEFS = [
-	{ id: 'move', label: 'Muévete con WASD', hint: 'Da unos pasos para empezar a explorar.' },
-	{ id: 'jump', label: 'Salta con Espacio', hint: 'Haz un salto para practicar el control del personaje.' },
-	{ id: 'break', label: 'Rompe un bloque', hint: 'Apunta a un bloque y usa clic izquierdo.' },
-	{ id: 'place', label: 'Coloca un bloque', hint: 'Usa clic derecho para colocar el bloque seleccionado.' },
-	{ id: 'inventory', label: 'Abre el inventario', hint: 'Pulsa E para ver tus bloques disponibles.' },
+	{ id: 'move', label: 'Moverse (W A S D)', hint: 'Mantén pulsadas W, A, S o D para caminar.' },
+	{ id: 'jump', label: 'Saltar (Espacio)', hint: 'Pulsa la barra espaciadora para saltar una vez.' },
+	{ id: 'break', label: 'Romper bloque (Clic izquierdo)', hint: 'Apunta a un bloque cercano y haz clic izquierdo.' },
+	{ id: 'place', label: 'Colocar bloque (Clic derecho)', hint: 'Selecciona un bloque y usa clic derecho para colocarlo.' },
+	{ id: 'inventory', label: 'Abrir inventario (E)', hint: 'Pulsa E para abrir y cerrar el inventario.' },
 ]
 
 function setupTutorial(noa, ui, options) {

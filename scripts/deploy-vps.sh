@@ -36,6 +36,7 @@ REMOTE_SERVER_DIR="${REMOTE_SERVER_DIR:-${REMOTE_BASE_DIR}/server}"
 REMOTE_SSH_TARGET="${VPS_USER}@${VPS_HOST}"
 SYSTEMCTL_BIN="${SYSTEMCTL_BIN:-/usr/bin/systemctl}"
 FRONTEND_BUILD_CMD="${FRONTEND_BUILD_CMD:-npm run build:test}"
+FORCE_TEST_REBUILD_CMD="${FORCE_TEST_REBUILD_CMD:-npm run build:test}"
 REMOTE_PREPARE_CMD="${REMOTE_PREPARE_CMD:-mkdir -p '${REMOTE_WEB_DIR}' '${REMOTE_SERVER_DIR}'}"
 REMOTE_DEPLOY_CMD="${REMOTE_DEPLOY_CMD:-cd '${REMOTE_SERVER_DIR}' && npm install && npm run build && sudo '${SYSTEMCTL_BIN}' restart '${REMOTE_SERVICE}' && sudo '${SYSTEMCTL_BIN}' status '${REMOTE_SERVICE}' --no-pager}"
 HEALTHCHECK_URL="${HEALTHCHECK_URL:-http://127.0.0.1:8080/health}"
@@ -67,30 +68,35 @@ run_remote() {
   ssh "${SSH_ARGS[@]}" "${REMOTE_SSH_TARGET}" "$1"
 }
 
-echo "[1/5] Compilando frontend..."
+echo "[1/6] Compilando frontend..."
 (cd "${REPO_ROOT}" && bash -lc "${FRONTEND_BUILD_CMD}")
 
-echo "[2/5] Preparando rutas remotas..."
+if [[ -n "${FORCE_TEST_REBUILD_CMD}" ]]; then
+  echo "[2/6] Recompilando docs/test (forzado)..."
+  (cd "${REPO_ROOT}" && bash -lc "${FORCE_TEST_REBUILD_CMD}")
+fi
+
+echo "[3/6] Preparando rutas remotas..."
 run_remote "${REMOTE_PREPARE_CMD}"
 
-echo "[3/5] Sincronizando frontend a ${REMOTE_WEB_DIR}..."
+echo "[4/6] Sincronizando frontend a ${REMOTE_WEB_DIR}..."
 run_step rsync "${RSYNC_FLAGS[@]}" \
   --exclude-from="${RSYNC_EXCLUDES_FILE}" \
   -e "ssh ${SSH_ARGS[*]}" \
   "${REPO_ROOT}/docs/test/" \
   "${REMOTE_SSH_TARGET}:${REMOTE_WEB_DIR}/"
 
-echo "[4/5] Sincronizando backend a ${REMOTE_SERVER_DIR}..."
+echo "[5/6] Sincronizando backend a ${REMOTE_SERVER_DIR}..."
 run_step rsync "${RSYNC_FLAGS[@]}" \
   --exclude-from="${RSYNC_EXCLUDES_FILE}" \
   -e "ssh ${SSH_ARGS[*]}" \
   "${REPO_ROOT}/server/" \
   "${REMOTE_SSH_TARGET}:${REMOTE_SERVER_DIR}/"
 
-echo "[5/6] Instalando, compilando y reiniciando servicio remoto..."
+echo "[6/7] Instalando, compilando y reiniciando servicio remoto..."
 run_remote "${REMOTE_DEPLOY_CMD}"
 
-echo "[6/6] Verificando healthcheck remoto..."
+echo "[7/7] Verificando healthcheck remoto..."
 run_remote "${REMOTE_HEALTHCHECK_CMD}"
 
 echo "Despliegue completado."
