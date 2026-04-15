@@ -4,13 +4,15 @@ import assert from 'node:assert/strict';
 import { PROTOCOL_VERSION, isClientMessage, sanitizeName, sanitizeWorld } from '../dist/protocol.js';
 
 test('sanitizeName uses a safe default for empty values', () => {
-  assert.equal(sanitizeName(undefined), 'Player');
-  assert.equal(sanitizeName('   '), 'Player');
+  assert.equal(sanitizeName(undefined), 'PLY');
+  assert.equal(sanitizeName('   '), 'PLY');
 });
 
-test('sanitizeName trims input and caps length', () => {
-  assert.equal(sanitizeName('  Ada Lovelace  '), 'Ada Lovelace');
-  assert.equal(sanitizeName('abcdefghijklmnopqrstuvwxy'), 'abcdefghijklmnopqrstuvwx');
+test('sanitizeName only accepts 3 alphanumeric chars', () => {
+  assert.equal(sanitizeName(' a1b '), 'A1B');
+  assert.equal(sanitizeName('ab'), 'PLY');
+  assert.equal(sanitizeName('abcd'), 'PLY');
+  assert.equal(sanitizeName('a-b'), 'PLY');
 });
 
 test('isClientMessage accepts valid hello, move and ping messages', () => {

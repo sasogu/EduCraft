@@ -159,7 +159,7 @@ function setupMultiplayer(noa, scene, options) {
 		var entry = remotePlayers[player.id]
 		if (!entry) {
 			var size = noa.entities.getPositionData(noa.playerEntity)
-			var mesh = createRemoteMesh(player.id)
+			var mesh = createRemoteMesh(player.id, player.name || 'PLY')
 			var eid = noa.entities.add([player.x, player.y, player.z], size.width, size.height, mesh, [0, size.height / 2, 0], false, false)
 			entry = {
 				eid: eid,
@@ -175,6 +175,7 @@ function setupMultiplayer(noa, scene, options) {
 		if (player.name && entry.name !== player.name) {
 			entry.name = player.name
 			updateNametag(entry.nametag, player.name)
+			applyNameToRemoteMesh(entry.mesh, player.name)
 		}
 		entry.last = { x: entry.target.x, y: entry.target.y, z: entry.target.z }
 		entry.target = { x: player.x, y: player.y, z: player.z }
@@ -189,14 +190,43 @@ function setupMultiplayer(noa, scene, options) {
 		delete remotePlayers[id]
 	}
 
-	function createRemoteMesh(id) {
+	function createRemoteMesh(id, label) {
 		var mesh = BABYLON.Mesh.CreateBox('remote-' + id, 1, scene)
 		mesh.isPickable = false
 		var mat = new BABYLON.StandardMaterial('remote-mat-' + id, scene)
 		var color = colorFromId(id)
 		mat.diffuseColor = new BABYLON.Color3(color.r, color.g, color.b)
+		mat.specularColor = new BABYLON.Color3(0, 0, 0)
+		applyNameToMaterial(mat, label || 'PLY', color)
 		mesh.material = mat
 		return mesh
+	}
+
+	function applyNameToRemoteMesh(mesh, label) {
+		if (!mesh || !mesh.material) return
+		var diffuse = mesh.material.diffuseColor || new BABYLON.Color3(0.5, 0.5, 0.5)
+		var color = { r: diffuse.r, g: diffuse.g, b: diffuse.b }
+		applyNameToMaterial(mesh.material, label || 'PLY', color)
+	}
+
+	function applyNameToMaterial(material, label, color) {
+		if (!material || !scene) return
+		var tex = material.diffuseTexture
+		if (!tex || !tex.getContext) {
+			tex = new BABYLON.DynamicTexture('remote-name-' + label, { width: 256, height: 256 }, scene, false)
+			material.diffuseTexture = tex
+		}
+		var ctx = tex.getContext()
+		ctx.fillStyle = 'rgb(' + Math.floor(color.r * 255) + ',' + Math.floor(color.g * 255) + ',' + Math.floor(color.b * 255) + ')'
+		ctx.fillRect(0, 0, 256, 256)
+		ctx.fillStyle = 'rgba(0,0,0,0.18)'
+		ctx.fillRect(0, 184, 256, 72)
+		ctx.textAlign = 'center'
+		ctx.textBaseline = 'middle'
+		ctx.font = "bold 54px 'Silkscreen'"
+		ctx.fillStyle = '#ffffff'
+		ctx.fillText((label || 'PLY').slice(0, 3), 128, 220)
+		tex.update()
 	}
 
 	function colorFromId(id) {
@@ -257,9 +287,18 @@ function getPlayerName(runtimeParams, sanitizePlayerName) {
 	}
 	var stored = sanitizePlayerName(localStorage.getItem('educraft-player-name') || '')
 	if (stored) return stored
-	var fallback = 'P' + Math.floor(Math.random() * 900 + 100)
+	var fallback = randomPlayerName()
 	localStorage.setItem('educraft-player-name', fallback)
 	return fallback
+}
+
+function randomPlayerName() {
+	var alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+	var out = ''
+	for (var i = 0; i < 3; i++) {
+		out += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+	}
+	return out
 }
 
 function getPlayerNameFromParams(runtimeParams, sanitizePlayerName) {
@@ -269,8 +308,9 @@ function getPlayerNameFromParams(runtimeParams, sanitizePlayerName) {
 function sanitizePlayerName(name) {
 	if (!name) return ''
 	var cleaned = name.trim().replace(/\s+/g, '')
-	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3)
-	return cleaned.toUpperCase()
+	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()
+	if (cleaned.length !== 3) return ''
+	return cleaned
 }
 
 function sanitizeWorldName(name) {

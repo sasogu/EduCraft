@@ -70,9 +70,9 @@ export function isClientMessage(value: unknown): value is ClientMessage {
 }
 
 export function sanitizeName(name: string | undefined): string {
-  const trimmed = (name || '').trim();
-  if (!trimmed) return 'Player';
-  return trimmed.slice(0, 24);
+  const cleaned = (name || '').trim().replace(/\s+/g, '').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+  if (cleaned.length !== 3) return 'PLY';
+  return cleaned;
 }
 
 export function sanitizeWorld(world: string | undefined): string {

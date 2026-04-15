@@ -9,6 +9,7 @@ var lastValidPos = null
 var islandAnimal = null
 var playerNameCurrent = null
 var localPlayerNametag = null
+var localPlayerSkinTexture = null
 var playerPanelMinimized = false
 var runtimeParams = new URLSearchParams(window.location.search)
 var runtimeHost = window.location.hostname || ''
@@ -142,8 +143,29 @@ function setPlayerName(name) {
 	localStorage.setItem('educraft-player-name', cleaned)
 	updatePlayerPanel()
 	if (localPlayerNametag) updateNametag(localPlayerNametag, cleaned)
+	applyNameToLocalSkin(cleaned)
 	if (multiplayer && multiplayer.setName) multiplayer.setName(cleaned)
 	return true
+}
+
+function applyNameToLocalSkin(name) {
+	if (!playerMesh || !playerMesh.material || !scene) return
+	if (!localPlayerSkinTexture || !localPlayerSkinTexture.getContext) {
+		localPlayerSkinTexture = new BABYLON.DynamicTexture('player-skin-name', { width: 256, height: 256 }, scene, false)
+		playerMesh.material.diffuseTexture = localPlayerSkinTexture
+	}
+	var texture = localPlayerSkinTexture
+	var ctx = texture.getContext()
+	ctx.fillStyle = '#5a8fd4'
+	ctx.fillRect(0, 0, 256, 256)
+	ctx.fillStyle = 'rgba(0,0,0,0.2)'
+	ctx.fillRect(0, 184, 256, 72)
+	ctx.textAlign = 'center'
+	ctx.textBaseline = 'middle'
+	ctx.font = "bold 54px 'Silkscreen'"
+	ctx.fillStyle = '#ffffff'
+	ctx.fillText((name || 'PLY').slice(0, 3), 128, 220)
+	texture.update()
 }
 
 function setupPlayerPanel() {
@@ -524,11 +546,16 @@ var h = dat.height
 var playerMesh = BABYLON.Mesh.CreateBox('player', 1, scene)
 playerMesh.scaling.x = playerMesh.scaling.z = w
 playerMesh.scaling.y = h
+var playerMat = new BABYLON.StandardMaterial('player-local-mat', scene)
+playerMat.specularColor = new BABYLON.Color3(0, 0, 0)
+playerMesh.material = playerMat
 
 // offset of mesh relative to the entity's "position" (center of its feet)
 var offset = [0, h / 2, 0]
 
-localPlayerNametag = createNametag(playerMesh, getPlayerName(), h, scene)
+var initialPlayerName = getPlayerName()
+applyNameToLocalSkin(initialPlayerName)
+localPlayerNametag = createNametag(playerMesh, initialPlayerName, h, scene)
 
 // a "mesh" component to the player entity
 noa.entities.addComponent(eid, noa.entities.names.mesh, {
