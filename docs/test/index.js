@@ -730,7 +730,7 @@ function applyWorldEditLocal(blockId, position, options) {
 function applyBlockEdit(blockId, position) {
 	if (blockId !== 0) {
 		var block = getBlockById(blockId)
-		if (block && block.locked) {
+		if (block && block.locked && !creativeMode) {
 			showLockedNotice('Bloque aun no desbloqueado.')
 			return
 		}
@@ -882,6 +882,7 @@ var ui = {
 	classroomPlay: document.getElementById('classroom-play'),
 	classroomReset: document.getElementById('classroom-reset'),
 	classroomToggle: document.getElementById('classroom-toggle'),
+	classroomOpen: document.getElementById('classroom-open'),
 	classroomDifficulty: document.getElementById('classroom-difficulty'),
 	classroomMode: document.getElementById('classroom-mode'),
 	classroomWorldName: document.getElementById('classroom-world-name'),
@@ -1048,6 +1049,9 @@ function setupClassroom() {
 	if (ui.classroomToggle) ui.classroomToggle.addEventListener('click', function () {
 		toggleClassroom(false)
 	})
+	if (ui.classroomOpen) ui.classroomOpen.addEventListener('click', function () {
+		toggleClassroom(true)
+	})
 	if (ui.classroomDifficulty) {
 		ui.classroomDifficulty.addEventListener('change', function (event) {
 			setClassroomDifficulty(parseInt(event.target.value, 10))
@@ -1094,6 +1098,7 @@ function setClassroomMode(mode) {
 function toggleClassroom(force) {
 	var open = (typeof force === 'boolean') ? force : !ui.classroom.classList.contains('open')
 	ui.classroom.classList.toggle('open', open)
+	if (ui.classroomOpen) ui.classroomOpen.classList.toggle('visible', !open)
 	scheduleSaveSettings()
 }
 
@@ -1379,7 +1384,7 @@ function createInventoryItem(block) {
 	item.appendChild(label)
 
 	item.addEventListener('click', function () {
-		if (block.locked) {
+		if (block.locked && !creativeMode) {
 			showLockedNotice('Bloque aun no desbloqueado.')
 			return
 		}
@@ -1402,7 +1407,13 @@ function addInventoryItem(block) {
 function updateInventoryItemLock(block, item) {
 	var el = item || inventoryElsById[block.id]
 	if (!el) return
-	el.classList.toggle('locked', !!block.locked)
+	el.classList.toggle('locked', !!block.locked && !creativeMode)
+}
+
+function refreshInventoryLocks() {
+	for (var i = 0; i < blockCatalog.length; i++) {
+		updateInventoryItemLock(blockCatalog[i])
+	}
 }
 
 function applyWorldUnlocks() {
@@ -2361,6 +2372,7 @@ function updatePause() {
 function setCreativeMode(enabled) {
 	creativeMode = enabled
 	noa.playerBody.gravityMultiplier = (creativeMode && allowFlight) ? 0 : 1
+	refreshInventoryLocks()
 	updateStatus()
 	scheduleSaveSettings()
 }

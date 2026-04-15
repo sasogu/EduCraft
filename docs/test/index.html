@@ -234,6 +234,34 @@
       color: var(--ui-accent);
     }
 
+    #classroom-open {
+      position: fixed;
+      bottom: 56px;
+      right: 16px;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--ui-border);
+      background: rgba(9, 13, 22, 0.9);
+      color: white;
+      cursor: pointer;
+      pointer-events: auto;
+      z-index: 60;
+      display: none;
+    }
+
+    #classroom-open.visible {
+      display: block;
+    }
+
+    #classroom-open:hover {
+      border-color: var(--ui-highlight);
+      color: var(--ui-highlight);
+    }
+
     #music-status {
       color: var(--ui-highlight);
     }
@@ -1147,9 +1175,10 @@
       </div>
       <div class="current">Nombre: <span id="player-name-current">---</span></div>
     </div>
-    <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Aula · L Mundos · Space/Ctrl Subir/Bajar</div>
+    <div id="help">WASD Mover · Click izq Romper · Click der Poner · R Reproducir · 1-9 Elegir · E Inventario · G Creativo · M Mostrar/Ocultar aula · L Mundos · Space/Ctrl Subir/Bajar</div>
     <div id="hotbar"></div>
   </div>
+  <button id="classroom-open" type="button">Aula</button>
   <button id="tutorial-open" type="button">Tutorial</button>
   <div id="music-pulse"></div>
   <div id="music-feedback">---</div>
