@@ -357,12 +357,13 @@ function handleEmbeddedGameCompletion(payload) {
 function getEmbeddedGameSignConfigs() {
 	return [
 		{ id: 'solmi', x: 4, z: -6, title: 'SOL-MI', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmi.html' },
+		{ id: 'karaoke', x: 8, z: 2, title: 'KARAOKE', subtitle: 'Canta y juega', url: '/embedded-game/EduMusic/html/karaoke.html' },
 		{ id: 'solmila', x: 12, z: -10, title: 'SOL-MI-LA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmila.html' },
 		{ id: 'solmilado', x: 18, z: -14, title: 'SOL-MI-DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmilado.html' },
 		{ id: 'piano', x: 10, z: 8, title: 'PIANO', subtitle: 'Toca libre', url: '/embedded-game/EduMusic/html/piano.html' },
 		{ id: 'memory', x: 20, z: 8, title: 'MEMORY', subtitle: 'Juego musical', url: '/embedded-game/EduMusic/html/memory.html' },
 		{ id: 'quiz', x: 26, z: 6, title: 'QUIZ', subtitle: 'Pregunta y juega', url: '/embedded-game/EduMusic/html/quiz.html' },
-		{ id: 'clave-sol', x: 30, z: 4, title: 'CLAVE SOL', subtitle: 'Traza la clave', url: '/embedded-game/EduMusic/html/clave-sol.html' },
+		{ id: 'cajaritmos', x: 30, z: 4, title: 'CAJA RITMOS', subtitle: 'Patrones y compas', url: '/embedded-game/EduMusic/html/cajaritmos.html' },
 		{ id: 'solmiladore', x: 24, z: 0, title: 'SOL+DO+RE', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladore.html' },
 		{ id: 'solmiladorefa', x: 30, z: -4, title: 'SOL+RE+FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladorefa.html' },
 		{ id: 'todas', x: 28, z: -10, title: 'DO A DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/todas.html' },
@@ -378,7 +379,10 @@ function getEmbeddedGameSignConfigs() {
 		{ id: 'compas', x: 30, z: -22, title: 'COMPAS', subtitle: 'Puzzle musical', url: '/embedded-game/EduMusic/html/compas.html' },
 		{ id: 'palabras-musicales', x: 18, z: -22, title: 'PALABRAS', subtitle: 'Letras y musica', url: '/embedded-game/EduMusic/html/palabras-musicales.html' },
 		{ id: 'piano-hero', x: 12, z: -22, title: 'PIANO HERO', subtitle: 'Arcade musical', url: '/embedded-game/EduMusic/html/piano-hero.html' },
-		{ id: 'instruments', x: 6, z: -12, title: 'INSTRUM.', subtitle: 'Familias', url: '/embedded-game/EduMusic/html/instruments.html' }
+		{ id: 'instruments', x: 6, z: -12, title: 'INSTRUM.', subtitle: 'Familias', url: '/embedded-game/EduMusic/html/instruments.html' },
+		{ id: 'minijocs', x: 32, z: 0, title: 'MINIJOCS', subtitle: 'Zona arcade', url: '/embedded-game/EduMusic/html/minijocs.html' },
+		{ id: 'jclic', x: 26, z: -14, title: 'JCLIC', subtitle: 'Actividades', url: '/embedded-game/EduMusic/html/jclic.html' },
+		{ id: 'timbre-dictation', x: 20, z: -4, title: 'TIMBRE', subtitle: 'Dictado sonoro', url: '/embedded-game/EduMusic/html/timbre-dictation.html' }
 	]
 }
 
