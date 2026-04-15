@@ -22,6 +22,46 @@ EduCraft es una experiencia voxel educativa construida sobre `noa-engine` y Baby
 - Bloques y dinámicas musicales.
 - Panel web integrado con minijuegos HTML externos.
 
+## Minijuegos ocultos y recompensas
+
+EduCraft puede abrir minijuegos de `EduMusic` desde carteles repartidos por las islas del mundo.
+
+- La configuracion central de carteles secretos vive en [docs/test/index.js](/home/sasogu/github/web/EduCraft/docs/test/index.js:358).
+- Cada entrada define `id`, `x`, `z`, `title`, `subtitle` y `url`.
+- Al acercarte a un cartel y pulsar `V`, se abre el minijuego asociado en el panel web.
+- El sistema busca automaticamente el cartel secreto mas cercano, por lo que se pueden repartir muchos accesos sin cambiar la logica base.
+
+### Juegos con recompensa
+
+Los juegos de la familia `Atrapa notas` usan el motor compartido [docs/test/embedded-game/EduMusic/js/game.js](/home/sasogu/github/web/EduCraft/docs/test/embedded-game/EduMusic/js/game.js:16), que ahora soporta recompensas por puntuacion.
+
+Para que un juego desbloquee un bloque del inventario al alcanzar una puntuacion:
+
+1. Declara `rewardAtScore` en el `window.GAME_CONFIG` del HTML del juego.
+2. Declara `rewardPayload` con `title`, `message`, `reward` y opcionalmente `closePanel`.
+3. Asegurate de que `reward` coincide exactamente con un bloque existente del catalogo en [docs/test/registry.js](/home/sasogu/github/web/EduCraft/docs/test/registry.js:45).
+
+Ejemplo simplificado:
+
+```html
+<script>
+  window.GAME_CONFIG = {
+    id: 'solmi',
+    rankKey: 'solmi',
+    pitches: ['mi', 'sol'],
+    rewardAtScore: 50,
+    rewardPayload: {
+      title: 'Reto completado',
+      message: 'Has conseguido 50 puntos.',
+      reward: 'Cristal',
+      closePanel: true
+    }
+  };
+</script>
+```
+
+Si un juego no puntua o no debe desbloquear nada, no hace falta declarar esos campos: puede seguir siendo accesible desde su cartel solo como experiencia libre.
+
 ## Multijugador por mundos (salas)
 
 El backend WebSocket separa el estado por mundo usando salas en memoria.

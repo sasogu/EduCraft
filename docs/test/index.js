@@ -258,6 +258,8 @@ function setupWebOverlay() {
 
 function showWebPanel() {
 	if (!ui.webPanel || !ui.webIframe) return
+	var nearbySign = getNearbyEmbeddedGameSign()
+	if (nearbySign && nearbySign.url) webPanelUrl = nearbySign.url
 	ui.webIframe.src = webPanelUrl
 	ui.webPanel.classList.add('active')
 	if (document.exitPointerLock) document.exitPointerLock()
@@ -267,6 +269,34 @@ function hideWebPanel() {
 	if (!ui.webPanel || !ui.webIframe) return
 	ui.webPanel.classList.remove('active')
 	ui.webIframe.src = ''
+}
+
+function canOpenWebPanel() {
+	return !!getNearbyEmbeddedGameSign()
+}
+
+function getNearbyEmbeddedGameSign() {
+	if (!embeddedGameSigns.length) return null
+	var posData = noa && noa.entities && noa.entities.getPositionData ? noa.entities.getPositionData(eid) : null
+	if (!posData || !posData.position) return embeddedGameSigns[0]
+	var player = posData.position
+	var best = null
+	var bestDistanceSq = Infinity
+	for (var i = 0; i < embeddedGameSigns.length; i++) {
+		var sign = embeddedGameSigns[i]
+		if (!sign || !sign.mesh || !sign.mesh.position) continue
+		var signPos = sign.mesh.position
+		var dx = player[0] - signPos.x
+		var dy = player[1] - signPos.y
+		var dz = player[2] - signPos.z
+		var distanceSq = dx * dx + dy * dy + dz * dz
+		if (distanceSq < bestDistanceSq) {
+			bestDistanceSq = distanceSq
+			best = sign
+		}
+	}
+	if (bestDistanceSq > 25) return null
+	return best
 }
 
 function setupEmbeddedGameBridge() {
@@ -325,31 +355,64 @@ function handleEmbeddedGameCompletion(payload) {
 	if (data.closePanel) hideWebPanel()
 }
 
+var embeddedGameSignConfigs = [
+	{ id: 'solmi', x: 4, z: -6, title: 'SOL-MI', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmi.html' },
+	{ id: 'solmila', x: 8, z: -2, title: 'SOL-MI-LA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmila.html' },
+	{ id: 'solmilado', x: 2, z: 4, title: 'SOL-MI-DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmilado.html' },
+	{ id: 'piano', x: 6, z: 6, title: 'PIANO', subtitle: 'Toca libre', url: '/embedded-game/EduMusic/html/piano.html' },
+	{ id: 'memory', x: 10, z: 4, title: 'MEMORY', subtitle: 'Juego musical', url: '/embedded-game/EduMusic/html/memory.html' },
+	{ id: 'quiz', x: 12, z: 0, title: 'QUIZ', subtitle: 'Pregunta y juega', url: '/embedded-game/EduMusic/html/quiz.html' },
+	{ id: 'clave-sol', x: 4, z: 8, title: 'CLAVE SOL', subtitle: 'Traza la clave', url: '/embedded-game/EduMusic/html/clave-sol.html' },
+	{ id: 'solmiladore', x: 16, z: 8, title: 'SOL+DO+RE', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladore.html' },
+	{ id: 'solmiladorefa', x: 20, z: 6, title: 'SOL+RE+FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladorefa.html' },
+	{ id: 'todas', x: 24, z: 6, title: 'DO A DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/todas.html' },
+	{ id: 'dofa', x: 28, z: 4, title: 'DO A FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/dofa.html' },
+	{ id: 'pitch-height', x: 30, z: 0, title: 'AGUDO/GRAVE', subtitle: 'Escucha alturas', url: '/embedded-game/EduMusic/html/pitch-height.html' },
+	{ id: 'pitch-direction', x: 22, z: -2, title: 'SUBE/BAJA', subtitle: 'Direccion sonora', url: '/embedded-game/EduMusic/html/pitch-direction.html' },
+	{ id: 'duration-choice', x: 18, z: -4, title: 'DURACION', subtitle: 'Largo o corto', url: '/embedded-game/EduMusic/html/duration-choice.html' },
+	{ id: 'rhythm', x: 14, z: -8, title: 'RITMO', subtitle: 'TA SU TITI', url: '/embedded-game/EduMusic/html/rhythm.html' },
+	{ id: 'rhythm-dictation', x: 20, z: -10, title: 'DICTADO R', subtitle: 'Escucha y elige', url: '/embedded-game/EduMusic/html/rhythm-dictation.html' },
+	{ id: 'melody-dictation', x: 24, z: -8, title: 'DICTADO M', subtitle: 'Escucha y elige', url: '/embedded-game/EduMusic/html/melody-dictation.html' },
+	{ id: 'melo-rhythm-dictation', x: 28, z: -6, title: 'MELO+RITMO', subtitle: 'Dictado mixto', url: '/embedded-game/EduMusic/html/melo-rhythm-dictation.html' },
+	{ id: 'melody', x: 30, z: -12, title: 'MELODIA', subtitle: 'Secuencias', url: '/embedded-game/EduMusic/html/melody.html' },
+	{ id: 'compas', x: 24, z: -16, title: 'COMPAS', subtitle: 'Puzzle musical', url: '/embedded-game/EduMusic/html/compas.html' },
+	{ id: 'palabras-musicales', x: 18, z: -18, title: 'PALABRAS', subtitle: 'Letras y musica', url: '/embedded-game/EduMusic/html/palabras-musicales.html' },
+	{ id: 'piano-hero', x: 12, z: -14, title: 'PIANO HERO', subtitle: 'Arcade musical', url: '/embedded-game/EduMusic/html/piano-hero.html' },
+	{ id: 'instruments', x: 8, z: -10, title: 'INSTRUM.', subtitle: 'Familias', url: '/embedded-game/EduMusic/html/instruments.html' }
+]
+
 function createWebScreen(scene) {
 	if (!scene) return
-	var post = BABYLON.MeshBuilder.CreateBox('web-post', { width: 0.35, height: 3.2, depth: 0.35 }, scene)
-post.position = new BABYLON.Vector3(4, 5.6, -6.15)
+	for (var i = 0; i < embeddedGameSignConfigs.length; i++) {
+		createEmbeddedGameSign(scene, embeddedGameSignConfigs[i])
+	}
+}
+
+function createEmbeddedGameSign(scene, config) {
+	var groundY = getHeight(config.x, config.z)
+	var post = BABYLON.MeshBuilder.CreateBox('web-post-' + config.id, { width: 0.35, height: 3.2, depth: 0.35 }, scene)
+	post.position = new BABYLON.Vector3(config.x, groundY + 1.6, config.z - 0.15)
 	post.isPickable = false
 
-	var signBoard = BABYLON.MeshBuilder.CreateBox('web-sign-board', { width: 2.6, height: 1.2, depth: 0.2 }, scene)
-signBoard.position = new BABYLON.Vector3(4, 6.3, -6)
+	var signBoard = BABYLON.MeshBuilder.CreateBox('web-sign-board-' + config.id, { width: 2.6, height: 1.2, depth: 0.2 }, scene)
+	signBoard.position = new BABYLON.Vector3(config.x, groundY + 2.3, config.z)
 	signBoard.isPickable = false
 
-	var signFace = BABYLON.MeshBuilder.CreatePlane('web-sign-face', { width: 2.8, height: 1.2 }, scene)
-signFace.position = new BABYLON.Vector3(4, 6.3, -6.22)
-signFace.rotation.y = Math.PI
+	var signFace = BABYLON.MeshBuilder.CreatePlane('web-sign-face-' + config.id, { width: 2.8, height: 1.2 }, scene)
+	signFace.position = new BABYLON.Vector3(config.x, groundY + 2.3, config.z - 0.22)
+	signFace.rotation.y = Math.PI
 	signFace.isPickable = true
 
-	var woodMat = new BABYLON.StandardMaterial('web-sign-wood-mat', scene)
+	var woodMat = new BABYLON.StandardMaterial('web-sign-wood-mat-' + config.id, scene)
 	woodMat.diffuseColor = new BABYLON.Color3(0.46, 0.3, 0.18)
 	woodMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1)
 	post.material = woodMat
 
-	var signMat = new BABYLON.StandardMaterial('web-sign-mat', scene)
+	var signMat = new BABYLON.StandardMaterial('web-sign-mat-' + config.id, scene)
 	signMat.diffuseColor = new BABYLON.Color3(0.5, 0.35, 0.2)
 	signMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1)
 
-	var tex = new BABYLON.DynamicTexture('web-sign-text', { width: 512, height: 256 }, scene, false)
+	var tex = new BABYLON.DynamicTexture('web-sign-text-' + config.id, { width: 512, height: 256 }, scene, false)
 	var ctx = tex.getContext()
 	ctx.fillStyle = '#5b3a1f'
 	ctx.fillRect(0, 0, 512, 256)
@@ -360,10 +423,11 @@ signFace.rotation.y = Math.PI
 	ctx.font = "bold 34px 'Silkscreen'"
 	ctx.textAlign = 'center'
 	ctx.textBaseline = 'middle'
-	ctx.font = "bold 44px 'Silkscreen'"
-	ctx.fillText('EDUBEATRIX', 256, 96)
-	ctx.font = "bold 20px 'Silkscreen'"
-	ctx.fillText('Pulsa V para abrir', 256, 150)
+	ctx.font = "bold 34px 'Silkscreen'"
+	ctx.fillText(config.title || 'MINIJUEGO', 256, 90)
+	ctx.font = "bold 18px 'Silkscreen'"
+	ctx.fillText(config.subtitle || 'Pulsa V cerca', 256, 132)
+	ctx.fillText('Pulsa V cerca', 256, 170)
 	tex.update()
 	signMat.diffuseTexture = tex
 	signMat.diffuseTexture.vScale = -1
@@ -375,7 +439,12 @@ signFace.rotation.y = Math.PI
 	signBoard.material = signMat
 	signFace.material = signMat
 
-	webSignMesh = signFace
+	embeddedGameSigns.push({
+		id: config.id,
+		url: config.url,
+		mesh: signFace
+	})
+	if (!webSignMesh) webSignMesh = signFace
 }
 
 
@@ -840,6 +909,10 @@ noa.inputs.down.on('play-note', function () {
 
 noa.inputs.bind('open-web', 'V')
 noa.inputs.down.on('open-web', function () {
+	if (!canOpenWebPanel()) {
+		showLockedNotice('Acercate a un cartel secreto para jugar.')
+		return
+	}
 	showWebPanel()
 })
 
@@ -927,8 +1000,9 @@ var stepSoundSets = {}
 var lastStepPosKey = null
 var clefStepCooldown = 0
 var lastClefStepKey = null
-var webPanelUrl = '/embedded-game/EduBeatrix/index.html'
+var webPanelUrl = '/embedded-game/EduMusic/html/solmi.html'
 var webSignMesh = null
+var embeddedGameSigns = []
 var musicPulseMat = null
 var lastStepTime = 0
 var rewardPlaced = false
