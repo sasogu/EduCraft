@@ -85,8 +85,6 @@ light.intensity = 0.9
 noa.inputs.unbind('alt-fire')
 noa.inputs.bind('alt-fire', '<mouse 3>')
 
-createWebScreen(scene)
-
 
 //		World generation
 
@@ -494,6 +492,8 @@ var treeDensity = 0.12
 var shrubDensity = 0.02
 var rockDensity = 0.01
 var flowerDensity = 0.03
+
+createWebScreen(scene)
 
 function getEditKey(x, y, z) {
 	return x + '|' + y + '|' + z
