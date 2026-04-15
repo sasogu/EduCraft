@@ -1,0 +1,59 @@
+@require 'zorium-paper/base'
+
+json('zorium-paper/colors.json')
+
+.z-footer
+  position: fixed
+  bottom: 0
+  left: 0
+  right: 0
+  padding: 14px 18px 18px
+  box-sizing: border-box
+  display: flex
+  justify-content: center
+  align-items: center
+  gap: 12px
+  z-index: 123
+  background: linear-gradient(180deg, rgba(248, 251, 255, 0.05), rgba(248, 251, 255, 0.75))
+  backdrop-filter: blur(10px)
+  font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif
+
+  > .left
+    display: flex
+    align-items: center
+    gap: 12px
+
+  .zp-button
+    border-radius: 999px
+    background: rgba(255, 255, 255, 0.95)
+    color: #0f172a
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12)
+    border: 1px solid rgba(15, 23, 42, 0.12)
+    cursor: pointer
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+    user-select: none
+    transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease
+
+  .zp-button:hover
+    background: rgba(255, 255, 255, 1)
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.14)
+
+  .zp-button:active
+    transform: translateY(1px)
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12)
+
+  .zp-button:focus
+    outline: none
+
+  .zp-button:focus-visible
+    outline: 2px solid rgba(15, 23, 42, 0.35)
+    outline-offset: 2px
+
+  .zp-button .zp-button__content
+    letter-spacing: 0.02em
+    padding: 10px 18px
+    font-size: 14px
+    font-weight: 600
+    text-transform: uppercase
+    line-height: 1
+    font-family: inherit

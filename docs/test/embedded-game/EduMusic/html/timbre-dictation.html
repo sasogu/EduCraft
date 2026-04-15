@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="timbre.title">Dictado de timbre</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/timbre-dictation.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <h1 data-i18n="timbre.title">Dictado de timbre</h1>
+  <p class="about-subtitle" data-i18n="timbre.instructions">
+    Escucha el sonido, reconoce el instrumento y refuerza el timbre orquestal con un modo de práctica y un modo de dictado.
+  </p>
+
+  <div data-lang-switch></div>
+
+  <section class="timbre-layout">
+    <article class="timbre-panel timbre-panel--compact">
+      <div class="timbre-panel__header timbre-panel__header--toggle">
+        <div>
+          <h2 data-i18n="timbre.practice.title">Banco de sonidos</h2>
+          <p data-i18n="timbre.practice.desc">Explora primero los timbres disponibles antes de empezar el dictado.</p>
+        </div>
+        <button
+          id="practiceToggle"
+          type="button"
+          class="game-btn timbre-toggle"
+          aria-expanded="false"
+          aria-controls="practicePanel"
+          data-i18n="timbre.practice.show"
+        >Mostrar banco</button>
+      </div>
+      <div id="practicePanel" class="practice-panel" hidden>
+        <div id="practiceGrid" class="practice-grid"></div>
+      </div>
+    </article>
+
+    <article class="timbre-panel">
+      <div class="timbre-panel__header">
+        <h2 data-i18n="timbre.game.title">Modo dictado</h2>
+        <p data-i18n="timbre.game.desc">Pulsa iniciar, escucha el audio y elige qué instrumento ha sonado.</p>
+      </div>
+
+      <div class="dictation-controls">
+        <label for="familyFilter" data-i18n="timbre.filter.label">Familia:</label>
+        <select id="familyFilter">
+          <option value="all" data-i18n="timbre.filter.all">Todas</option>
+          <option value="cuerdas" data-i18n="timbre.family.cuerdas">Cuerdas</option>
+          <option value="viento_madera" data-i18n="timbre.family.viento_madera">Viento madera</option>
+          <option value="viento_metal" data-i18n="timbre.family.viento_metal">Viento metal</option>
+          <option value="percusion" data-i18n="timbre.family.percusion">Percusión</option>
+        </select>
+
+        <label for="optionsSelect" data-i18n="timbre.options.label">Opciones:</label>
+        <select id="optionsSelect">
+          <option value="3">3</option>
+          <option value="4" selected>4</option>
+        </select>
+
+        <button id="startBtn" class="game-btn" data-i18n="hud.start">Iniciar</button>
+        <button id="playBtn" class="game-btn" disabled data-i18n="timbre.play">Escuchar timbre</button>
+      </div>
+
+      <div class="dictation-hud">
+        <span id="score" data-i18n="hud.points">Puntos: {n}</span>
+        <span class="hud-sep">|</span>
+        <span id="lives" data-i18n="hud.lives">Vidas: {n}</span>
+        <span class="hud-sep">|</span>
+        <span id="round" data-i18n="timbre.round">Ronda: {n}</span>
+      </div>
+
+      <div id="feedback" class="dictation-feedback" data-i18n="timbre.feedback.welcome">
+        Pulsa iniciar para comenzar.
+      </div>
+
+      <div id="answerGrid" class="answer-grid"></div>
+
+      <div class="game-rankings">
+        <div class="game-ranking-section">
+          <h3 data-i18n="rankings.period.alltime">Ranking General</h3>
+          <section
+            data-scoreboard
+            data-game="timbre-dictation"
+            data-period="all-time"
+            data-heading-key="rankings.timbre_dictation"
+            data-heading="Dictado de timbre"
+          ></section>
+        </div>
+        <div class="game-ranking-section">
+          <h3 data-i18n="rankings.period.weekly">Ranking Semanal</h3>
+          <section
+            data-scoreboard
+            data-game="timbre-dictation"
+            data-period="weekly"
+            data-heading-key="rankings.timbre_dictation"
+            data-heading="Dictado de timbre"
+          ></section>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <footer class="page-footer" data-sw-status></footer>
+  <a href="../index.html" class="home-link">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="game.back">Volver al inicio</span>
+  </a>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/i18n/hud.js" defer></script>
+  <script src="../js/i18n/rankings.js" defer></script>
+  <script src="../js/i18n/timbre-dictation.js" defer></script>
+  <script src="../js/score-service.js?v=2" defer></script>
+  <script src="../js/game-over-overlay.js" defer></script>
+  <script src="../js/timbre-dictation.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE HTML>
+<title>EduBeatrix</title>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <meta name="theme-color" content="#111111" />
+        <script src="scripts/phaser.min.js"></script>
+        <script src="scripts/graphics.js"></script>
+        <script src="scripts/beat.js"></script>
+        <script src="scripts/indicator.js"></script>
+        <script src="scripts/drum.js"></script>
+        <script src="scripts/levels/0.js"></script>
+        <script src="scripts/levels/1.js"></script>
+        <script src="scripts/levels/2.js"></script>
+        <script src="scripts/levels/3.js"></script>
+        <script src="scripts/main.js"></script>
+        <script src="scripts/preload.js"></script>
+        <script src="scripts/boot.js"></script>
+        <link rel="manifest" href="manifest.webmanifest">
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div id="hud">
+          <button id="playBtn">PLAY</button>
+          <button id="stopBtn">STOP</button>
+          <button id="pauseBtn">PAUSE</button>
+          <button id="speedDownBtn">-</button>
+          <button id="speedUpBtn">+</button>
+          <span id="speedText" class="stat">BPM: 120</span>
+          <span id="stepText" class="stat">Compas/Paso: 1/1</span>
+          <span id="metro"></span>
+          <label for="levelSelect" class="stat">Screen</label>
+          <select id="levelSelect"></select>
+          <button id="exportBtn">EXPORT WAV</button>
+          <button id="installBtn" class="install">INSTALL</button>
+        </div>
+        <div id="gameContainer"></div>
+                <div id="dpad" aria-label="Controles de dirección">
+                    <button id="dpadUp" class="dpad" aria-label="Arriba">▲</button>
+                    <button id="dpadLeft" class="dpad" aria-label="Izquierda">◀</button>
+                    <button id="dpadDown" class="dpad" aria-label="Abajo">▼</button>
+                    <button id="dpadRight" class="dpad" aria-label="Derecha">▶</button>
+                </div>
+                <div id="footer">
+                    <span class="muted">SW:</span>
+                    <span id="swVersion" class="mono">(cargando…)</span>
+                </div>
+
+        <script type="text/javascript">
+        
+        window.onload = function() {
+                        var isTouch = ('ontouchstart' in window) ||
+                            (navigator && (navigator.maxTouchPoints || navigator.msMaxTouchPoints));
+                        if (document && document.body && document.body.classList) {
+                            document.body.classList.toggle('touch', !!isTouch);
+                        }
+
+            var baseWidth = GRID_SIZE * PIXEL_SIZE;
+            var baseHeight = GRID_SIZE * PIXEL_SIZE;
+            var game = new Phaser.Game(baseWidth, baseHeight, Phaser.AUTO, 'gameContainer');
+            game.state.add('boot', BasicGame.Boot);
+            game.state.add('preload', BasicGame.Preload);
+            game.state.add('game', GameState);
+            game.state.start('boot');
+
+            var resize = function() {
+                var hud = document.getElementById('hud');
+                var container = document.getElementById('gameContainer');
+                var dpad = document.getElementById('dpad');
+                var footer = document.getElementById('footer');
+                var dpadHeight = (dpad && dpad.offsetParent !== null) ? dpad.offsetHeight : 0;
+                var footerHeight = (footer && footer.offsetParent !== null) ? footer.offsetHeight : 0;
+                var availableHeight = window.innerHeight - hud.offsetHeight - dpadHeight - footerHeight;
+                container.style.width = window.innerWidth + 'px';
+                container.style.height = Math.max(0, availableHeight) + 'px';
+                if (game.scale && game.scale.refresh) {
+                    game.scale.refresh();
+                }
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            var swVersionEl = document.getElementById('swVersion');
+            var setSwText = function(text) {
+                if (swVersionEl) {
+                    swVersionEl.textContent = text;
+                }
+            };
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js').catch(function() {
+                    setSwText('(sin SW)');
+                });
+
+                navigator.serviceWorker.addEventListener('message', function(event) {
+                    var data = event.data || {};
+                    if (data.type === 'SW_VERSION') {
+                        setSwText(data.version || '(desconocida)');
+                    }
+                });
+
+                var requestVersion = function(sw) {
+                    try {
+                        if (sw && sw.postMessage) {
+                            sw.postMessage({ type: 'GET_VERSION' });
+                        }
+                    } catch (e) {}
+                };
+
+                navigator.serviceWorker.ready.then(function(reg) {
+                    // Si hay controller, mejor (es el SW que controla esta página)
+                    requestVersion(navigator.serviceWorker.controller);
+                    // Fallback: preguntar al SW activo del registro
+                    if (reg && reg.active) {
+                        requestVersion(reg.active);
+                    }
+                }).catch(function() {
+                    setSwText('(sin SW)');
+                });
+            } else {
+                setSwText('(sin SW)');
+            }
+
+            var installBtn = document.getElementById('installBtn');
+            var deferredPrompt = null;
+            window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                deferredPrompt = e;
+                if (installBtn) {
+                    installBtn.style.display = 'inline-block';
+                }
+            });
+            if (installBtn) {
+                installBtn.addEventListener('click', function() {
+                    if (!deferredPrompt) {
+                        return;
+                    }
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.finally(function() {
+                        deferredPrompt = null;
+                        installBtn.style.display = 'none';
+                    });
+                });
+            }
+        
+        };
+        
+        </script>
+    </body>
+</html>

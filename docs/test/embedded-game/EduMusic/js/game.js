@@ -14,7 +14,6 @@
   if (!configured.length) configured = defaultPitches;
 
   const rawMonoThreshold = Number(CONFIG_INPUT.monoAtScore);
-  const rawRewardThreshold = Number(CONFIG_INPUT.rewardAtScore);
   const GAME_CONFIG = {
     id: CONFIG_INPUT.id || null,
     hintKey: CONFIG_INPUT.hintKey || null,
@@ -24,8 +23,6 @@
     monoAtScore: Number.isFinite(rawMonoThreshold) ? Math.max(0, rawMonoThreshold) : 30,
     forceMono: CONFIG_INPUT.forceMono === true || CONFIG_INPUT.forceMono === 'true',
     level: CONFIG_INPUT.level || null,
-    rewardAtScore: Number.isFinite(rawRewardThreshold) ? Math.max(0, rawRewardThreshold) : 0,
-    rewardPayload: CONFIG_INPUT.rewardPayload && typeof CONFIG_INPUT.rewardPayload === 'object' ? CONFIG_INPUT.rewardPayload : null,
   };
   if (!GAME_CONFIG.id) GAME_CONFIG.id = configured.join('_') || 'solmi';
   if (!GAME_CONFIG.rankKey) GAME_CONFIG.rankKey = GAME_CONFIG.id;
@@ -37,7 +34,7 @@
       pointsPerHit: 1,
       lifeEveryPoints: 0,
       showNoteLabels: (score) => score < 10,
-      showKeyLabels: (score) => score < 20,
+      showKeyLabels: () => true, // nivel 1: siempre visibles
     },
     mono: {
       pointsPerHit: 3,
@@ -194,10 +191,6 @@
     return (str || '').toString().toLowerCase().replace(/[^a-z0-9]+/g, '-');
   }
 
-  const REWARD_STORAGE_KEY = GAME_CONFIG.rewardAtScore > 0
-    ? `educraft-reward-${sanitizeKey(GAME_CONFIG.id)}-${GAME_CONFIG.rewardAtScore}`
-    : '';
-
   function normalizePitch(pitch) {
     if (!pitch) return '';
     const key = pitch.toString().toLowerCase();
@@ -209,64 +202,6 @@
       return window.i18n.getLang();
     }
     return 'es';
-  }
-
-  function hasStoredReward() {
-    if (!REWARD_STORAGE_KEY || typeof window === 'undefined' || !window.localStorage) return false;
-    try {
-      return window.localStorage.getItem(REWARD_STORAGE_KEY) === '1';
-    } catch (err) {
-      return false;
-    }
-  }
-
-  function storeReward() {
-    if (!REWARD_STORAGE_KEY || typeof window === 'undefined' || !window.localStorage) return;
-    try {
-      window.localStorage.setItem(REWARD_STORAGE_KEY, '1');
-    } catch (err) {
-      // ignore storage failures
-    }
-  }
-
-  function parentHasReward() {
-    const rewardName = GAME_CONFIG.rewardPayload && GAME_CONFIG.rewardPayload.reward;
-    if (!rewardName || typeof window === 'undefined' || !window.parent || window.parent === window) return false;
-    try {
-      if (window.parent.EduCraft && typeof window.parent.EduCraft.hasUnlockedBlock === 'function') {
-        return !!window.parent.EduCraft.hasUnlockedBlock(rewardName);
-      }
-    } catch (err) {
-      return false;
-    }
-    return false;
-  }
-
-  function sendRewardToParent() {
-    if (!GAME_CONFIG.rewardPayload || typeof window === 'undefined' || !window.parent || window.parent === window) return false;
-    const payload = Object.assign({}, GAME_CONFIG.rewardPayload);
-    try {
-      if (window.parent.EduCraft && typeof window.parent.EduCraft.completeEmbeddedGame === 'function') {
-        window.parent.EduCraft.completeEmbeddedGame(payload);
-        return true;
-      }
-    } catch (err) {
-      // ignore bridge errors
-    }
-    try {
-      window.parent.postMessage({
-        type: 'educraft:challenge-complete',
-        payload: payload,
-        title: payload.title,
-        message: payload.message,
-        reward: payload.reward,
-        closePanel: payload.closePanel
-      }, window.location.origin);
-      return true;
-    } catch (err) {
-      // ignore postMessage errors
-    }
-    return false;
   }
 
   function getMetaLabel(meta) {
@@ -363,6 +298,11 @@
 
   const KEYBOARD_MAP = {};
 
+  function isLevelOneMode() {
+    const lvl = (GAME_CONFIG.level || '').toString().toLowerCase();
+    return lvl === 'color' || lvl === 'basic' || lvl === '1' || lvl === 'level1';
+  }
+
   function shouldUseMonoPalette() {
     const threshold = Number.isFinite(GAME_CONFIG.monoAtScore) ? GAME_CONFIG.monoAtScore : 30;
     return Boolean(GAME_CONFIG.forceMono) || state.score >= threshold;
@@ -376,6 +316,7 @@
   }
 
   function shouldShowPianoLabels(score) {
+    if (isLevelOneMode()) return true;
     if (ACTIVE_RULES && typeof ACTIVE_RULES.showKeyLabels === 'function') {
       return ACTIVE_RULES.showKeyLabels(score);
     }
@@ -426,7 +367,6 @@
     tPrev: 0,
     notes: [],
     fx: [], // visual effects
-    rewardSent: false,
   };
 
   // Simple piano keyboard at bottom
@@ -561,7 +501,6 @@
     state.lastSpawn = 0;
     state.tPrev = performance.now();
     state.notes.length = 0;
-    state.rewardSent = hasStoredReward() || parentHasReward();
     if (hud.scoreEl) hud.scoreEl.textContent = (window.i18n ? window.i18n.t('hud.points', { n: state.score }) : `Puntos: ${state.score}`);
     if (hud.livesEl) hud.livesEl.textContent = (window.i18n ? window.i18n.t('hud.lives', { n: state.lives }) : `Vidas: ${state.lives}`);
     draw();
@@ -729,6 +668,7 @@
       const layoutPitch = PIANO_WHITE_KEYS[i];
       labels.push(layoutPitch ? getPitchLabel(layoutPitch) : '');
     }
+    const showKeyboardLabels = shouldShowPianoLabels(state.score);
     const mono = shouldUseMonoPalette();
     ctx.save();
     // base
@@ -752,8 +692,8 @@
       }
       ctx.strokeStyle = '#cbd5e1';
       ctx.strokeRect(x+0.5, top+0.5, keyW-1, h-1);
-      // label (oculto desde 100 puntos)
-      if (shouldShowPianoLabels(state.score)) {
+      // label (nivel 1 siempre visible; otros modos siguen sus reglas)
+      if (showKeyboardLabels) {
         ctx.fillStyle = meta ? '#0f172a' : '#475569';
         ctx.font = meta ? 'bold 14px system-ui, -apple-system, Segoe UI, Roboto, Arial' : '12px system-ui, -apple-system, Segoe UI, Roboto, Arial';
         ctx.textAlign = 'center';
@@ -883,19 +823,6 @@
     }
   }
 
-  function maybeSendReward(prevScore, newScore) {
-    if (!GAME_CONFIG.rewardPayload || GAME_CONFIG.rewardAtScore <= 0) return;
-    if (state.rewardSent || hasStoredReward() || parentHasReward()) {
-      state.rewardSent = true;
-      return;
-    }
-    if (prevScore >= GAME_CONFIG.rewardAtScore || newScore < GAME_CONFIG.rewardAtScore) return;
-    if (sendRewardToParent()) {
-      state.rewardSent = true;
-      storeReward();
-    }
-  }
-
   function addScore(points) {
     const prev = state.score;
     state.score += points;
@@ -903,7 +830,6 @@
       hud.scoreEl.textContent = (window.i18n ? window.i18n.t('hud.points', { n: state.score }) : `Puntos: ${state.score}`);
     }
     maybeGrantBonusLife(prev, state.score);
-    maybeSendReward(prev, state.score);
   }
 
   function handleHit(pitch) {

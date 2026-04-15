@@ -1,0 +1,119 @@
+html, body{
+height: 100%;
+}
+body{
+margin: 0;
+padding: 0;
+background: #1b1b1b;
+color: #ffffff;
+font-family: Arial, sans-serif;
+display: flex;
+flex-direction: column;
+}
+#hud{
+display: flex;
+flex-wrap: wrap;
+align-items: center;
+gap: 8px;
+padding: 8px 12px;
+background: #111111;
+}
+#gameContainer{
+flex: 1;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+}
+#gameContainer canvas{
+display: block;
+image-rendering: pixelated;
+touch-action: none;
+}
+
+#dpad{
+display: none;
+padding: 10px 12px;
+background: #111111;
+}
+
+body.touch #dpad{
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+grid-template-rows: repeat(2, auto);
+gap: 10px;
+align-items: center;
+justify-items: center;
+}
+
+#dpad .dpad{
+background: #222222;
+color: #ffffff;
+border: 1px solid #ffffff;
+cursor: pointer;
+touch-action: manipulation;
+min-width: 64px;
+min-height: 52px;
+font-size: 20px;
+line-height: 1;
+}
+
+#dpadUp{ grid-column: 2; grid-row: 1; }
+#dpadLeft{ grid-column: 1; grid-row: 2; }
+#dpadDown{ grid-column: 2; grid-row: 2; }
+#dpadRight{ grid-column: 3; grid-row: 2; }
+
+#footer{
+padding: 6px 12px;
+background: #111111;
+font-size: 12px;
+display: flex;
+gap: 6px;
+align-items: center;
+}
+
+#footer .muted{
+opacity: 0.75;
+}
+
+#footer .mono{
+font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+#hud button{
+background: #222222;
+color: #ffffff;
+border: 1px solid #ffffff;
+padding: 4px 10px;
+cursor: pointer;
+font-size: 12px;
+}
+#exportBtn{
+white-space: nowrap;
+}
+#hud select{
+background: #222222;
+color: #ffffff;
+border: 1px solid #ffffff;
+padding: 3px 6px;
+font-size: 12px;
+}
+#hud label{
+font-size: 12px;
+}
+#installBtn{
+margin-left: auto;
+display: none;
+}
+#hud .stat{
+font-size: 12px;
+}
+#metro{
+width: 10px;
+height: 10px;
+border-radius: 50%;
+background: #ffffff;
+display: inline-block;
+opacity: 0.6;
+transform: scale(1);
+transition: transform 0.05s linear, opacity 0.05s linear;
+}

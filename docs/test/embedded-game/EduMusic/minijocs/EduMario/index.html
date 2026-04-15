@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>EduMario - Phaser</title>
+        <link rel="stylesheet" href="./styles.css">
+        <script src="./phaser.min.js"></script>
+    </head>
+    <body>
+        <div id="game-container"></div>
+        <div id="edumario-help" class="edumario-help" aria-live="polite">
+            <button id="edumario-help-toggle" type="button" class="edumario-help__toggle" aria-expanded="false">ⓘ</button>
+            <div id="edumario-help-panel" class="edumario-help__panel" hidden>
+                <h2 id="edumario-help-title" class="edumario-help__title">¿Cómo se puntúa?</h2>
+                <p id="edumario-help-body" class="edumario-help__body">
+                    x1/x2/x3/x4: multiplica los puntos al acertar varias seguidas.
+                    Intentos: fallos al pulsar una nota incorrecta.
+                    Vidas: golpes de enemigos. Escudo: bloquea un golpe.
+                </p>
+            </div>
+        </div>
+        <div id="edumario-scoreboards" style="display:none;" aria-hidden="true">
+            <section data-scoreboard data-game="edumario" data-rank-key="edumario" data-period="all-time" data-heading="EduMario"></section>
+            <section data-scoreboard data-game="edumario" data-rank-key="edumario" data-period="weekly" data-heading="EduMario"></section>
+        </div>
+        <script src="./score-service.js?v=2" onerror="console.warn('ScoreService no disponible (modo portable)')"></script>
+        <script>
+            try {
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('scoreDebug') === '1' && window.ScoreService && typeof window.ScoreService.setDebug === 'function') {
+                    window.ScoreService.setDebug(true);
+                    console.log('[EduMario] ScoreService debug ON');
+                }
+            } catch (_) {}
+        </script>
+        <script src="./game.js"></script>
+    </body>
+</html>

@@ -4,6 +4,9 @@
     es: {
       'resources.title': 'Recursos de Juegos Musicales',
       'resources.intro': 'Una pequeña selección de páginas con actividades, juegos y materiales musicales interactivos para seguir practicando.',
+      'resources.jclic.carnaval.title': 'JClic: El carnaval de los animales',
+      'resources.jclic.carnaval.desc': 'Actividad interactiva incrustada dentro de EduMúsic (requiere Internet).',
+      'resources.jclic.carnaval.meta': 'Fuente: clic.xtec.cat · JClic',
       'resources.aprendo.title': 'Aprendomusica.com',
       'resources.aprendo.desc': 'Plataforma con juegos de lenguaje musical, dictados, lecturas rítmicas y recursos para aula.',
       'resources.aprendo.meta': 'Gratuito',
@@ -23,6 +26,9 @@
     val: {
       'resources.title': 'Recursos de Jocs Musicals',
       'resources.intro': 'Una xicoteta selecció de pàgines amb activitats, jocs i materials musicals interactius per a continuar practicant.',
+      'resources.jclic.carnaval.title': 'JClic: El carnaval dels animals',
+      'resources.jclic.carnaval.desc': 'Activitat interactiva incrustada dins d’EduMúsic (requereix Internet).',
+      'resources.jclic.carnaval.meta': 'Font: clic.xtec.cat · JClic',
       'resources.aprendo.title': 'Aprendomusica.com',
       'resources.aprendo.desc': 'Plataforma amb jocs de llenguatge musical, dictats, lectures rítmiques i recursos per a l\'aula.',
       'resources.aprendo.meta': 'Gratuït',
@@ -42,6 +48,9 @@
     en: {
       'resources.title': 'Musical Game Resources',
       'resources.intro': 'A small selection of sites with interactive music games, activities and materials to keep practising.',
+      'resources.jclic.carnaval.title': 'JClic: The Carnival of the Animals',
+      'resources.jclic.carnaval.desc': 'Interactive activity embedded inside EduMúsic (Internet required).',
+      'resources.jclic.carnaval.meta': 'Source: clic.xtec.cat · JClic',
       'resources.aprendo.title': 'Aprendomusica.com',
       'resources.aprendo.desc': 'Platform featuring music theory games, dictations, rhythm reading and classroom resources.',
       'resources.aprendo.meta': 'Free',

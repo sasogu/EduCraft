@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>EduZop</title>
+    <script>
+      (function () {
+        // GitHub Pages (project pages) sirve 404.html para rutas SPA.
+        // Convertimos /<repo>/ruta -> /<repo>/#/ruta preservando query.
+        var l = window.location;
+        var parts = l.pathname.split('/');
+        // parts[0] = '' ; parts[1] = '<repo>'
+        var repo = parts[1] || '';
+        var base = repo ? '/' + repo + '/' : '/';
+        var rest = '/' + parts.slice(repo ? 2 : 1).join('/');
+        // Normaliza "//" si no hay resto.
+        if (rest === '/') rest = '/';
+
+        var target = base + '#' + rest + (l.search || '');
+        l.replace(target);
+      })();
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to <a href="./">EduZop</a>...</p>
+  </body>
+</html>

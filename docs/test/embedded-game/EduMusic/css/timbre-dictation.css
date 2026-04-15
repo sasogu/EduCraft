@@ -1,0 +1,221 @@
+.timbre-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(360px, 1.4fr);
+  gap: 24px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.timbre-panel {
+  background: #ffffff;
+  border: 1px solid #dbe4ff;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.timbre-panel--compact {
+  align-self: start;
+}
+
+.timbre-panel__header h2 {
+  margin-bottom: 6px;
+}
+
+.timbre-panel__header p {
+  margin-top: 0;
+}
+
+.timbre-panel__header--toggle {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timbre-toggle {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.timbre-panel .game-btn {
+  margin: 0;
+}
+
+.practice-card .game-btn,
+.answer-card .game-btn,
+#playBtn,
+#practiceToggle {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 10px;
+  background: #1e3a8a;
+  color: #ffffff;
+  box-shadow: 0 6px 14px rgba(30, 58, 138, 0.18);
+}
+
+.practice-card .game-btn:hover,
+.answer-card .game-btn:hover,
+#playBtn:hover,
+#practiceToggle:hover,
+.practice-card .game-btn:focus-visible,
+.answer-card .game-btn:focus-visible,
+#playBtn:focus-visible,
+#practiceToggle:focus-visible {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+#playBtn:disabled,
+.answer-card .game-btn:disabled {
+  background: #94a3b8;
+  color: #f8fafc;
+  box-shadow: none;
+}
+
+.practice-panel[hidden] {
+  display: none;
+}
+
+.practice-panel {
+  margin-top: 18px;
+}
+
+.practice-grid,
+.answer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.practice-card,
+.answer-card {
+  border: 2px solid #dbe4ff;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  padding: 14px;
+  text-align: center;
+  color: #0f172a;
+}
+
+.practice-card img,
+.answer-card img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.practice-card h3,
+.answer-card h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.practice-card p,
+.answer-card p {
+  margin: 0 0 10px;
+  color: #475569;
+  font-size: 0.92rem;
+}
+
+.practice-card button,
+.answer-card button {
+  width: 100%;
+}
+
+.answer-card {
+  transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+}
+
+.answer-card:hover,
+.answer-card:focus-within {
+  transform: translateY(-2px);
+  border-color: #7c3aed;
+  box-shadow: 0 10px 24px rgba(124, 58, 237, 0.16);
+}
+
+.answer-card.is-correct {
+  border-color: #10b981;
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.22);
+}
+
+.answer-card.is-error {
+  border-color: #ef4444;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.22);
+}
+
+.answer-card button[disabled] {
+  opacity: 0.7;
+}
+
+.family-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: #e0ecff;
+  color: #1e3a8a;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dictation-controls {
+  margin: 0 0 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.dictation-controls select,
+.dictation-controls button {
+  padding: 0.6em 1.1em;
+  border-radius: 10px;
+}
+
+.dictation-hud {
+  margin: 1em 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.dictation-hud .hud-sep {
+  margin: 0 0.75em;
+  color: #94a3b8;
+}
+
+.dictation-feedback {
+  text-align: center;
+  margin-bottom: 1.2em;
+  min-height: 1.5em;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+@media (max-width: 640px) {
+  .timbre-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .timbre-panel {
+    padding: 18px;
+  }
+
+  .timbre-panel__header--toggle {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .practice-grid,
+  .answer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

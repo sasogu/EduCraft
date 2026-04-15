@@ -7,19 +7,27 @@
     'melodia',
     'dictado',
     'audicion',
-    'quiz',
-    
+    'juego',
+    'minijocs',
+    'teclado',
+    'ranking',
   ];
+
+  const LEVEL_TAGS = ['inicial', 'intermedio', 'avanzado'];
+  const DEFAULT_LEVEL = 'all';
 
   const FALLBACK_LABELS = {
     ritmo: 'Ritmo',
     melodia: 'Melodía',
     dictado: 'Dictado',
     audicion: 'Audición',
+    juego: 'Juego',
+    minijocs: 'Minijocs',
+    teclado: 'Teclado',
+    ranking: 'Ranking',
     inicial: 'Inicial',
     intermedio: 'Intermedio',
     avanzado: 'Avanzado',
-    quiz: 'Quiz',
   };
 
   const KNOWN_TAGS = new Set([
@@ -131,6 +139,40 @@
     const grid = document.querySelector('.activity-grid');
     if (!container || !listEl || !grid) return;
 
+    const filterToggleBtn = container.querySelector('[data-tag-filter-toggle]');
+    const filterToggleLabel = filterToggleBtn && filterToggleBtn.querySelector('[data-i18n]');
+
+    function setFilterCollapsed(isCollapsed) {
+      container.classList.toggle('is-collapsed', Boolean(isCollapsed));
+      if (filterToggleBtn) {
+        const expanded = !Boolean(isCollapsed);
+        filterToggleBtn.setAttribute('aria-expanded', String(expanded));
+        if (filterToggleLabel) {
+          filterToggleLabel.setAttribute('data-i18n', expanded ? 'tags.filter.hide' : 'tags.filter.show');
+          filterToggleLabel.textContent = expanded ? 'Ocultar etiquetas' : 'Mostrar etiquetas';
+        }
+      }
+    }
+
+    if (filterToggleBtn) {
+      setFilterCollapsed(true);
+      filterToggleBtn.addEventListener('click', () => {
+        const isCollapsed = container.classList.contains('is-collapsed');
+        setFilterCollapsed(!isCollapsed);
+        if (!isCollapsed) return;
+        if (listEl) {
+          const firstInput = listEl.querySelector('input[type="checkbox"]');
+          if (firstInput) firstInput.focus();
+        }
+      });
+    }
+
+    const levelSwitch = document.querySelector('[data-level-switch]');
+    const levelButtons = levelSwitch
+      ? Array.from(levelSwitch.querySelectorAll('[data-level-switch-btn]'))
+      : [];
+    let currentLevel = levelSwitch ? DEFAULT_LEVEL : 'all';
+
     const allTags = new Set();
     const cardEntries = [];
 
@@ -187,10 +229,33 @@
       return ia - ib;
     });
 
+    const visibleFilterTags = orderedTags.filter((tag) => !LEVEL_TAGS.includes(tag));
+
     listEl.innerHTML = '';
     const active = new Set();
     const emptyEl = container.querySelector('[data-tag-filter-empty]');
     const clearBtn = container.querySelector('[data-tag-filter-clear]');
+    let isAutoAdjustingLevel = false;
+
+    function syncLevelButtons() {
+      if (!levelButtons.length) return;
+      levelButtons.forEach((btn) => {
+        const level = String(btn.getAttribute('data-level') || '').toLowerCase();
+        const isActive = currentLevel === level;
+        btn.classList.toggle('is-active', isActive);
+        btn.setAttribute('aria-pressed', String(isActive));
+      });
+    }
+
+    function syncLevelCheckboxes() {
+      if (!listEl) return;
+      const inputs = listEl.querySelectorAll('input[type="checkbox"]');
+      inputs.forEach((input) => {
+        const value = String(input.value || '').toLowerCase();
+        if (!LEVEL_TAGS.includes(value)) return;
+        input.checked = active.has(value);
+      });
+    }
 
     function applyTranslations() {
       if (window.i18n && typeof window.i18n.apply === 'function') {
@@ -213,9 +278,35 @@
       if (emptyEl) {
         emptyEl.hidden = visibleCount !== 0;
       }
+
+      if (
+        !isAutoAdjustingLevel &&
+        visibleCount === 0 &&
+        currentLevel !== 'all' &&
+        required.some((tag) => !LEVEL_TAGS.includes(tag))
+      ) {
+        isAutoAdjustingLevel = true;
+        setLevel('all');
+        isAutoAdjustingLevel = false;
+      }
     }
 
-    orderedTags.forEach((tag) => {
+    function setLevel(level) {
+      const next = String(level || '').toLowerCase();
+      if (!next) return;
+
+      currentLevel = next;
+      LEVEL_TAGS.forEach((tag) => active.delete(tag));
+      if (LEVEL_TAGS.includes(next)) {
+        active.add(next);
+      }
+
+      syncLevelButtons();
+      syncLevelCheckboxes();
+      updateCards();
+    }
+
+    visibleFilterTags.forEach((tag) => {
       const label = document.createElement('label');
       label.className = 'tag-filter__option';
       const id = `tag-filter-${tag}`;
@@ -231,23 +322,52 @@
       if (!target || target.tagName !== 'INPUT') return;
       const value = String(target.value || '').toLowerCase();
       if (!value) return;
+
+      if (LEVEL_TAGS.includes(value)) {
+        if (target.checked) {
+          setLevel(value);
+        } else if (currentLevel === value) {
+          setLevel('all');
+        }
+        return;
+      }
+
       if (target.checked) active.add(value);
       else active.delete(value);
       updateCards();
     });
 
+    if (levelButtons.length) {
+      levelSwitch.addEventListener('click', (event) => {
+        const btn = event.target && event.target.closest('[data-level-switch-btn]');
+        if (!btn) return;
+        const level = String(btn.getAttribute('data-level') || '').toLowerCase();
+        setLevel(level || 'all');
+      });
+    }
+
     if (clearBtn) {
       clearBtn.addEventListener('click', () => {
+        const keepLevel = currentLevel;
         active.clear();
+        if (LEVEL_TAGS.includes(keepLevel)) {
+          active.add(keepLevel);
+        }
         const inputs = listEl.querySelectorAll('input[type="checkbox"]');
         inputs.forEach((input) => {
-          input.checked = false;
+          const value = String(input.value || '').toLowerCase();
+          input.checked = active.has(value);
         });
+        syncLevelButtons();
         updateCards();
       });
     }
 
-    updateCards();
+    if (levelButtons.length) {
+      setLevel(DEFAULT_LEVEL);
+    } else {
+      updateCards();
+    }
     applyTranslations();
 
     if (window.i18n && typeof window.i18n.onChange === 'function') {

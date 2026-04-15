@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="cajaritmos.title">Simulador de Compases y Ritmos</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/cajaritmos.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body class="cajaritmos-page">
+  <header class="cajaritmos-header">
+    <img src="../assets/icon-512.png" alt="Logo EduMúsic">
+    <h1 data-i18n="cajaritmos.title">Simulador de Compases y Ritmos</h1>
+    <p class="cajaritmos-subtitle" data-i18n="cajaritmos.subtitle">Aprende teoría musical de forma interactiva</p>
+    <div id="langSwitcher" data-lang-switch></div>
+  </header>
+
+  <main class="cajaritmos">
+    <div class="cajaritmos-grid">
+      <aside class="cajaritmos-card cajaritmos-theory" data-i18n="cajaritmos.theory.aria" data-i18n-attr="aria-label" aria-label="Teoría musical">
+        <div class="cajaritmos-section">
+          <h2 data-i18n="cajaritmos.theory.meter.title">¿Qué es un compás?</h2>
+          <p data-i18n="cajaritmos.theory.meter.desc" data-i18n-html>El <strong>compás</strong> es la división del tiempo en la música. Organiza los sonidos en grupos regulares de pulsos o tiempos.</p>
+          <h3 data-i18n="cajaritmos.theory.meter.naming">Nomenclatura</h3>
+          <div class="music-notation">4/4</div>
+          <p data-i18n="cajaritmos.theory.meter.numerator" data-i18n-html><strong>Numerador (arriba):</strong> número de tiempos por compás.</p>
+          <p data-i18n="cajaritmos.theory.meter.denominator" data-i18n-html><strong>Denominador (abajo):</strong> figura que representa un tiempo (4 = negra, 8 = corchea).</p>
+        </div>
+
+        <div class="cajaritmos-section">
+          <h2 data-i18n="cajaritmos.theory.pulse.title">Pulso y acento</h2>
+          <p data-i18n="cajaritmos.theory.pulse.pulse" data-i18n-html><strong>Pulso:</strong> el “latido” constante de la música.</p>
+          <p data-i18n="cajaritmos.theory.pulse.accent" data-i18n-html><strong>Acento:</strong> énfasis en ciertos tiempos. El primer tiempo suele ser el <strong>fuerte</strong>.</p>
+        </div>
+
+        <div class="cajaritmos-section">
+          <h2 data-i18n="cajaritmos.theory.figures.title">Figuras rítmicas</h2>
+          <ul>
+            <li data-i18n="cajaritmos.theory.figures.whole" data-i18n-html><strong>Redonda (𝅝):</strong> 4 tiempos</li>
+            <li data-i18n="cajaritmos.theory.figures.half" data-i18n-html><strong>Blanca (𝅗𝅥):</strong> 2 tiempos</li>
+            <li data-i18n="cajaritmos.theory.figures.quarter" data-i18n-html><strong>Negra (♩):</strong> 1 tiempo</li>
+            <li data-i18n="cajaritmos.theory.figures.eighth" data-i18n-html><strong>Corchea (♪):</strong> 1/2 tiempo</li>
+            <li data-i18n="cajaritmos.theory.figures.sixteenth" data-i18n-html><strong>Semicorchea (𝅘𝅥𝅯):</strong> 1/4 tiempo</li>
+          </ul>
+        </div>
+
+        <div class="cajaritmos-section">
+          <h2 data-i18n="cajaritmos.theory.howto.title">Instrucciones</h2>
+          <ul>
+            <li data-i18n="cajaritmos.theory.howto.1" data-i18n-html>Elige un <strong>compás</strong> (2/4, 3/4, 4/4, 6/8).</li>
+            <li data-i18n="cajaritmos.theory.howto.2" data-i18n-html>Ajusta el <strong>tempo</strong> (BPM).</li>
+            <li data-i18n="cajaritmos.theory.howto.3">Toca las celdas para activar/desactivar golpes.</li>
+            <li data-i18n="cajaritmos.theory.howto.4">Las celdas con marca inferior indican tiempos/acento.</li>
+            <li data-i18n="cajaritmos.theory.howto.5" data-i18n-html>Prueba los <strong>ejemplos</strong> para empezar rápido.</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section class="cajaritmos-card cajaritmos-panel" aria-label="Secuenciador">
+        <div class="cajaritmos-controls">
+          <div class="control-group">
+            <label for="bpm" data-i18n="cajaritmos.controls.tempo">Tempo</label>
+            <div class="value"><span id="bpm-val">120</span> BPM</div>
+            <input type="range" id="bpm" min="40" max="200" value="120">
+          </div>
+          <div class="control-group">
+            <label data-i18n="cajaritmos.controls.meter">Compás</label>
+            <div class="signature-btns" role="group" aria-label="Selector de compás">
+              <button type="button" data-sig="2">2/4</button>
+              <button type="button" data-sig="3">3/4</button>
+              <button type="button" data-sig="4" class="active">4/4</button>
+              <button type="button" data-sig="6">6/8</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="examples-section">
+          <h3 data-i18n="cajaritmos.examples.title">Cargar ejemplo</h3>
+          <div class="example-btns">
+            <button type="button" class="example-btn" data-example="rock" data-i18n="cajaritmos.examples.rock">Rock básico (4/4)</button>
+            <button type="button" class="example-btn" data-example="waltz" data-i18n="cajaritmos.examples.waltz">Vals (3/4)</button>
+            <button type="button" class="example-btn" data-example="march" data-i18n="cajaritmos.examples.march">Marcha (2/4)</button>
+            <button type="button" class="example-btn" data-example="compound" data-i18n="cajaritmos.examples.compound">Ritmo 6/8</button>
+          </div>
+        </div>
+
+        <div class="cajaritmos-metronome" aria-label="Metrónomo visual">
+          <div id="beatIndicators" class="beat-indicators" aria-hidden="true"></div>
+          <div class="measure-counter">
+            <span data-i18n="cajaritmos.measure.label">Compás:</span>
+            <span id="measure-count">1</span>
+          </div>
+        </div>
+
+        <div class="sequencer" id="sequencer-grid" aria-label="Secuenciador de percusión"></div>
+
+        <div class="info-box" id="info-box">
+          <strong>Compás 4/4:</strong> Cuaternario. El compás más común. Acentuación: FUERTE-débil-medio-débil.
+        </div>
+
+        <div class="transport">
+          <button type="button" id="play-btn">▶ <span data-i18n="cajaritmos.transport.play">Iniciar</span></button>
+          <button type="button" class="clear-btn" id="clear-btn">✕ <span data-i18n="cajaritmos.transport.clear">Limpiar</span></button>
+        </div>
+      </section>
+    </div>
+
+    <a href="../index.html" class="home-link cajaritmos-home" style="margin:18px auto 0;">
+      <span class="home-icon" aria-hidden="true">⌂</span>
+      <span data-i18n="cajaritmos.back">Volver al inicio</span>
+    </a>
+  </main>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/cajaritmos.js" defer></script>
+  <script src="../js/cajaritmos.js" defer></script>
+</body>
+</html>

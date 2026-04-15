@@ -1,0 +1,91 @@
+@require 'zorium-paper/base'
+
+json('zorium-paper/colors.json')
+
+.z-game-over
+  text-align: center
+  padding: 40px 20px 120px
+  min-height: 100vh
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 8px
+  background: #f8fbff
+  color: #0f172a
+  font-family: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif
+
+  > .current-score
+    zp-font-display3()
+    margin-top: 0
+    letter-spacing: -0.02em
+    font-family: inherit
+
+  > .current-label
+    zp-font-subhead()
+    color: rgba(15, 23, 42, 0.6)
+    text-transform: uppercase
+    letter-spacing: 0.28em
+    font-family: inherit
+
+  > .divider
+    height: 2px
+    width: min(320px, 70vw)
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.2), rgba(15, 23, 42, 0))
+    margin: 18px 0
+
+  > .best-score
+    zp-font-display1()
+    letter-spacing: -0.01em
+    font-family: inherit
+
+  > .best-label
+    zp-font-subhead()
+    color: rgba(15, 23, 42, 0.6)
+    text-transform: uppercase
+    letter-spacing: 0.24em
+    font-family: inherit
+
+  > .buttons
+    position: absolute
+    width: 100%
+    left: 0
+    bottom: 30px
+    display: flex
+    justify-content: center
+    gap: 16px
+
+  .zp-button
+    border-radius: 999px
+    background: rgba(255, 255, 255, 0.95)
+    color: #0f172a
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.14)
+    border: 1px solid rgba(15, 23, 42, 0.12)
+    cursor: pointer
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0)
+    user-select: none
+    transition: background 120ms ease, transform 120ms ease, box-shadow 120ms ease
+
+  .zp-button:hover
+    background: rgba(255, 255, 255, 1)
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16)
+
+  .zp-button:active
+    transform: translateY(1px)
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14)
+
+  .zp-button:focus
+    outline: none
+
+  .zp-button:focus-visible
+    outline: 2px solid rgba(15, 23, 42, 0.35)
+    outline-offset: 2px
+
+  .zp-button .zp-button__content
+    letter-spacing: 0.02em
+    padding: 10px 18px
+    font-size: 14px
+    font-weight: 600
+    text-transform: uppercase
+    line-height: 1
+    font-family: inherit

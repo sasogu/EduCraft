@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+	<meta content="Flappy Bird,game,Crappy Bird,clone,javascript,html5 game,mobile,canvas,flappy bird source" name="keywords"/>
+	<meta name="description" content="Clone of Flappy bird game in javascript using canvas 2d">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#1c8bd4" />
+</head>
+
+<body>
+    <canvas></canvas>
+    <details class="minijoc-overlay" open>
+        <summary class="minijoc-overlay__summary">Ranking</summary>
+        <a class="minijoc-home" href="../../index.html">Volver al inicio</a>
+        <div class="minijoc-scoreboard-panel">
+            <h2>Edu Flappy Bird</h2>
+            <div class="minijoc-scoreboard-group">
+                <h3>Ranking general</h3>
+                <section
+                    data-scoreboard
+                    data-game="eduflappybird"
+                    data-period="all-time"
+                    data-heading-key="rankings.eduflappy"
+                    data-heading="Edu Flappy Bird"
+                    data-show-save-at="1"
+                ></section>
+            </div>
+            <div class="minijoc-scoreboard-group">
+                <h3>Ranking semanal</h3>
+                <section
+                    data-scoreboard
+                    data-game="eduflappybird"
+                    data-period="weekly"
+                    data-heading-key="rankings.eduflappy"
+                    data-heading="Edu Flappy Bird"
+                    data-show-save-at="1"
+                ></section>
+            </div>
+        </div>
+    </details>
+    <script src="game.js"></script>
+    <script src="../../js/score-service.js?v=2"></script>
+    <script>
+        (function () {
+            var panel = document.querySelector('.minijoc-overlay');
+            if (!panel) return;
+            if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
+                panel.removeAttribute('open');
+            }
+        })();
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('./sw.js');
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="minijocs.title">Minijocs EduMúsic</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+</head>
+<body>
+  <img src="../assets/icon-512.png" alt="Logo EduMúsic" style="display:block;width:96px;height:96px;margin:0 auto 16px;">
+
+  <h1 data-i18n="minijocs.title">Minijocs EduMúsic</h1>
+  <p data-i18n="minijocs.intro" style="max-width:640px;margin:0 auto 24px;">Elige un minijuego musical, juega y guarda tu puntuación.</p>
+
+  <div class="activity-grid">
+    <a href="../minijocs/EduFlappyBird/index.html" class="activity-card" data-theme="flappy" data-emoji="🐦">
+      <h2 data-i18n="index.eduflappy.title">Edu Flappy Bird</h2>
+      <p data-i18n="index.eduflappy.desc">Atrapa notas mientras sobrevuelas los obstáculos en modo lectura musical.</p>
+      <small data-i18n="index.eduflappy.small">Niveles con fallos limitados · Puntuación y ranking</small>
+    </a>
+    <a href="../minijocs/EduSnake/index.html" class="activity-card" data-theme="snake" data-emoji="🐍">
+      <h2 data-i18n="index.edusnake.title">EduSnake</h2>
+      <p data-i18n="index.edusnake.desc">Guía a la serpiente con notas y suma puntos sin chocar.</p>
+      <small data-i18n="index.edusnake.small">Modo clásico y duelo · Marcador integrado</small>
+    </a>
+    <a href="../minijocs/EduZop/docs/index.html" class="activity-card" data-theme="zop" data-emoji="🧩">
+      <h2 data-i18n="index.eduzop.title">EduZop</h2>
+      <p data-i18n="index.eduzop.desc">Conecta fichas musicales del mismo color y supera el tiempo.</p>
+      <small data-i18n="index.eduzop.small">Modo clásico con tiempo · Modo relax sin límite</small>
+    </a>
+    <a href="../minijocs/EduBeatrix/index.html" class="activity-card" data-theme="beatrix" data-emoji="🥁">
+      <h2 data-i18n="index.edubeatrix.title">EduBeatrix</h2>
+      <p data-i18n="index.edubeatrix.desc">Crea ritmos con cajas, palmas y percusión desde el secuenciador.</p>
+      <small data-i18n="index.edubeatrix.small">Sampler interactivo · Exportación WAV</small>
+    </a>
+    <a href="../minijocs/EduMelody/index.html" class="activity-card" data-theme="edumelody" data-emoji="🎛️">
+      <h2 data-i18n="index.edumelody.title">EduMelody</h2>
+      <p data-i18n="index.edumelody.desc">Diseña patrones melódicos y prueba escalas en un grid creativo.</p>
+      <small data-i18n="index.edumelody.small">Control de tempo y tonalidad · Instrumentos dinámicos</small>
+    </a>
+
+    <a href="../minijocs/EduMario/index.html" class="activity-card" data-theme="mario" data-emoji="🍄">
+      <h2 data-i18n="index.edumario.title">EduMario</h2>
+      <p data-i18n="index.edumario.desc">Salta plataformas y supera niveles en un arcade inspirado en los clásicos.</p>
+      <small data-i18n="index.edumario.small">Plataformas 2D · Juego rápido</small>
+    </a>
+    <a href="https://educraft.edutictac.es/" target="_blank" rel="noopener noreferrer" class="activity-card" data-theme="educraft" data-emoji="🧱">
+      <h2 data-i18n="index.educraft.title">EduCraft</h2>
+      <p data-i18n="index.educraft.desc">Abre Educraft directamente en una pestaña nueva desde EduMúsic.</p>
+      <small data-i18n="index.educraft.small">Juego externo · Apertura directa</small>
+    </a>
+  </div>
+
+  <a href="../index.html" class="home-link" style="margin:24px auto 0;">
+    <span class="home-icon" aria-hidden="true">⌂</span>
+    <span data-i18n="gamehub.back">Volver al inicio</span>
+  </a>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/index.js" defer></script>
+  <script src="../js/i18n/gamehub.js" defer></script>
+  <script src="../js/i18n/minijocs.js" defer></script>
+</body>
+</html>

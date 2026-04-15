@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="jclic.viewer.title">JClic · Actividad</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="../assets/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="../assets/icon-192.png">
+</head>
+<body>
+  <img src="../assets/icon-512.png" alt="Logo EduMúsic" style="display:block;width:96px;height:96px;margin:0 auto 16px;">
+
+  <h1 id="jclicTitle">JClic</h1>
+  <p class="embed-intro" data-i18n="jclic.viewer.intro">
+    Actividad interactiva de JClic incrustada desde clic.xtec.cat. Requiere conexión a Internet.
+  </p>
+
+  <div class="embed-actions">
+    <a href="jclic.html" class="home-link btn-secondary">
+      <span class="home-icon" aria-hidden="true">⌂</span>
+      <span data-i18n="jclic.back">Volver a JClic</span>
+    </a>
+    <a href="../index.html" class="home-link btn-secondary">
+      <span class="home-icon" aria-hidden="true">⌂</span>
+      <span data-i18n="jclic.backHome">Volver al inicio</span>
+    </a>
+    <a
+      class="home-link"
+      id="jclicOpenLink"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      data-i18n="jclic.viewer.open"
+    >Abrir en nueva pestaña</a>
+  </div>
+
+  <p class="embed-note" data-i18n="jclic.viewer.note">
+    Si el contenido no se muestra dentro de la página (por bloqueo del navegador), usa “Abrir en nueva pestaña”.
+  </p>
+
+  <div class="embed-frame-wrap" role="region" aria-label="JClic">
+    <iframe
+      class="embed-frame"
+      id="jclicFrame"
+      title="JClic"
+      src=""
+      loading="lazy"
+      referrerpolicy="no-referrer"
+      allow="fullscreen; autoplay"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+  <footer class="page-footer" data-sw-status></footer>
+
+  <script src="../js/app.js" defer></script>
+  <script src="../js/audio-settings.js" defer></script>
+  <script src="../js/i18n/jclic.js" defer></script>
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const title = params.get('title') || 'JClic';
+      const src = params.get('src') || '';
+      const open = params.get('open') || src;
+      const titleEl = document.getElementById('jclicTitle');
+      const frame = document.getElementById('jclicFrame');
+      const openLink = document.getElementById('jclicOpenLink');
+
+      if (titleEl) titleEl.textContent = title;
+      if (frame && src) frame.src = src;
+      if (frame && title) frame.title = title;
+      if (openLink && open) openLink.href = open;
+    })();
+  </script>
+</body>
+</html>

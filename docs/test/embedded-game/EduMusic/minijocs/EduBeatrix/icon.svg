@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 32 32" shape-rendering="crispEdges">
+  <!-- Background + frame -->
+  <rect width="32" height="32" fill="#181818"/>
+  <rect x="1" y="1" width="30" height="30" fill="#202020"/>
+  <rect x="1" y="1" width="30" height="1" fill="#2f6bff" opacity="0.65"/>
+  <rect x="1" y="30" width="30" height="1" fill="#2f6bff" opacity="0.25"/>
+  <rect x="1" y="1" width="1" height="30" fill="#2f6bff" opacity="0.35"/>
+  <rect x="30" y="1" width="1" height="30" fill="#2f6bff" opacity="0.35"/>
+
+  <!-- Central motif: 2x2 "pads" + beat path -->
+  <!-- Panel -->
+  <rect x="8" y="10" width="16" height="14" fill="#181818"/>
+  <rect x="8" y="10" width="16" height="1" fill="#c9c9ff" opacity="0.25"/>
+  <rect x="8" y="23" width="16" height="1" fill="#000000" opacity="0.35"/>
+
+  <!-- Pads shadows -->
+  <g fill="#000000" opacity="0.35">
+    <rect x="10" y="13" width="6" height="1"/>
+    <rect x="18" y="13" width="6" height="1"/>
+    <rect x="10" y="19" width="6" height="1"/>
+    <rect x="18" y="19" width="6" height="1"/>
+  </g>
+
+  <!-- Pads (inspired by app palette) -->
+  <rect x="10" y="12" width="6" height="4" fill="#30d2a7"/>
+  <rect x="18" y="12" width="6" height="4" fill="#2f6bff"/>
+  <rect x="10" y="18" width="6" height="4" fill="#f0c14e"/>
+  <rect x="18" y="18" width="6" height="4" fill="#6f2bd0"/>
+
+  <!-- Pad highlights -->
+  <g fill="#ffffff" opacity="0.18">
+    <rect x="10" y="12" width="6" height="1"/>
+    <rect x="18" y="12" width="6" height="1"/>
+    <rect x="10" y="18" width="6" height="1"/>
+    <rect x="18" y="18" width="6" height="1"/>
+  </g>
+
+  <!-- Beat path + beat dot -->
+  <g opacity="0.9">
+    <rect x="6" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="7" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="8" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="9" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="10" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="21" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="22" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="23" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="24" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <rect x="25" y="16" width="1" height="1" fill="#c9c9ff" opacity="0.6"/>
+    <!-- Beat dot (red-ish like good/bad accents) -->
+    <rect x="16" y="16" width="1" height="1" fill="#e14b4b"/>
+    <rect x="15" y="16" width="1" height="1" fill="#e14b4b" opacity="0.55"/>
+    <rect x="16" y="15" width="1" height="1" fill="#e14b4b" opacity="0.55"/>
+  </g>
+
+  <!-- Sparkles -->
+  <rect x="27" y="11" width="1" height="1" fill="#f0c14e" opacity="0.75"/>
+  <rect x="26" y="12" width="1" height="1" fill="#30d2a7" opacity="0.55"/>
+  <rect x="5" y="22" width="1" height="1" fill="#2f6bff" opacity="0.55"/>
+
+  <!-- Pixel title -->
+  <g id="title-shadow" opacity="0.6" fill="#000000">
+    <!-- EDU shadow (x+1,y+1), 3x5 font at (3,3) -->
+    <!-- E -->
+    <rect x="4" y="4" width="1" height="1"/><rect x="5" y="4" width="1" height="1"/><rect x="6" y="4" width="1" height="1"/>
+    <rect x="4" y="5" width="1" height="1"/>
+    <rect x="4" y="6" width="1" height="1"/><rect x="5" y="6" width="1" height="1"/><rect x="6" y="6" width="1" height="1"/>
+    <rect x="4" y="7" width="1" height="1"/>
+    <rect x="4" y="8" width="1" height="1"/><rect x="5" y="8" width="1" height="1"/><rect x="6" y="8" width="1" height="1"/>
+    <!-- D -->
+    <rect x="8" y="4" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/>
+    <rect x="8" y="5" width="1" height="1"/><rect x="10" y="5" width="1" height="1"/>
+    <rect x="8" y="6" width="1" height="1"/><rect x="10" y="6" width="1" height="1"/>
+    <rect x="8" y="7" width="1" height="1"/><rect x="10" y="7" width="1" height="1"/>
+    <rect x="8" y="8" width="1" height="1"/><rect x="9" y="8" width="1" height="1"/>
+    <!-- U -->
+    <rect x="12" y="4" width="1" height="1"/><rect x="14" y="4" width="1" height="1"/>
+    <rect x="12" y="5" width="1" height="1"/><rect x="14" y="5" width="1" height="1"/>
+    <rect x="12" y="6" width="1" height="1"/><rect x="14" y="6" width="1" height="1"/>
+    <rect x="12" y="7" width="1" height="1"/><rect x="14" y="7" width="1" height="1"/>
+    <rect x="12" y="8" width="1" height="1"/><rect x="13" y="8" width="1" height="1"/><rect x="14" y="8" width="1" height="1"/>
+
+    <!-- BEATRIX shadow (x+1,y+1), 3x5 font at (2,25) -->
+    <!-- B -->
+    <rect x="3" y="26" width="1" height="1"/><rect x="4" y="26" width="1" height="1"/>
+    <rect x="3" y="27" width="1" height="1"/><rect x="5" y="27" width="1" height="1"/>
+    <rect x="3" y="28" width="1" height="1"/><rect x="4" y="28" width="1" height="1"/>
+    <rect x="3" y="29" width="1" height="1"/><rect x="5" y="29" width="1" height="1"/>
+    <rect x="3" y="30" width="1" height="1"/><rect x="4" y="30" width="1" height="1"/>
+    <!-- E -->
+    <rect x="7" y="26" width="1" height="1"/><rect x="8" y="26" width="1" height="1"/><rect x="9" y="26" width="1" height="1"/>
+    <rect x="7" y="27" width="1" height="1"/>
+    <rect x="7" y="28" width="1" height="1"/><rect x="8" y="28" width="1" height="1"/><rect x="9" y="28" width="1" height="1"/>
+    <rect x="7" y="29" width="1" height="1"/>
+    <rect x="7" y="30" width="1" height="1"/><rect x="8" y="30" width="1" height="1"/><rect x="9" y="30" width="1" height="1"/>
+    <!-- A -->
+    <rect x="12" y="26" width="1" height="1"/>
+    <rect x="11" y="27" width="1" height="1"/><rect x="13" y="27" width="1" height="1"/>
+    <rect x="11" y="28" width="1" height="1"/><rect x="12" y="28" width="1" height="1"/><rect x="13" y="28" width="1" height="1"/>
+    <rect x="11" y="29" width="1" height="1"/><rect x="13" y="29" width="1" height="1"/>
+    <rect x="11" y="30" width="1" height="1"/><rect x="13" y="30" width="1" height="1"/>
+    <!-- T -->
+    <rect x="15" y="26" width="1" height="1"/><rect x="16" y="26" width="1" height="1"/><rect x="17" y="26" width="1" height="1"/>
+    <rect x="16" y="27" width="1" height="1"/>
+    <rect x="16" y="28" width="1" height="1"/>
+    <rect x="16" y="29" width="1" height="1"/>
+    <rect x="16" y="30" width="1" height="1"/>
+    <!-- R -->
+    <rect x="19" y="26" width="1" height="1"/><rect x="20" y="26" width="1" height="1"/>
+    <rect x="19" y="27" width="1" height="1"/><rect x="21" y="27" width="1" height="1"/>
+    <rect x="19" y="28" width="1" height="1"/><rect x="20" y="28" width="1" height="1"/>
+    <rect x="19" y="29" width="1" height="1"/><rect x="21" y="29" width="1" height="1"/>
+    <rect x="19" y="30" width="1" height="1"/><rect x="21" y="30" width="1" height="1"/>
+    <!-- I -->
+    <rect x="23" y="26" width="1" height="1"/><rect x="24" y="26" width="1" height="1"/><rect x="25" y="26" width="1" height="1"/>
+    <rect x="24" y="27" width="1" height="1"/>
+    <rect x="24" y="28" width="1" height="1"/>
+    <rect x="24" y="29" width="1" height="1"/>
+    <rect x="23" y="30" width="1" height="1"/><rect x="24" y="30" width="1" height="1"/><rect x="25" y="30" width="1" height="1"/>
+    <!-- X -->
+    <rect x="27" y="26" width="1" height="1"/><rect x="29" y="26" width="1" height="1"/>
+    <rect x="27" y="27" width="1" height="1"/><rect x="29" y="27" width="1" height="1"/>
+    <rect x="28" y="28" width="1" height="1"/>
+    <rect x="27" y="29" width="1" height="1"/><rect x="29" y="29" width="1" height="1"/>
+    <rect x="27" y="30" width="1" height="1"/><rect x="29" y="30" width="1" height="1"/>
+  </g>
+
+  <g id="title">
+    <!-- EDU (3x5 font at (3,3)) -->
+    <g fill="#30d2a7">
+      <!-- E -->
+      <rect x="3" y="3" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/><rect x="5" y="3" width="1" height="1"/>
+      <rect x="3" y="4" width="1" height="1"/>
+      <rect x="3" y="5" width="1" height="1"/><rect x="4" y="5" width="1" height="1"/><rect x="5" y="5" width="1" height="1"/>
+      <rect x="3" y="6" width="1" height="1"/>
+      <rect x="3" y="7" width="1" height="1"/><rect x="4" y="7" width="1" height="1"/><rect x="5" y="7" width="1" height="1"/>
+      <!-- D -->
+      <rect x="7" y="3" width="1" height="1"/><rect x="8" y="3" width="1" height="1"/>
+      <rect x="7" y="4" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/>
+      <rect x="7" y="5" width="1" height="1"/><rect x="9" y="5" width="1" height="1"/>
+      <rect x="7" y="6" width="1" height="1"/><rect x="9" y="6" width="1" height="1"/>
+      <rect x="7" y="7" width="1" height="1"/><rect x="8" y="7" width="1" height="1"/>
+      <!-- U -->
+      <rect x="11" y="3" width="1" height="1"/><rect x="13" y="3" width="1" height="1"/>
+      <rect x="11" y="4" width="1" height="1"/><rect x="13" y="4" width="1" height="1"/>
+      <rect x="11" y="5" width="1" height="1"/><rect x="13" y="5" width="1" height="1"/>
+      <rect x="11" y="6" width="1" height="1"/><rect x="13" y="6" width="1" height="1"/>
+      <rect x="11" y="7" width="1" height="1"/><rect x="12" y="7" width="1" height="1"/><rect x="13" y="7" width="1" height="1"/>
+    </g>
+
+    <!-- BEATRIX (3x5 font at (2,25)) -->
+    <g fill="#c9c9ff">
+      <!-- B -->
+      <rect x="2" y="25" width="1" height="1"/><rect x="3" y="25" width="1" height="1"/>
+      <rect x="2" y="26" width="1" height="1"/><rect x="4" y="26" width="1" height="1"/>
+      <rect x="2" y="27" width="1" height="1"/><rect x="3" y="27" width="1" height="1"/>
+      <rect x="2" y="28" width="1" height="1"/><rect x="4" y="28" width="1" height="1"/>
+      <rect x="2" y="29" width="1" height="1"/><rect x="3" y="29" width="1" height="1"/>
+      <!-- E -->
+      <rect x="6" y="25" width="1" height="1"/><rect x="7" y="25" width="1" height="1"/><rect x="8" y="25" width="1" height="1"/>
+      <rect x="6" y="26" width="1" height="1"/>
+      <rect x="6" y="27" width="1" height="1"/><rect x="7" y="27" width="1" height="1"/><rect x="8" y="27" width="1" height="1"/>
+      <rect x="6" y="28" width="1" height="1"/>
+      <rect x="6" y="29" width="1" height="1"/><rect x="7" y="29" width="1" height="1"/><rect x="8" y="29" width="1" height="1"/>
+      <!-- A -->
+      <rect x="11" y="25" width="1" height="1"/>
+      <rect x="10" y="26" width="1" height="1"/><rect x="12" y="26" width="1" height="1"/>
+      <rect x="10" y="27" width="1" height="1"/><rect x="11" y="27" width="1" height="1"/><rect x="12" y="27" width="1" height="1"/>
+      <rect x="10" y="28" width="1" height="1"/><rect x="12" y="28" width="1" height="1"/>
+      <rect x="10" y="29" width="1" height="1"/><rect x="12" y="29" width="1" height="1"/>
+      <!-- T -->
+      <rect x="14" y="25" width="1" height="1"/><rect x="15" y="25" width="1" height="1"/><rect x="16" y="25" width="1" height="1"/>
+      <rect x="15" y="26" width="1" height="1"/>
+      <rect x="15" y="27" width="1" height="1"/>
+      <rect x="15" y="28" width="1" height="1"/>
+      <rect x="15" y="29" width="1" height="1"/>
+      <!-- R -->
+      <rect x="18" y="25" width="1" height="1"/><rect x="19" y="25" width="1" height="1"/>
+      <rect x="18" y="26" width="1" height="1"/><rect x="20" y="26" width="1" height="1"/>
+      <rect x="18" y="27" width="1" height="1"/><rect x="19" y="27" width="1" height="1"/>
+      <rect x="18" y="28" width="1" height="1"/><rect x="20" y="28" width="1" height="1"/>
+      <rect x="18" y="29" width="1" height="1"/><rect x="20" y="29" width="1" height="1"/>
+      <!-- I -->
+      <rect x="22" y="25" width="1" height="1"/><rect x="23" y="25" width="1" height="1"/><rect x="24" y="25" width="1" height="1"/>
+      <rect x="23" y="26" width="1" height="1"/>
+      <rect x="23" y="27" width="1" height="1"/>
+      <rect x="23" y="28" width="1" height="1"/>
+      <rect x="22" y="29" width="1" height="1"/><rect x="23" y="29" width="1" height="1"/><rect x="24" y="29" width="1" height="1"/>
+      <!-- X -->
+      <rect x="26" y="25" width="1" height="1"/><rect x="28" y="25" width="1" height="1"/>
+      <rect x="26" y="26" width="1" height="1"/><rect x="28" y="26" width="1" height="1"/>
+      <rect x="27" y="27" width="1" height="1"/>
+      <rect x="26" y="28" width="1" height="1"/><rect x="28" y="28" width="1" height="1"/>
+      <rect x="26" y="29" width="1" height="1"/><rect x="28" y="29" width="1" height="1"/>
+    </g>
+  </g>
+</svg>

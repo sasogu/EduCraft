@@ -105,6 +105,37 @@ function ensureSwFooter() {
         const baseHref = manifestLink ? manifestLink.href : window.location.href;
         const swUrl = new URL('service-worker.js', baseHref);
         const reg = await navigator.serviceWorker.register(swUrl.href);
+        let pendingReload = false;
+
+        const requestSkipWaiting = (worker) => {
+          if (!worker || !worker.postMessage) return;
+          try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch (_) {}
+        };
+
+        const scheduleReload = () => {
+          pendingReload = true;
+          requestSkipWaiting(reg.waiting || reg.installing);
+        };
+
+        const bindWorkerState = (worker) => {
+          if (!worker) return;
+          worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              scheduleReload();
+            }
+          });
+        };
+
+        if (reg.waiting) {
+          scheduleReload();
+        }
+        if (reg.installing) {
+          bindWorkerState(reg.installing);
+        }
+
+        reg.addEventListener('updatefound', () => {
+          if (reg.installing) bindWorkerState(reg.installing);
+        });
         // Wait until the SW is active and ready
         const ready = await navigator.serviceWorker.ready;
         // Try to ask the active controller first (after claim), then the ready registration
@@ -116,6 +147,15 @@ function ensureSwFooter() {
         else setSWState('unavailable');
         // Re-check when controller changes (e.g., after update)
         navigator.serviceWorker.addEventListener('controllerchange', async () => {
+          if (pendingReload) {
+            const reloaded = sessionStorage.getItem('sw-reloaded');
+            if (!reloaded) {
+              sessionStorage.setItem('sw-reloaded', '1');
+              window.location.reload();
+              return;
+            }
+            pendingReload = false;
+          }
           const v2 = await getSWVersion(ready);
           if (v2) setSWState('version', v2);
         });
@@ -133,15 +173,22 @@ function ensureSwFooter() {
               btn.textContent = 'Actualizar';
               btn.onclick = function() {
                 try {
-                  // Ask SW to skipWaiting
-                  if (navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage) {
-                    navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+                  const waiting = reg.waiting || reg.installing || navigator.serviceWorker.controller;
+                  if (waiting && waiting.postMessage) {
+                    waiting.postMessage({ type: 'SKIP_WAITING' });
                   }
                 } catch (e) {}
-                // reload to let the new SW take control when activated
+                pendingReload = true;
                 setTimeout(() => { window.location.reload(); }, 800);
               };
             }
+          }
+        });
+
+        try { reg.update(); } catch (_) {}
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+            try { reg.update(); } catch (_) {}
           }
         });
       } catch (e) {
@@ -290,9 +337,13 @@ function ensureSwFooter() {
     nodes.forEach((el) => {
       const key = el.getAttribute('data-i18n');
       const attr = el.getAttribute('data-i18n-attr');
+      const isHtml = el.hasAttribute('data-i18n-html');
       const text = t(key);
       if (attr) {
         el.setAttribute(attr, text);
+      } else if (isHtml) {
+        // Only use with trusted strings from our own bundles.
+        el.innerHTML = text;
       } else {
         el.textContent = text;
       }

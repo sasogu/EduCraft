@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EduSnake</title>
+        <link rel="icon" href="data:,">
+        <link rel="stylesheet" type="text/css" href="css/snake.css"/>
+        <!-- Firebase compat: se carga ANTES de RequireJS para no interferir con módulos UMD (Kinetic/buzz). -->
+        <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js" crossorigin="anonymous"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore-compat.js" crossorigin="anonymous"></script>
+        <script data-main="js/libs/main" src="js/deps/require-v2.1.11.min.js"></script>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    </head>
+    <body>
+        <div id="game"></div>
+        <details class="minijoc-overlay" open>
+            <summary class="minijoc-overlay__summary">Ranking</summary>
+            <a class="minijoc-home" href="../../index.html">Volver al inicio</a>
+            <div class="minijoc-scoreboard-panel">
+                <h2>EduSnake</h2>
+                <div class="minijoc-scoreboard-group">
+                    <h3>Ranking general</h3>
+                    <section
+                        data-scoreboard
+                        data-game="edusnake"
+                        data-rank-key="edusnake-classic"
+                        data-period="all-time"
+                        data-heading-key="rankings.edusnake"
+                        data-heading="EduSnake"
+                        data-show-save-at="1"
+                        data-disable-save-ui="true"
+                    ></section>
+                </div>
+                <div class="minijoc-scoreboard-group">
+                    <h3>Ranking semanal</h3>
+                    <section
+                        data-scoreboard
+                        data-game="edusnake"
+                        data-rank-key="edusnake-classic"
+                        data-period="weekly"
+                        data-heading-key="rankings.edusnake"
+                        data-heading="EduSnake"
+                        data-show-save-at="1"
+                        data-disable-save-ui="true"
+                    ></section>
+                </div>
+            </div>
+        </details>
+        <script>
+            window.EDUMUSIC_SCORE_AUTOSCAN = false;
+        </script>
+        <script src="../../js/firebase-config.js"></script>
+        <script src="../../js/score-service.js?v=2"></script>
+        <script>
+            (function () {
+                var panel = document.querySelector('.minijoc-overlay');
+                if (!panel) return;
+                if (window.matchMedia && window.matchMedia('(max-width: 720px)').matches) {
+                    panel.removeAttribute('open');
+                }
+            })();
+            window.addEventListener('load', function () {
+                // IMPORTANT: EduSnake usa RequireJS y Kinetic (UMD). ScoreService puede cargar
+                // Firebase y, durante ese proceso, desactiva temporalmente `define.amd`.
+                // Si eso ocurre mientras Kinetic está cargando, RequireJS no recibe el módulo
+                // y acaba siendo `undefined` en viewport.js.
+                function isRequireJsDefined(id) {
+                    try {
+                        return !!(window.requirejs
+                            && window.requirejs.s
+                            && window.requirejs.s.contexts
+                            && window.requirejs.s.contexts._
+                            && window.requirejs.s.contexts._.defined
+                            && window.requirejs.s.contexts._.defined[id]);
+                    } catch (e) {
+                        return false;
+                    }
+                }
+
+                function mountRankings() {
+                    if (window.ScoreService && typeof window.ScoreService.scanDom === 'function') {
+                        window.ScoreService.scanDom();
+                    }
+                }
+
+                (function waitForKineticThenMount() {
+                    var attempts = 0;
+                    var maxAttempts = 80; // ~8s
+                    function tick() {
+                        attempts++;
+                        // Si no hay RequireJS, montamos sin esperar.
+                        if (!window.requirejs || isRequireJsDefined('Kinetic')) {
+                            mountRankings();
+                            return;
+                        }
+                        if (attempts >= maxAttempts) {
+                            mountRankings();
+                            return;
+                        }
+                        setTimeout(tick, 100);
+                    }
+
+                    if ('requestIdleCallback' in window) {
+                        window.requestIdleCallback(tick, { timeout: 2000 });
+                    } else {
+                        setTimeout(tick, 250);
+                    }
+                })();
+            });
+        </script>
+    </body>
+</html>
