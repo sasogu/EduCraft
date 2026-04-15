@@ -2,11 +2,13 @@ import http, { IncomingMessage } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { randomUUID } from 'crypto';
 import {
+  BlockEdit,
   PROTOCOL_VERSION,
   PlayerState,
   ServerMessage,
   isClientMessage,
   sanitizeName,
+  sanitizeWorld,
 } from './protocol.js';
 
 const PORT = Number(process.env.PORT || 8080);
@@ -20,6 +22,7 @@ const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 1000);
 const RATE_LIMIT_MAX_MESSAGES = Number(process.env.RATE_LIMIT_MAX_MESSAGES || 80);
 const MAX_INVALID_MESSAGES = Number(process.env.MAX_INVALID_MESSAGES || 5);
 const MAX_COORD_ABS = Number(process.env.MAX_COORD_ABS || 10000);
+const MAX_BLOCK_ID = Number(process.env.MAX_BLOCK_ID || 4096);
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
   .map((value) => value.trim())
@@ -28,8 +31,10 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || '')
 type Client = {
   id: string;
   name: string;
+  world: string | null;
   socket: WebSocket;
   state: PlayerState;
+  initialized: boolean;
   lastSeen: number;
   isAlive: boolean;
   invalidMessages: number;
@@ -37,13 +42,20 @@ type Client = {
   windowCount: number;
 };
 
+type WorldRoom = {
+  name: string;
+  clients: Map<WebSocket, Client>;
+  dirtyPlayers: Set<string>;
+  blockEdits: Map<string, BlockEdit>;
+};
+
 const clients = new Map<WebSocket, Client>();
-const dirtyPlayers = new Set<string>();
+const rooms = new Map<string, WorldRoom>();
 
 const server = http.createServer((req, res) => {
   if (req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, clients: clients.size }));
+    res.end(JSON.stringify({ ok: true, clients: clients.size, rooms: rooms.size }));
     return;
   }
 
@@ -78,11 +90,64 @@ function registerInvalidMessage(client: Client, message: string) {
   }
 }
 
+function getOrCreateRoom(worldName: string): WorldRoom {
+  const existing = rooms.get(worldName);
+  if (existing) return existing;
+  const room: WorldRoom = {
+    name: worldName,
+    clients: new Map<WebSocket, Client>(),
+    dirtyPlayers: new Set<string>(),
+    blockEdits: new Map<string, BlockEdit>(),
+  };
+  rooms.set(worldName, room);
+  return room;
+}
+
+function roomForClient(client: Client): WorldRoom | null {
+  if (!client.world) return null;
+  return rooms.get(client.world) || null;
+}
+
+function maybeDeleteRoom(room: WorldRoom) {
+  if (room.clients.size === 0) {
+    rooms.delete(room.name);
+  }
+}
+
+function removeFromRoom(client: Client, notifyLeft: boolean) {
+  const room = roomForClient(client);
+  if (!room) return;
+  room.clients.delete(client.socket);
+  room.dirtyPlayers.delete(client.id);
+  if (notifyLeft) {
+    broadcastRoom(room, { type: 'playerLeft', v: PROTOCOL_VERSION, id: client.id });
+  }
+  maybeDeleteRoom(room);
+}
+
+function assignToWorld(client: Client, requestedWorld: string | undefined): WorldRoom {
+  const nextWorld = sanitizeWorld(requestedWorld);
+  if (client.world === nextWorld) {
+    const current = getOrCreateRoom(nextWorld);
+    current.clients.set(client.socket, client);
+    return current;
+  }
+
+  if (client.world) {
+    removeFromRoom(client, client.initialized);
+  }
+
+  client.world = nextWorld;
+  const room = getOrCreateRoom(nextWorld);
+  room.clients.set(client.socket, client);
+  room.dirtyPlayers.add(client.id);
+  return room;
+}
+
 function cleanupClient(client: Client) {
   if (!clients.has(client.socket)) return;
   clients.delete(client.socket);
-  dirtyPlayers.delete(client.id);
-  broadcast({ type: 'playerLeft', v: PROTOCOL_VERSION, id: client.id });
+  removeFromRoom(client, client.initialized);
 }
 
 function send(ws: WebSocket, msg: ServerMessage) {
@@ -91,24 +156,54 @@ function send(ws: WebSocket, msg: ServerMessage) {
   }
 }
 
-function broadcast(msg: ServerMessage, exclude?: WebSocket) {
-  for (const client of clients.values()) {
+function broadcastRoom(room: WorldRoom, msg: ServerMessage, exclude?: WebSocket) {
+  for (const client of room.clients.values()) {
     if (exclude && client.socket === exclude) continue;
     send(client.socket, msg);
   }
 }
 
-function snapshotPayload(): PlayerState[] {
-  return Array.from(clients.values()).map((client) => client.state);
+function snapshotPayload(room: WorldRoom): PlayerState[] {
+  return Array.from(room.clients.values()).map((client) => client.state);
 }
 
-function deltaPayload(): PlayerState[] {
+function deltaPayload(room: WorldRoom): PlayerState[] {
   const updates: PlayerState[] = [];
-  for (const client of clients.values()) {
-    if (!dirtyPlayers.has(client.id)) continue;
+  for (const client of room.clients.values()) {
+    if (!room.dirtyPlayers.has(client.id)) continue;
     updates.push(client.state);
   }
   return updates;
+}
+
+function worldEditsPayload(room: WorldRoom): BlockEdit[] {
+  return Array.from(room.blockEdits.values());
+}
+
+function editKey(x: number, y: number, z: number): string {
+  return `${x}|${y}|${z}`;
+}
+
+function isValidBlockUpdate(x: number, y: number, z: number, blockId: number): boolean {
+  if (Math.abs(x) > MAX_COORD_ABS || Math.abs(y) > MAX_COORD_ABS || Math.abs(z) > MAX_COORD_ABS) {
+    return false;
+  }
+  if (blockId < 0 || blockId > MAX_BLOCK_ID) {
+    return false;
+  }
+  return Number.isInteger(blockId);
+}
+
+function sendWorldSync(client: Client, room: WorldRoom) {
+  send(client.socket, {
+    type: 'welcome',
+    v: PROTOCOL_VERSION,
+    id: client.id,
+    tickRate: TICK_RATE,
+    world: room.name,
+  });
+  send(client.socket, { type: 'snapshot', v: PROTOCOL_VERSION, players: snapshotPayload(room) });
+  send(client.socket, { type: 'worldEdits', v: PROTOCOL_VERSION, edits: worldEditsPayload(room) });
 }
 
 wss.on('connection', (ws, req) => {
@@ -124,8 +219,10 @@ wss.on('connection', (ws, req) => {
   const client: Client = {
     id,
     name,
+    world: null,
     socket: ws,
     state,
+    initialized: false,
     lastSeen: now,
     isAlive: true,
     invalidMessages: 0,
@@ -133,10 +230,6 @@ wss.on('connection', (ws, req) => {
     windowCount: 0,
   };
   clients.set(ws, client);
-  dirtyPlayers.add(id);
-
-  send(ws, { type: 'welcome', v: PROTOCOL_VERSION, id, tickRate: TICK_RATE });
-  send(ws, { type: 'snapshot', v: PROTOCOL_VERSION, players: snapshotPayload() });
 
   ws.on('pong', () => {
     client.isAlive = true;
@@ -173,12 +266,24 @@ wss.on('connection', (ws, req) => {
 
     switch (parsed.type) {
       case 'hello': {
+        const requestedWorld = sanitizeWorld(parsed.world);
+        const shouldResync = !client.initialized || client.world !== requestedWorld;
+        const room = assignToWorld(client, requestedWorld);
         client.name = sanitizeName(parsed.name);
         client.state.name = client.name;
-        dirtyPlayers.add(client.id);
+        room.dirtyPlayers.add(client.id);
+        client.initialized = true;
+        if (shouldResync) {
+          sendWorldSync(client, room);
+        }
         break;
       }
       case 'move': {
+        const room = roomForClient(client);
+        if (!client.initialized || !room) {
+          registerInvalidMessage(client, 'Send hello first');
+          return;
+        }
         if (
           Math.abs(parsed.x) > MAX_COORD_ABS ||
           Math.abs(parsed.y) > MAX_COORD_ABS ||
@@ -190,7 +295,39 @@ wss.on('connection', (ws, req) => {
         client.state.x = parsed.x;
         client.state.y = parsed.y;
         client.state.z = parsed.z;
-        dirtyPlayers.add(client.id);
+        room.dirtyPlayers.add(client.id);
+        break;
+      }
+      case 'blockUpdate': {
+        const room = roomForClient(client);
+        if (!client.initialized || !room) {
+          registerInvalidMessage(client, 'Send hello first');
+          return;
+        }
+        if (typeof parsed.world === 'string' && sanitizeWorld(parsed.world) !== room.name) {
+          registerInvalidMessage(client, 'World mismatch');
+          return;
+        }
+        if (!isValidBlockUpdate(parsed.x, parsed.y, parsed.z, parsed.blockId)) {
+          registerInvalidMessage(client, 'Block update out of bounds');
+          return;
+        }
+        const update: BlockEdit = {
+          x: parsed.x,
+          y: parsed.y,
+          z: parsed.z,
+          blockId: parsed.blockId,
+        };
+        room.blockEdits.set(editKey(parsed.x, parsed.y, parsed.z), update);
+        broadcastRoom(room, {
+          type: 'blockUpdate',
+          v: PROTOCOL_VERSION,
+          x: parsed.x,
+          y: parsed.y,
+          z: parsed.z,
+          blockId: parsed.blockId,
+          by: client.id,
+        });
         break;
       }
       case 'ping': {
@@ -215,17 +352,24 @@ let lastSnapshot = Date.now();
 
 setInterval(() => {
   const now = Date.now();
-  if (now - lastSnapshot >= SNAPSHOT_INTERVAL_MS) {
-    const snapshot = snapshotPayload();
-    broadcast({ type: 'snapshot', v: PROTOCOL_VERSION, players: snapshot });
+  const shouldSendSnapshot = now - lastSnapshot >= SNAPSHOT_INTERVAL_MS;
+
+  for (const room of rooms.values()) {
+    if (shouldSendSnapshot) {
+      broadcastRoom(room, { type: 'snapshot', v: PROTOCOL_VERSION, players: snapshotPayload(room) });
+    }
+
+    if (room.dirtyPlayers.size === 0) continue;
+    const delta = deltaPayload(room);
+    if (delta.length > 0) {
+      broadcastRoom(room, { type: 'delta', v: PROTOCOL_VERSION, players: delta });
+    }
+    room.dirtyPlayers.clear();
+  }
+
+  if (shouldSendSnapshot) {
     lastSnapshot = now;
   }
-  if (dirtyPlayers.size === 0) return;
-  const delta = deltaPayload();
-  if (delta.length > 0) {
-    broadcast({ type: 'delta', v: PROTOCOL_VERSION, players: delta });
-  }
-  dirtyPlayers.clear();
 }, TICK_MS);
 
 setInterval(() => {

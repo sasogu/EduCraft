@@ -59,8 +59,12 @@ configureMovement(noa)
 var multiplayer = multiplayerLib.setupMultiplayer(noa, scene, {
 	runtimeParams: runtimeParams,
 	runtimeIsLocal: runtimeIsLocal,
+	worldName: getWorldName(),
 	getPlayerName: getPlayerName,
 	sanitizePlayerName: sanitizePlayerName,
+	sanitizeWorldName: sanitizeWorldName,
+	onWorldEdits: queueServerWorldEdits,
+	onBlockUpdate: handleRemoteBlockUpdate,
 	createNametag: function (parent, name, height, targetScene) {
 		return multiplayerLib.createNametag(noa, parent, name, height, targetScene)
 	},
@@ -626,6 +630,76 @@ function spawnIslandAnimal() {
 
 // 		Interactivity:
 
+function queueServerWorldEdits(edits) {
+	pendingServerWorldEdits = Array.isArray(edits) ? edits : []
+	flushPendingServerWorldEdits()
+}
+
+function flushPendingServerWorldEdits() {
+	if (!localStateReady || !pendingServerWorldEdits) return
+	applyServerWorldEditsSnapshot(pendingServerWorldEdits)
+	pendingServerWorldEdits = null
+}
+
+function handleRemoteBlockUpdate(update) {
+	if (!update) return
+	if (!localStateReady) return
+	applyWorldEditLocal(update.blockId, [update.x, update.y, update.z], { saveLocal: true, broadcast: false })
+}
+
+function applyServerWorldEditsSnapshot(edits) {
+	var next = {}
+	for (var i = 0; i < edits.length; i++) {
+		var edit = edits[i]
+		if (!edit) continue
+		if (!Number.isInteger(edit.x) || !Number.isInteger(edit.y) || !Number.isInteger(edit.z)) continue
+		if (!Number.isInteger(edit.blockId) || edit.blockId < 0) continue
+		var key = getEditKey(edit.x, edit.y, edit.z)
+		next[key] = edit.blockId
+	}
+
+	var previousKeys = Object.keys(worldEdits).filter(function (key) {
+		return key.charAt(0) !== '_'
+	})
+
+	previousKeys.forEach(function (key) {
+		if (Object.prototype.hasOwnProperty.call(next, key)) return
+		delete worldEdits[key]
+		var coords = key.split('|').map(Number)
+		if (coords.length !== 3) return
+		var resolved = decideBlock(coords[0], coords[1], coords[2])
+		applyBlockToScene(resolved, coords)
+	})
+
+	Object.keys(next).forEach(function (key) {
+		var coords = key.split('|').map(Number)
+		if (coords.length !== 3) return
+		worldEdits[key] = next[key]
+		applyBlockToScene(next[key], coords)
+	})
+
+	scheduleSaveWorld()
+}
+
+function applyBlockToScene(blockId, position) {
+	if (blockId === 0) {
+		noa.setBlock(0, position)
+	} else {
+		noa.addBlock(blockId, position)
+	}
+}
+
+function applyWorldEditLocal(blockId, position, options) {
+	var opts = options || {}
+	var key = getEditKey(position[0], position[1], position[2])
+	worldEdits[key] = blockId
+	if (opts.saveLocal !== false) scheduleSaveWorld()
+	applyBlockToScene(blockId, position)
+	if (opts.broadcast !== false && multiplayer && multiplayer.sendBlockUpdate) {
+		multiplayer.sendBlockUpdate(blockId, position)
+	}
+}
+
 function applyBlockEdit(blockId, position) {
 	if (blockId !== 0) {
 		var block = getBlockById(blockId)
@@ -638,14 +712,7 @@ function applyBlockEdit(blockId, position) {
 			return
 		}
 	}
-	var key = getEditKey(position[0], position[1], position[2])
-	worldEdits[key] = blockId
-	scheduleSaveWorld()
-	if (blockId === 0) {
-		noa.setBlock(0, position)
-	} else {
-		noa.addBlock(blockId, position)
-	}
+	applyWorldEditLocal(blockId, position, { saveLocal: true, broadcast: true })
 }
 
 function playBreakSound() {
@@ -942,6 +1009,8 @@ var saveSettingsTimer = null
 var saveWorldTimer = null
 var editsApplied = false
 var worldListCache = []
+var localStateReady = false
+var pendingServerWorldEdits = null
 
 initLocalState()
 
@@ -1003,7 +1072,8 @@ function toggleClassroom(force) {
 
 function getWorldName() {
 	var params = new URLSearchParams(window.location.search)
-	return params.get('world') || 'default'
+	var worldParam = params.get('world')
+	return sanitizeWorldName(worldParam) || 'default'
 }
 
 function setupWorldMenu() {
@@ -1106,10 +1176,7 @@ function createWorldFromInput() {
 }
 
 function sanitizeWorldName(name) {
-	if (!name) return ''
-	var cleaned = name.trim().replace(/\s+/g, '')
-	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3)
-	return cleaned.toUpperCase()
+	return multiplayerLib.sanitizeWorldName(name)
 }
 
 function setWorldError(msg) {
@@ -1117,8 +1184,9 @@ function setWorldError(msg) {
 }
 
 function goToWorld(name) {
+	var cleaned = sanitizeWorldName(name) || 'default'
 	var params = new URLSearchParams(window.location.search)
-	params.set('world', name)
+	params.set('world', cleaned)
 	window.location.search = params.toString()
 }
 
@@ -1145,6 +1213,8 @@ function initLocalState() {
 			updateClassroomUI()
 			toggleClassroom(settingsClassroomOpen())
 			applySavedEdits()
+			localStateReady = true
+			flushPendingServerWorldEdits()
 			storage.touchWorld(worldName)
 		})
 		.catch(function () {
@@ -1161,6 +1231,8 @@ function initLocalState() {
 			setupWebOverlay()
 			updateClassroomUI()
 			toggleClassroom(true)
+			localStateReady = true
+			flushPendingServerWorldEdits()
 			storage.touchWorld(worldName)
 		})
 }

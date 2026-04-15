@@ -5,10 +5,14 @@
 function setupMultiplayer(noa, scene, options) {
 	var runtimeParams = options.runtimeParams
 	var runtimeIsLocal = !!options.runtimeIsLocal
+	var initialWorldName = options.worldName
+	var sanitizeWorldName = options.sanitizeWorldName
 	var getPlayerName = options.getPlayerName
 	var sanitizePlayerName = options.sanitizePlayerName
 	var createNametag = options.createNametag
 	var updateNametag = options.updateNametag
+	var onWorldEdits = options.onWorldEdits
+	var onBlockUpdate = options.onBlockUpdate
 
 	var serverUrl = runtimeIsLocal ? runtimeParams.get('server') : null
 	var playerName = getPlayerName()
@@ -17,11 +21,21 @@ function setupMultiplayer(noa, scene, options) {
 
 	var socket = null
 	var clientId = null
+	var worldName = normalizeWorldName(initialWorldName)
 	var remotePlayers = {}
 	var reconnectTimer = null
 	var pingTimer = null
 	var sendCooldown = 0
 	var snapshotDelay = 120
+
+	function normalizeWorldName(name) {
+		if (typeof sanitizeWorldName === 'function') {
+			return sanitizeWorldName(name) || 'default'
+		}
+		var cleaned = (name || '').trim().replace(/\s+/g, '')
+		cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3).toUpperCase()
+		return cleaned || 'default'
+	}
 
 	function send(msg) {
 		if (socket && socket.readyState === WebSocket.OPEN) {
@@ -44,7 +58,7 @@ function setupMultiplayer(noa, scene, options) {
 		socket = new WebSocket(serverUrl)
 
 		socket.addEventListener('open', function () {
-			send({ type: 'hello', v: 1, name: playerName || 'Player' })
+			send({ type: 'hello', v: 1, name: playerName || 'Player', world: worldName })
 			if (pingTimer) clearInterval(pingTimer)
 			pingTimer = setInterval(function () {
 				send({ type: 'ping', v: 1, t: Date.now() })
@@ -62,6 +76,7 @@ function setupMultiplayer(noa, scene, options) {
 
 			if (msg.type === 'welcome') {
 				clientId = msg.id
+				worldName = normalizeWorldName(msg.world || worldName)
 				return
 			}
 
@@ -88,6 +103,18 @@ function setupMultiplayer(noa, scene, options) {
 
 			if (msg.type === 'playerLeft' && msg.id) {
 				removeRemotePlayer(msg.id)
+				return
+			}
+
+			if (msg.type === 'worldEdits' && Array.isArray(msg.edits)) {
+				if (typeof onWorldEdits === 'function') onWorldEdits(msg.edits)
+				return
+			}
+
+			if (msg.type === 'blockUpdate') {
+				if (!msg || typeof msg.x !== 'number' || typeof msg.y !== 'number' || typeof msg.z !== 'number' || typeof msg.blockId !== 'number') return
+				if (msg.by && msg.by === clientId) return
+				if (typeof onBlockUpdate === 'function') onBlockUpdate(msg)
 			}
 		})
 
@@ -108,8 +135,24 @@ function setupMultiplayer(noa, scene, options) {
 		playerName = sanitizePlayerName(name)
 		if (!playerName) return
 		if (socket && socket.readyState === WebSocket.OPEN) {
-			send({ type: 'hello', v: 1, name: playerName })
+			send({ type: 'hello', v: 1, name: playerName, world: worldName })
 		}
+	}
+
+	function sendBlockUpdate(blockId, position) {
+		if (!position || position.length < 3) return false
+		if (!Number.isInteger(blockId)) return false
+		if (!socket || socket.readyState !== WebSocket.OPEN) return false
+		send({
+			type: 'blockUpdate',
+			v: 1,
+			world: worldName,
+			x: Math.floor(position[0]),
+			y: Math.floor(position[1]),
+			z: Math.floor(position[2]),
+			blockId: blockId,
+		})
+		return true
 	}
 
 	function upsertRemotePlayer(player) {
@@ -198,7 +241,12 @@ function setupMultiplayer(noa, scene, options) {
 
 	connect()
 
-	return { tick: tick, updateRemotes: updateRemotes, setName: setName }
+	return {
+		tick: tick,
+		updateRemotes: updateRemotes,
+		setName: setName,
+		sendBlockUpdate: sendBlockUpdate,
+	}
 }
 
 function getPlayerName(runtimeParams, sanitizePlayerName) {
@@ -219,6 +267,13 @@ function getPlayerNameFromParams(runtimeParams, sanitizePlayerName) {
 }
 
 function sanitizePlayerName(name) {
+	if (!name) return ''
+	var cleaned = name.trim().replace(/\s+/g, '')
+	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3)
+	return cleaned.toUpperCase()
+}
+
+function sanitizeWorldName(name) {
 	if (!name) return ''
 	var cleaned = name.trim().replace(/\s+/g, '')
 	cleaned = cleaned.replace(/[^a-zA-Z0-9]/g, '').slice(0, 3)
@@ -266,6 +321,7 @@ module.exports = {
 	setupMultiplayer: setupMultiplayer,
 	getPlayerName: getPlayerName,
 	sanitizePlayerName: sanitizePlayerName,
+	sanitizeWorldName: sanitizeWorldName,
 	createNametag: createNametag,
 	updateNametag: updateNametag,
 }

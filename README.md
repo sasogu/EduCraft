@@ -16,11 +16,51 @@ EduCraft es una experiencia voxel educativa construida sobre `noa-engine` y Baby
 - Inventario y hotbar.
 - Guardado local de ajustes y progreso con IndexedDB.
 - Múltiples mundos.
-- Multijugador básico con sincronización de posición y nombre.
+- Multijugador en tiempo real con salas por mundo (presencia y bloques aislados por mundo).
 - Interfaz in-game personalizada.
 - Soporte de teclado, ratón y detección de entorno móvil.
 - Bloques y dinámicas musicales.
 - Panel web integrado con minijuegos HTML externos.
+
+## Multijugador por mundos (salas)
+
+El backend WebSocket separa el estado por mundo usando salas en memoria.
+
+- El parámetro `world` del cliente se envía en el `hello` y se normaliza en cliente y servidor.
+- Si no se especifica mundo, se usa `default`.
+- `snapshot`, `delta` y `playerLeft` se emiten solo a clientes del mismo mundo.
+- Un jugador de `ABC` no recibe presencia de `DEF`.
+- El terreno base procedural sigue siendo global e idéntico para todos los mundos.
+- Las ediciones de bloques se superponen sobre ese terreno base y se aíslan por sala.
+
+### Estado compartido de bloques
+
+- El servidor mantiene en memoria las ediciones de bloques por mundo.
+- Al entrar a un mundo, el cliente recibe el estado actual de ediciones de ese mundo.
+- Al colocar/quitar bloques, el cliente aplica local inmediato y envía el cambio al servidor.
+- El servidor valida y difunde el cambio solo dentro de la sala del mundo correspondiente.
+
+En esta fase, la persistencia compartida entre jugadores es memoria del servidor (no disco). Si el servidor reinicia, las ediciones compartidas se pierden.
+
+### Mensajes de protocolo relevantes
+
+Cliente -> Servidor:
+
+- `hello { v, name, world }`
+- `move { v, x, y, z }`
+- `blockUpdate { v, world?, x, y, z, blockId }`
+- `ping { v, t }`
+
+Servidor -> Cliente:
+
+- `welcome { v, id, tickRate, world }`
+- `snapshot { v, players }`
+- `delta { v, players }`
+- `playerLeft { v, id }`
+- `worldEdits { v, edits }`
+- `blockUpdate { v, x, y, z, blockId, by }`
+- `pong { v, t }`
+- `error { v, message }`
 
 ## Controles por defecto
 
