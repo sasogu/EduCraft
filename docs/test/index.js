@@ -16,6 +16,7 @@ var runtimeParams = new URLSearchParams(window.location.search)
 var runtimeHost = window.location.hostname || ''
 var runtimeIsLocal = runtimeHost === 'localhost' || runtimeHost === '127.0.0.1' || runtimeHost === '0.0.0.0'
 var runtimeDebug = runtimeParams.get('debug') === '1' || runtimeIsLocal
+var DEFAULT_WORLD_NAME = 'default'
 
 
 /**
@@ -395,6 +396,20 @@ function createWebScreen(scene) {
 	}
 }
 
+function resetWorldDecorations() {
+	for (var i = 0; i < embeddedGameSigns.length; i++) {
+		var sign = embeddedGameSigns[i]
+		if (!sign || !Array.isArray(sign.parts)) continue
+		for (var j = 0; j < sign.parts.length; j++) {
+			if (sign.parts[j] && sign.parts[j].dispose) sign.parts[j].dispose(false, true)
+		}
+	}
+	embeddedGameSigns = []
+	webSignMesh = null
+	createWebScreen(scene)
+	resetIslandAnimal()
+}
+
 function createEmbeddedGameSign(scene, config) {
 	var groundY = getHeight(config.x, config.z)
 	var post = BABYLON.MeshBuilder.CreateBox('web-post-' + config.id, { width: 0.35, height: 3.2, depth: 0.35 }, scene)
@@ -449,7 +464,8 @@ function createEmbeddedGameSign(scene, config) {
 	embeddedGameSigns.push({
 		id: config.id,
 		url: config.url,
-		mesh: signFace
+		mesh: signFace,
+		parts: [post, signBoard, signFace]
 	})
 	if (!webSignMesh) webSignMesh = signFace
 }
@@ -557,9 +573,17 @@ function decideBlock(x, y, z) {
 }
 
 function getHeight(x, z) {
+	if (isDefaultWorld()) {
+		var legacyHeight = baseHeight
+		legacyHeight += Math.floor(Math.sin(x / 12) * 2 + Math.cos(z / 14) * 2)
+		legacyHeight += Math.floor(Math.sin((x + z) / 18) * 1.5)
+		return Math.max(2, legacyHeight)
+	}
+
 	var h = baseHeight
-	h += Math.floor(Math.sin(x / 12) * 2 + Math.cos(z / 14) * 2)
-	h += Math.floor(Math.sin((x + z) / 18) * 1.5)
+	h += Math.floor(sampleTerrainNoise(x / 72, z / 72, 101) * 5)
+	h += Math.floor(sampleTerrainNoise(x / 28, z / 28, 151) * 3)
+	h += Math.floor(sampleTerrainNoise(x / 12, z / 12, 211) * 2)
 	return Math.max(2, h)
 }
 
@@ -605,9 +629,44 @@ function getTreeForCell(cellX, cellZ) {
 }
 
 function hash2D(x, z, seed) {
+	if (isDefaultWorld()) return legacyHash2D(x, z, seed)
+	var n = Math.imul(x | 0, 374761393)
+	n = (n + Math.imul(z | 0, 668265263)) | 0
+	n = (n + Math.imul(seed | 0, 1442695041)) | 0
+	n = (n + Math.imul(currentWorldSeed | 0, 1597334677)) | 0
+	n = Math.imul(n ^ (n >>> 13), 1274126177)
+	n = (n ^ (n >>> 16)) | 0
+	return (n >>> 0) / 4294967295
+}
+
+function legacyHash2D(x, z, seed) {
 	var n = x * 374761393 + z * 668265263 + seed * 1442695041
 	n = (n ^ (n >> 13)) * 1274126177
 	return ((n ^ (n >> 16)) >>> 0) / 4294967295
+}
+
+function sampleTerrainNoise(x, z, seed) {
+	var x0 = Math.floor(x)
+	var z0 = Math.floor(z)
+	var tx = x - x0
+	var tz = z - z0
+	var sx = smoothstep(tx)
+	var sz = smoothstep(tz)
+	var n00 = hash2D(x0, z0, seed) * 2 - 1
+	var n10 = hash2D(x0 + 1, z0, seed) * 2 - 1
+	var n01 = hash2D(x0, z0 + 1, seed) * 2 - 1
+	var n11 = hash2D(x0 + 1, z0 + 1, seed) * 2 - 1
+	var nx0 = lerp(n00, n10, sx)
+	var nx1 = lerp(n01, n11, sx)
+	return lerp(nx0, nx1, sz)
+}
+
+function smoothstep(t) {
+	return t * t * (3 - 2 * t)
+}
+
+function lerp(a, b, t) {
+	return a + (b - a) * t
 }
 
 
@@ -729,6 +788,14 @@ function spawnIslandAnimal() {
 		targetZ: null,
 		nextTargetTime: 0,
 	}
+}
+
+function resetIslandAnimal() {
+	if (islandAnimal && Number.isInteger(islandAnimal.eid)) {
+		noa.entities.deleteEntity(islandAnimal.eid, true)
+	}
+	islandAnimal = null
+	spawnIslandAnimal()
 }
 
 
@@ -1115,6 +1182,8 @@ var staffSongs = [
 
 var worldName = getWorldName()
 var worldEdits = {}
+var currentWorldSeed = 0
+var currentWorldGeneratorVersion = 1
 var saveSettingsTimer = null
 var saveWorldTimer = null
 var editsApplied = false
@@ -1187,7 +1256,59 @@ function toggleClassroom(force) {
 function getWorldName() {
 	var params = new URLSearchParams(window.location.search)
 	var worldParam = params.get('world')
-	return sanitizeWorldName(worldParam) || 'default'
+	return sanitizeWorldName(worldParam) || DEFAULT_WORLD_NAME
+}
+
+function isDefaultWorld() {
+	return worldName === DEFAULT_WORLD_NAME
+}
+
+function isPersistentWorld() {
+	return !isDefaultWorld()
+}
+
+function normalizeWorldSeed(seed) {
+	if (!Number.isFinite(seed)) return 0
+	var normalized = Math.floor(Math.abs(seed)) >>> 0
+	return normalized || 0
+}
+
+function applyWorldMeta(meta) {
+	if (!isPersistentWorld()) {
+		currentWorldSeed = 0
+		currentWorldGeneratorVersion = 1
+		return false
+	}
+	var nextSeed = normalizeWorldSeed(meta && meta.seed)
+	var nextVersion = (meta && Number.isFinite(meta.generatorVersion)) ? Math.floor(meta.generatorVersion) : 1
+	var changed = currentWorldSeed !== nextSeed || currentWorldGeneratorVersion !== nextVersion
+	currentWorldSeed = nextSeed
+	currentWorldGeneratorVersion = nextVersion
+	return changed
+}
+
+function finalizeLocalState() {
+	applyWorldUnlocks()
+	applyWorldSettings(worldEdits._settings)
+	buildHotbar()
+	buildInventory()
+	selectSlot(selectedIndex)
+	setCreativeMode(creativeMode)
+	setupClassroom()
+	setupWorldMenu()
+	setupPlayerPanel()
+	setupWebOverlay()
+	updateClassroomUI()
+	toggleClassroom(settingsClassroomOpen())
+	applySavedEdits()
+	localStateReady = true
+	flushPendingServerWorldEdits()
+}
+
+function initDefaultWorldState() {
+	worldEdits = {}
+	applyWorldMeta(null)
+	finalizeLocalState()
 }
 
 function setupWorldMenu() {
@@ -1298,7 +1419,7 @@ function setWorldError(msg) {
 }
 
 function goToWorld(name) {
-	var cleaned = sanitizeWorldName(name) || 'default'
+	var cleaned = sanitizeWorldName(name) || DEFAULT_WORLD_NAME
 	var params = new URLSearchParams(window.location.search)
 	params.set('world', cleaned)
 	window.location.search = params.toString()
@@ -1311,43 +1432,32 @@ function formatWorldDate(ts) {
 }
 
 function initLocalState() {
-	storage.getWorldEdits(worldName)
-		.then(function (edits) {
-			if (edits) worldEdits = edits
-			applyWorldUnlocks()
-			applyWorldSettings(worldEdits._settings)
-			buildHotbar()
-			buildInventory()
-			selectSlot(selectedIndex)
-			setCreativeMode(creativeMode)
-			setupClassroom()
-			setupWorldMenu()
-			setupPlayerPanel()
-			setupWebOverlay()
-			updateClassroomUI()
-			toggleClassroom(settingsClassroomOpen())
-			applySavedEdits()
-			localStateReady = true
-			flushPendingServerWorldEdits()
-			storage.touchWorld(worldName)
+	if (!isPersistentWorld()) {
+		initDefaultWorldState()
+		return
+	}
+
+	storage.getWorldMeta(worldName)
+		.then(function (meta) {
+			if (meta) return meta
+			return storage.createWorld(worldName).then(function () {
+				return storage.getWorldMeta(worldName)
+			})
+		})
+		.then(function (meta) {
+			var changed = applyWorldMeta(meta)
+			return storage.getWorldEdits(worldName).then(function (edits) {
+				worldEdits = edits || {}
+				if (changed) resetWorldDecorations()
+				finalizeLocalState()
+				if (changed) noa.world.invalidateAllChunks()
+				return storage.touchWorld(worldName)
+			})
 		})
 		.catch(function () {
 			worldEdits = {}
-			applyWorldUnlocks()
-			applyWorldSettings(null)
-			buildHotbar()
-			buildInventory()
-			selectSlot(selectedIndex)
-			setCreativeMode(creativeMode)
-			setupClassroom()
-			setupWorldMenu()
-			setupPlayerPanel()
-			setupWebOverlay()
-			updateClassroomUI()
-			toggleClassroom(true)
-			localStateReady = true
-			flushPendingServerWorldEdits()
-			storage.touchWorld(worldName)
+			applyWorldMeta(null)
+			finalizeLocalState()
 		})
 }
 
@@ -1398,6 +1508,7 @@ function collectWorldSettings() {
 }
 
 function scheduleSaveSettings() {
+	if (!isPersistentWorld()) return
 	if (saveSettingsTimer) clearTimeout(saveSettingsTimer)
 	saveSettingsTimer = setTimeout(function () {
 		if (!worldEdits) worldEdits = {}
@@ -1408,6 +1519,7 @@ function scheduleSaveSettings() {
 }
 
 function scheduleSaveWorld() {
+	if (!isPersistentWorld()) return
 	if (saveWorldTimer) clearTimeout(saveWorldTimer)
 	saveWorldTimer = setTimeout(function () {
 		storage.saveWorldEdits(worldName, worldEdits)
