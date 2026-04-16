@@ -86,5 +86,3 @@ function bugFix(state) {
 
 var lastx = 0
 var lasty = 0
-
-

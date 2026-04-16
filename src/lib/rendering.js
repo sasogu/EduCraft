@@ -643,5 +643,3 @@ function setUpFPS() {
         start = nt
     }
 }
-
-
