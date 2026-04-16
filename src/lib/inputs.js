@@ -27,6 +27,18 @@ var defaultBindings = {
 function makeInputs(noa, opts, element) {
     opts = Object.assign({}, defaultBindings, opts)
     var inputs = createInputs(element, opts)
+    var rawScrollY = 0
+    Object.defineProperty(inputs.state, 'scrolly', {
+        configurable: true,
+        enumerable: true,
+        get: function () {
+            return -rawScrollY
+        },
+        set: function (value) {
+            rawScrollY = value
+        }
+    })
+    inputs.state.scrolly = 0
     var b = opts.bindings
     for (var name in b) {
         var arr = (Array.isArray(b[name])) ? b[name] : [b[name]]
@@ -35,7 +47,6 @@ function makeInputs(noa, opts, element) {
     }
     return inputs
 }
-
 
 
 
