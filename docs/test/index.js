@@ -596,6 +596,52 @@ function getHeight(x, z) {
 	return Math.max(2, h)
 }
 
+function isDryLandAt(x, z) {
+	return getHeight(Math.floor(x), Math.floor(z)) > waterLevel + 1
+}
+
+function findNearestDrySpawn(x, z, maxRadius) {
+	var xi = Math.floor(x)
+	var zi = Math.floor(z)
+	if (isDryLandAt(xi, zi)) {
+		return [xi + 0.5, getHeight(xi, zi), zi + 0.5]
+	}
+	for (var r = 1; r <= maxRadius; r++) {
+		for (var dx = -r; dx <= r; dx++) {
+			var dz = r
+			if (isDryLandAt(xi + dx, zi + dz)) {
+				return [xi + dx + 0.5, getHeight(xi + dx, zi + dz), zi + dz + 0.5]
+			}
+			dz = -r
+			if (isDryLandAt(xi + dx, zi + dz)) {
+				return [xi + dx + 0.5, getHeight(xi + dx, zi + dz), zi + dz + 0.5]
+			}
+		}
+		for (var dz2 = -r + 1; dz2 <= r - 1; dz2++) {
+			var dx2 = r
+			if (isDryLandAt(xi + dx2, zi + dz2)) {
+				return [xi + dx2 + 0.5, getHeight(xi + dx2, zi + dz2), zi + dz2 + 0.5]
+			}
+			dx2 = -r
+			if (isDryLandAt(xi + dx2, zi + dz2)) {
+				return [xi + dx2 + 0.5, getHeight(xi + dx2, zi + dz2), zi + dz2 + 0.5]
+			}
+		}
+	}
+	return [xi + 0.5, Math.max(getHeight(xi, zi), waterLevel + 2), zi + 0.5]
+}
+
+function updateWorldSpawnPosition() {
+	var spawn = isPersistentWorld()
+		? findNearestDrySpawn(0, 0, 48)
+		: [0.5, 6, 0.5]
+	opts.playerStart = [spawn[0], spawn[1], spawn[2]]
+	lastValidPos = [spawn[0], spawn[1], spawn[2]]
+	if (noa && noa.entities) {
+		noa.entities.setPosition(eid, spawn[0], spawn[1], spawn[2])
+	}
+}
+
 function getTreeAt(x, z) {
 	var cellX = Math.floor(x / treeCellSize)
 	var cellZ = Math.floor(z / treeCellSize)
@@ -1353,6 +1399,7 @@ function finalizeLocalState() {
 function initDefaultWorldState() {
 	worldEdits = {}
 	applyWorldMeta(null)
+	updateWorldSpawnPosition()
 	finalizeLocalState()
 }
 
@@ -1493,6 +1540,7 @@ function initLocalState() {
 			var changed = applyWorldMeta(meta)
 			return storage.getWorldEdits(worldName).then(function (edits) {
 				worldEdits = edits || {}
+				updateWorldSpawnPosition()
 				if (changed) resetWorldDecorations()
 				finalizeLocalState()
 				if (changed) noa.world.invalidateAllChunks()
