@@ -1,6 +1,8 @@
 
 const Dexie = require('dexie');
 
+var WORLD_GENERATOR_VERSION = 2
+
 var db = new Dexie('educraft-storage')
 db.version(1).stores({
 	main: 'name, data',
@@ -46,7 +48,7 @@ function saveWorldEdits(name, edits) {
 				name: name,
 				createdAt: ts,
 				seed: generateWorldSeed(),
-				generatorVersion: 1
+				generatorVersion: WORLD_GENERATOR_VERSION
 			}
 			meta.lastplay = ts
 			return Promise.all([
@@ -78,7 +80,7 @@ function createWorld(name) {
 			createdAt: ts,
 			lastplay: ts,
 			seed: generateWorldSeed(),
-			generatorVersion: 1
+			generatorVersion: WORLD_GENERATOR_VERSION
 		}
 		return Promise.all([
 			db.world.put(meta),
