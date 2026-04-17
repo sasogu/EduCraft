@@ -264,12 +264,15 @@ function showWebPanel() {
 	ui.webIframe.src = webPanelUrl
 	ui.webPanel.classList.add('active')
 	if (document.exitPointerLock) document.exitPointerLock()
+	grantRandomInventoryReward('al entrar en el minijuego')
 }
 
 function hideWebPanel() {
 	if (!ui.webPanel || !ui.webIframe) return
+	var wasOpen = ui.webPanel.classList.contains('active') || !!ui.webIframe.src
 	ui.webPanel.classList.remove('active')
 	ui.webIframe.src = ''
+	if (wasOpen) grantRandomInventoryReward('al salir del minijuego')
 }
 
 function canOpenWebPanel() {
@@ -388,13 +391,14 @@ function getEmbeddedGameSignConfigs() {
 		{ id: 'jclic', title: 'JCLIC', subtitle: 'Actividades', url: '/embedded-game/EduMusic/html/jclic.html' },
 		{ id: 'timbre-dictation', title: 'TIMBRE', subtitle: 'Dictado sonoro', url: '/embedded-game/EduMusic/html/timbre-dictation.html' }
 	]
+	var selectedDefs = pickRandomSigns(defs, 15)
 	var columns = 5
 	var spacingX = 10
 	var spacingZ = 9
 	var startX = -20
 	var startZ = -18
 
-	return defs.map(function (def, index) {
+	return selectedDefs.map(function (def, index) {
 		var col = index % columns
 		var row = Math.floor(index / columns)
 		return {
@@ -406,6 +410,17 @@ function getEmbeddedGameSignConfigs() {
 			url: def.url
 		}
 	})
+}
+
+function pickRandomSigns(defs, limit) {
+	var shuffled = defs.slice()
+	for (var i = shuffled.length - 1; i > 0; i--) {
+		var j = Math.floor(Math.random() * (i + 1))
+		var temp = shuffled[i]
+		shuffled[i] = shuffled[j]
+		shuffled[j] = temp
+	}
+	return shuffled.slice(0, Math.min(limit, shuffled.length))
 }
 
 function createWebScreen(scene) {
@@ -1753,6 +1768,28 @@ function unlockBlockByName(name) {
 		}
 	}
 	return false
+}
+
+function getRandomLockedRewardBlock() {
+	var locked = []
+	for (var i = 0; i < blockCatalog.length; i++) {
+		var block = blockCatalog[i]
+		if (defaultLockState[i] && block.locked) locked.push(block)
+	}
+	if (!locked.length) return null
+	return locked[Math.floor(Math.random() * locked.length)]
+}
+
+function grantRandomInventoryReward(triggerText) {
+	var rewardBlock = getRandomLockedRewardBlock()
+	if (!rewardBlock) {
+		showChallengeBanner('Minijuego', 'Ya has desbloqueado todos los objetos disponibles.')
+		return false
+	}
+	var unlocked = unlockBlockByName(rewardBlock.name)
+	if (!unlocked) return false
+	showChallengeBanner('Objeto desbloqueado', rewardBlock.name + ' ' + triggerText + '.')
+	return true
 }
 
 function trackWorldUnlock(name) {
