@@ -393,10 +393,10 @@ function getEmbeddedGameSignConfigs() {
 	]
 	var selectedDefs = pickRandomSigns(defs, 15)
 	var columns = 5
-	var spacingX = 10
-	var spacingZ = 9
-	var startX = -20
-	var startZ = -18
+	var spacingX = isDefaultWorld() ? 8 : 10
+	var spacingZ = isDefaultWorld() ? 8 : 9
+	var startX = isDefaultWorld() ? -16 : -20
+	var startZ = isDefaultWorld() ? -8 : -18
 
 	return selectedDefs.map(function (def, index) {
 		var col = index % columns
@@ -553,8 +553,6 @@ var treeDensity = 0.12
 var shrubDensity = 0.02
 var rockDensity = 0.01
 var flowerDensity = 0.03
-
-createWebScreen(scene)
 
 function getEditKey(x, y, z) {
 	return x + '|' + y + '|' + z
@@ -1438,6 +1436,7 @@ function initDefaultWorldState() {
 	worldEdits = {}
 	applyWorldMeta(null)
 	updateWorldSpawnPosition()
+	resetWorldDecorations()
 	finalizeLocalState()
 }
 
@@ -1579,7 +1578,7 @@ function initLocalState() {
 			return storage.getWorldEdits(worldName).then(function (edits) {
 				worldEdits = edits || {}
 				updateWorldSpawnPosition()
-				if (changed) resetWorldDecorations()
+				resetWorldDecorations()
 				finalizeLocalState()
 				if (changed) noa.world.invalidateAllChunks()
 				return storage.touchWorld(worldName)
