@@ -102,6 +102,27 @@ Servidor -> Cliente:
 - `pong { v, t }`
 - `error { v, message }`
 
+## Panel de administracion
+
+El roadmap tecnico del panel vive en [docs/ADMIN_PANEL_ROADMAP.md](/home/sasogu/github/web/EduCraft/docs/ADMIN_PANEL_ROADMAP.md:1).
+
+El backend expone ahora dos rutas utiles para supervision:
+
+- `/admin`: pagina HTML con refresco automatico cada 5 segundos.
+- `/admin/stats`: JSON con jugadores activos, mundos activos, picos recientes y salud del proceso.
+- `/admin/events`: timeline reciente con filtros por tipo, mundo y jugador.
+- `/admin/history`: serie temporal de concurrencia y mundos activos.
+- `/admin/worlds`: resumen actual y pico reciente por mundo.
+- `/admin/health`: estado tecnico del proceso Node.
+
+Las metricas disponibles hoy son:
+
+- `activePlayers`: conexiones WebSocket activas en este instante.
+- `activeWorlds`: salas actualmente ocupadas.
+- `knownWorldsSinceBoot`: mundos que han sido usados desde que se arranco el proceso del backend.
+
+Importante: el backend sigue guardando el estado compartido en memoria. Eso significa que el conteo de mundos conocidos se reinicia cuando el servicio Node se reinicia.
+
 ## Controles por defecto
 
 - `WASD`: mover
