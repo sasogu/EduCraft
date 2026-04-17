@@ -74,6 +74,30 @@ export function buildAdminHtml(): string {
       gap: 14px;
     }
 
+    .quick-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .quick-links a {
+      display: inline-flex;
+      align-items: center;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.7);
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    .quick-links a:hover {
+      background: var(--accent-soft);
+    }
+
     .summary {
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       margin-bottom: 16px;
@@ -225,6 +249,14 @@ export function buildAdminHtml(): string {
       </div>
       <div class="status" id="status">Cargando metricas...</div>
     </section>
+
+    <nav class="quick-links" aria-label="Endpoints admin">
+      <a href="/admin/stats" target="_blank" rel="noreferrer">/admin/stats</a>
+      <a href="/admin/events" target="_blank" rel="noreferrer">/admin/events</a>
+      <a href="/admin/history" target="_blank" rel="noreferrer">/admin/history</a>
+      <a href="/admin/worlds" target="_blank" rel="noreferrer">/admin/worlds</a>
+      <a href="/admin/health" target="_blank" rel="noreferrer">/admin/health</a>
+    </nav>
 
     <section class="summary" id="summary"></section>
 
