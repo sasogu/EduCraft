@@ -1789,9 +1789,30 @@ function grantRandomInventoryReward(triggerText) {
 	return true
 }
 
+function getClaimedGameRewardCount() {
+	if (!worldEdits || !Array.isArray(worldEdits._rewardedGames)) return 0
+	return worldEdits._rewardedGames.length
+}
+
 function hasClaimedGameReward(gameId) {
 	if (!worldEdits || !Array.isArray(worldEdits._rewardedGames)) return false
 	return worldEdits._rewardedGames.indexOf(gameId) !== -1
+}
+
+function getBridgeRewardTargetIndex() {
+	if (!worldEdits) worldEdits = {}
+	if (typeof worldEdits._bridgeRewardAt !== 'number') {
+		worldEdits._bridgeRewardAt = 1 + Math.floor(Math.random() * 3)
+		scheduleSaveWorld()
+	}
+	return Math.max(1, Math.min(3, Math.floor(worldEdits._bridgeRewardAt)))
+}
+
+function grantBridgeReward(triggerText) {
+	var unlocked = unlockBlockByName('Puente')
+	if (!unlocked) return false
+	showChallengeBanner('Objeto desbloqueado', 'Puente ' + triggerText + '.')
+	return true
 }
 
 function trackGameReward(gameId) {
@@ -1806,7 +1827,14 @@ function trackGameReward(gameId) {
 
 function grantGameRewardOnce(gameId) {
 	if (!gameId || hasClaimedGameReward(gameId)) return false
-	var unlocked = grantRandomInventoryReward('por descubrir este minijuego')
+	var rewardIndex = getClaimedGameRewardCount() + 1
+	var bridgeBlock = getBlockByName('Puente')
+	var shouldGrantBridge = !!(bridgeBlock && bridgeBlock.locked && rewardIndex <= 3 && (
+		rewardIndex === getBridgeRewardTargetIndex() || rewardIndex === 3
+	))
+	var unlocked = shouldGrantBridge
+		? grantBridgeReward('por descubrir este minijuego')
+		: grantRandomInventoryReward('por descubrir este minijuego')
 	if (!unlocked) return false
 	trackGameReward(gameId)
 	return true
