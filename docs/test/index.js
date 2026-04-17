@@ -1152,6 +1152,7 @@ var inventoryElsById = {}
 var selectedIndex = 0
 var pickedID = hotbarSlots[0].id
 var creativeMode = false
+var creativeUnlockBuffer = ''
 var allowFlight = false
 var musicFeedbackTimer = null
 var musicPulseTimer = null
@@ -2735,11 +2736,6 @@ noa.inputs.down.on('inventory', function () {
 	if (tutorial) tutorial.onAction('inventory')
 })
 
-noa.inputs.bind('toggle-creative', 'G')
-noa.inputs.down.on('toggle-creative', function () {
-	setCreativeMode(!creativeMode)
-})
-
 noa.inputs.bind('toggle-classroom', 'M')
 noa.inputs.down.on('toggle-classroom', function () {
 	toggleClassroom()
@@ -2756,6 +2752,25 @@ function bindSlotAction(action, index) {
 		selectSlot(index)
 	})
 }
+
+document.addEventListener('keydown', function (event) {
+	if (!event || event.defaultPrevented) return
+	if (event.ctrlKey || event.metaKey || event.altKey) return
+	var target = event.target
+	if (target) {
+		var tag = target.tagName
+		if (target.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+	}
+	if (event.key < '0' || event.key > '9') {
+		creativeUnlockBuffer = ''
+		return
+	}
+	creativeUnlockBuffer = (creativeUnlockBuffer + event.key).slice(-3)
+	if (creativeUnlockBuffer !== '007') return
+	creativeUnlockBuffer = ''
+	setCreativeMode(!creativeMode)
+	showChallengeBanner('Modo creativo', creativeMode ? 'Activado con codigo secreto.' : 'Desactivado.')
+})
 
 var paused = false
 var inventoryOpen = false
