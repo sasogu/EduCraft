@@ -33,7 +33,7 @@ var tutorialLib = require('./tutorial')
 var opts = {
 	debug: runtimeDebug,
 	showFPS: runtimeDebug,
-	inverseY: true,
+	inverseY: false,
 	chunkSize: 32,
 	chunkAddDistance: 2,
 	chunkRemoveDistance: 3,
@@ -359,35 +359,53 @@ function handleEmbeddedGameCompletion(payload) {
 function getEmbeddedGameSignConfigs() {
 	var offsetX = isPersistentWorld() ? currentWorldSignOffsetX : 0
 	var offsetZ = isPersistentWorld() ? currentWorldSignOffsetZ : 0
-	return [
-		{ id: 'solmi', x: 4 + offsetX, z: -6 + offsetZ, title: 'SOL-MI', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmi.html' },
-		{ id: 'karaoke', x: 8 + offsetX, z: 2 + offsetZ, title: 'KARAOKE', subtitle: 'Canta y juega', url: '/embedded-game/EduMusic/html/karaoke.html' },
-		{ id: 'piano', x: 10 + offsetX, z: 8 + offsetZ, title: 'PIANO', subtitle: 'Toca libre', url: '/embedded-game/EduMusic/html/piano.html' },
-		{ id: 'solmila', x: -66 + offsetX, z: -30 + offsetZ, title: 'SOL-MI-LA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmila.html' },
-		{ id: 'solmilado', x: -62 + offsetX, z: -30 + offsetZ, title: 'SOL-MI-DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmilado.html' },
-		{ id: 'memory', x: -58 + offsetX, z: -30 + offsetZ, title: 'MEMORY', subtitle: 'Juego musical', url: '/embedded-game/EduMusic/html/memory.html' },
-		{ id: 'quiz', x: -54 + offsetX, z: -30 + offsetZ, title: 'QUIZ', subtitle: 'Pregunta y juega', url: '/embedded-game/EduMusic/html/quiz.html' },
-		{ id: 'cajaritmos', x: -50 + offsetX, z: -30 + offsetZ, title: 'CAJA RITMOS', subtitle: 'Patrones y compas', url: '/embedded-game/EduMusic/html/cajaritmos.html' },
-		{ id: 'solmiladore', x: -46 + offsetX, z: -30 + offsetZ, title: 'SOL+DO+RE', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladore.html' },
-		{ id: 'solmiladorefa', x: -66 + offsetX, z: -22 + offsetZ, title: 'SOL+RE+FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladorefa.html' },
-		{ id: 'todas', x: -62 + offsetX, z: -22 + offsetZ, title: 'DO A DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/todas.html' },
-		{ id: 'dofa', x: -58 + offsetX, z: -22 + offsetZ, title: 'DO A FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/dofa.html' },
-		{ id: 'pitch-height', x: -54 + offsetX, z: -22 + offsetZ, title: 'AGUDO/GRAVE', subtitle: 'Escucha alturas', url: '/embedded-game/EduMusic/html/pitch-height.html' },
-		{ id: 'pitch-direction', x: -50 + offsetX, z: -22 + offsetZ, title: 'SUBE/BAJA', subtitle: 'Direccion sonora', url: '/embedded-game/EduMusic/html/pitch-direction.html' },
-		{ id: 'duration-choice', x: -46 + offsetX, z: -22 + offsetZ, title: 'DURACION', subtitle: 'Largo o corto', url: '/embedded-game/EduMusic/html/duration-choice.html' },
-		{ id: 'rhythm', x: -66 + offsetX, z: -14 + offsetZ, title: 'RITMO', subtitle: 'TA SU TITI', url: '/embedded-game/EduMusic/html/rhythm.html' },
-		{ id: 'rhythm-dictation', x: -62 + offsetX, z: -14 + offsetZ, title: 'DICTADO R', subtitle: 'Escucha y elige', url: '/embedded-game/EduMusic/html/rhythm-dictation.html' },
-		{ id: 'melody-dictation', x: -58 + offsetX, z: -14 + offsetZ, title: 'DICTADO M', subtitle: 'Escucha y elige', url: '/embedded-game/EduMusic/html/melody-dictation.html' },
-		{ id: 'melo-rhythm-dictation', x: -54 + offsetX, z: -14 + offsetZ, title: 'MELO+RITMO', subtitle: 'Dictado mixto', url: '/embedded-game/EduMusic/html/melo-rhythm-dictation.html' },
-		{ id: 'melody', x: -50 + offsetX, z: -14 + offsetZ, title: 'MELODIA', subtitle: 'Secuencias', url: '/embedded-game/EduMusic/html/melody.html' },
-		{ id: 'compas', x: -46 + offsetX, z: -14 + offsetZ, title: 'COMPAS', subtitle: 'Puzzle musical', url: '/embedded-game/EduMusic/html/compas.html' },
-		{ id: 'palabras-musicales', x: -66 + offsetX, z: -6 + offsetZ, title: 'PALABRAS', subtitle: 'Letras y musica', url: '/embedded-game/EduMusic/html/palabras-musicales.html' },
-		{ id: 'piano-hero', x: -62 + offsetX, z: -6 + offsetZ, title: 'PIANO HERO', subtitle: 'Arcade musical', url: '/embedded-game/EduMusic/html/piano-hero.html' },
-		{ id: 'instruments', x: -58 + offsetX, z: -6 + offsetZ, title: 'INSTRUM.', subtitle: 'Familias', url: '/embedded-game/EduMusic/html/instruments.html' },
-		{ id: 'minijocs', x: -54 + offsetX, z: -6 + offsetZ, title: 'MINIJOCS', subtitle: 'Zona arcade', url: '/embedded-game/EduMusic/html/minijocs.html' },
-		{ id: 'jclic', x: -50 + offsetX, z: -6 + offsetZ, title: 'JCLIC', subtitle: 'Actividades', url: '/embedded-game/EduMusic/html/jclic.html' },
-		{ id: 'timbre-dictation', x: -46 + offsetX, z: -6 + offsetZ, title: 'TIMBRE', subtitle: 'Dictado sonoro', url: '/embedded-game/EduMusic/html/timbre-dictation.html' }
+	var defs = [
+		{ id: 'solmi', title: 'SOL-MI', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmi.html' },
+		{ id: 'karaoke', title: 'KARAOKE', subtitle: 'Canta y juega', url: '/embedded-game/EduMusic/html/karaoke.html' },
+		{ id: 'piano', title: 'PIANO', subtitle: 'Toca libre', url: '/embedded-game/EduMusic/html/piano.html' },
+		{ id: 'solmila', title: 'SOL-MI-LA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmila.html' },
+		{ id: 'solmilado', title: 'SOL-MI-DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmilado.html' },
+		{ id: 'memory', title: 'MEMORY', subtitle: 'Juego musical', url: '/embedded-game/EduMusic/html/memory.html' },
+		{ id: 'quiz', title: 'QUIZ', subtitle: 'Pregunta y juega', url: '/embedded-game/EduMusic/html/quiz.html' },
+		{ id: 'cajaritmos', title: 'CAJA RITMOS', subtitle: 'Patrones y compas', url: '/embedded-game/EduMusic/html/cajaritmos.html' },
+		{ id: 'solmiladore', title: 'SOL+DO+RE', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladore.html' },
+		{ id: 'solmiladorefa', title: 'SOL+RE+FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/solmiladorefa.html' },
+		{ id: 'todas', title: 'DO A DO', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/todas.html' },
+		{ id: 'dofa', title: 'DO A FA', subtitle: 'Atrapa notas', url: '/embedded-game/EduMusic/html/dofa.html' },
+		{ id: 'pitch-height', title: 'AGUDO/GRAVE', subtitle: 'Escucha alturas', url: '/embedded-game/EduMusic/html/pitch-height.html' },
+		{ id: 'pitch-direction', title: 'SUBE/BAJA', subtitle: 'Direccion sonora', url: '/embedded-game/EduMusic/html/pitch-direction.html' },
+		{ id: 'duration-choice', title: 'DURACION', subtitle: 'Largo o corto', url: '/embedded-game/EduMusic/html/duration-choice.html' },
+		{ id: 'rhythm', title: 'RITMO', subtitle: 'TA SU TITI', url: '/embedded-game/EduMusic/html/rhythm.html' },
+		{ id: 'rhythm-dictation', title: 'DICTADO R', subtitle: 'Escucha y elige', url: '/embedded-game/EduMusic/html/rhythm-dictation.html' },
+		{ id: 'melody-dictation', title: 'DICTADO M', subtitle: 'Escucha y elige', url: '/embedded-game/EduMusic/html/melody-dictation.html' },
+		{ id: 'melo-rhythm-dictation', title: 'MELO+RITMO', subtitle: 'Dictado mixto', url: '/embedded-game/EduMusic/html/melo-rhythm-dictation.html' },
+		{ id: 'melody', title: 'MELODIA', subtitle: 'Secuencias', url: '/embedded-game/EduMusic/html/melody.html' },
+		{ id: 'compas', title: 'COMPAS', subtitle: 'Puzzle musical', url: '/embedded-game/EduMusic/html/compas.html' },
+		{ id: 'palabras-musicales', title: 'PALABRAS', subtitle: 'Letras y musica', url: '/embedded-game/EduMusic/html/palabras-musicales.html' },
+		{ id: 'piano-hero', title: 'PIANO HERO', subtitle: 'Arcade musical', url: '/embedded-game/EduMusic/html/piano-hero.html' },
+		{ id: 'instruments', title: 'INSTRUM.', subtitle: 'Familias', url: '/embedded-game/EduMusic/html/instruments.html' },
+		{ id: 'minijocs', title: 'MINIJOCS', subtitle: 'Zona arcade', url: '/embedded-game/EduMusic/html/minijocs.html' },
+		{ id: 'jclic', title: 'JCLIC', subtitle: 'Actividades', url: '/embedded-game/EduMusic/html/jclic.html' },
+		{ id: 'timbre-dictation', title: 'TIMBRE', subtitle: 'Dictado sonoro', url: '/embedded-game/EduMusic/html/timbre-dictation.html' }
 	]
+	var columns = 5
+	var spacingX = 10
+	var spacingZ = 9
+	var startX = -20
+	var startZ = -18
+
+	return defs.map(function (def, index) {
+		var col = index % columns
+		var row = Math.floor(index / columns)
+		return {
+			id: def.id,
+			x: startX + col * spacingX + offsetX,
+			z: startZ + row * spacingZ + offsetZ,
+			title: def.title,
+			subtitle: def.subtitle,
+			url: def.url
+		}
+	})
 }
 
 function createWebScreen(scene) {
@@ -463,6 +481,11 @@ function createEmbeddedGameSign(scene, config) {
 	signMat.backFaceCulling = false
 	signBoard.material = signMat
 	signFace.material = signMat
+
+	// Register standalone Babylon meshes with noa's scene management so they render consistently.
+	noa.rendering.addMeshToScene(post, true)
+	noa.rendering.addMeshToScene(signBoard, true)
+	noa.rendering.addMeshToScene(signFace, true)
 
 	embeddedGameSigns.push({
 		id: config.id,
