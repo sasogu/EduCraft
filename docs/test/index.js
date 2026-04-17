@@ -264,15 +264,13 @@ function showWebPanel() {
 	ui.webIframe.src = webPanelUrl
 	ui.webPanel.classList.add('active')
 	if (document.exitPointerLock) document.exitPointerLock()
-	grantRandomInventoryReward('al entrar en el minijuego')
+	if (nearbySign && nearbySign.id) grantGameRewardOnce(nearbySign.id)
 }
 
 function hideWebPanel() {
 	if (!ui.webPanel || !ui.webIframe) return
-	var wasOpen = ui.webPanel.classList.contains('active') || !!ui.webIframe.src
 	ui.webPanel.classList.remove('active')
 	ui.webIframe.src = ''
-	if (wasOpen) grantRandomInventoryReward('al salir del minijuego')
 }
 
 function canOpenWebPanel() {
@@ -393,10 +391,10 @@ function getEmbeddedGameSignConfigs() {
 	]
 	var selectedDefs = pickRandomSigns(defs, 15)
 	var columns = 5
-	var spacingX = isDefaultWorld() ? 8 : 10
-	var spacingZ = isDefaultWorld() ? 8 : 9
-	var startX = isDefaultWorld() ? -16 : -20
-	var startZ = isDefaultWorld() ? -8 : -18
+	var spacingX = isDefaultWorld() ? 18 : 10
+	var spacingZ = isDefaultWorld() ? 18 : 9
+	var startX = isDefaultWorld() ? -42 : -20
+	var startZ = isDefaultWorld() ? -28 : -18
 
 	return selectedDefs.map(function (def, index) {
 		var col = index % columns
@@ -1788,6 +1786,29 @@ function grantRandomInventoryReward(triggerText) {
 	var unlocked = unlockBlockByName(rewardBlock.name)
 	if (!unlocked) return false
 	showChallengeBanner('Objeto desbloqueado', rewardBlock.name + ' ' + triggerText + '.')
+	return true
+}
+
+function hasClaimedGameReward(gameId) {
+	if (!worldEdits || !Array.isArray(worldEdits._rewardedGames)) return false
+	return worldEdits._rewardedGames.indexOf(gameId) !== -1
+}
+
+function trackGameReward(gameId) {
+	if (!gameId) return
+	if (!worldEdits) worldEdits = {}
+	if (!Array.isArray(worldEdits._rewardedGames)) worldEdits._rewardedGames = []
+	if (worldEdits._rewardedGames.indexOf(gameId) === -1) {
+		worldEdits._rewardedGames.push(gameId)
+		scheduleSaveWorld()
+	}
+}
+
+function grantGameRewardOnce(gameId) {
+	if (!gameId || hasClaimedGameReward(gameId)) return false
+	var unlocked = grantRandomInventoryReward('por descubrir este minijuego')
+	if (!unlocked) return false
+	trackGameReward(gameId)
 	return true
 }
 
