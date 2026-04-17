@@ -1597,7 +1597,7 @@ function applyWorldSettings(settings) {
 		hotbarSlots = getDefaultHotbar()
 		selectedIndex = 0
 		creativeMode = false
-		classroom._open = true
+		classroom._open = false
 		return
 	}
 	if (Array.isArray(settings.hotbar)) {
@@ -1624,7 +1624,7 @@ function applyWorldSettings(settings) {
 
 function settingsClassroomOpen() {
 	if (typeof classroom._open === 'boolean') return classroom._open
-	return true
+	return false
 }
 
 function collectWorldSettings() {

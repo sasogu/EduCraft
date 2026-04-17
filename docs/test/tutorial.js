@@ -156,8 +156,7 @@ function setupTutorial(noa, ui, options) {
 	}
 
 	function maybeShowIntro() {
-		if (state.completed || state.dismissed) return
-		showIntro()
+		return
 	}
 
 	function onAction(action) {
