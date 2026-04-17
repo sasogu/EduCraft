@@ -1105,7 +1105,10 @@
     }
 
     #web-panel .panel {
-      width: min(86vw, 1100px);
+      width: min(94vw, 1440px);
+      height: min(90vh, 980px);
+      display: flex;
+      flex-direction: column;
       background: linear-gradient(150deg, rgba(12, 16, 26, 0.95), rgba(22, 26, 34, 0.9));
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 16px;
@@ -1115,7 +1118,8 @@
 
     #web-panel .frame {
       width: 100%;
-      aspect-ratio: 16 / 9;
+      flex: 1 1 auto;
+      min-height: 0;
       background: #000;
       border-radius: 12px;
       overflow: hidden;
@@ -1147,6 +1151,14 @@
     #web-close:hover {
       border-color: var(--ui-highlight);
       color: var(--ui-highlight);
+    }
+
+    @media (max-width: 900px) {
+      #web-panel .panel {
+        width: min(96vw, 960px);
+        height: min(92vh, 900px);
+        padding: 8px;
+      }
     }
 
   </style>
